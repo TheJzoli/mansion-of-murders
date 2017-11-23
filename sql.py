@@ -22,11 +22,19 @@ def run_query (query):
 ## PARSER FUNCTIONS
 def get_verbs():
 	query = "SELECT word FROM verbs;"
-	return run_query (query)
+	verbs = []
+	result = run_query(query)
+	for record in result:
+		verbs.append(record[0])
+	return verbs
 	
 def get_prepositions():
 	query = "SELECT word FROM prepositions;"
-	return run_query (query)
+	prepositions = []
+	result = run_query (query)
+	for record in result:
+		prepositions.append(record[0])
+	return prepositions
 	
 
 def get_adjacent_rooms (room_id):
