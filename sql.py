@@ -7,6 +7,11 @@ database = mysql.connector.connect(
 	passwd = 'dbpass',
 	db = 'mom_game',
 	buffered = True)
+print ("Connect to sql")
+
+def end ():
+	database.rollback()
+	database.close()
 
 ## SQL FUNCTIONS
 def run_query (query):
