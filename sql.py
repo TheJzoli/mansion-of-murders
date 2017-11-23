@@ -12,12 +12,22 @@ print ("Connect to sql")
 def end ():
 	database.rollback()
 	database.close()
-
+	
 ## SQL FUNCTIONS
 def run_query (query):
 	cursor = database.cursor()
 	cursor.execute (query)
 	return cursor.fetchall()
+
+## PARSER FUNCTIONS
+def get_verbs():
+	query = "SELECT word FROM verbs;"
+	return run_query (query)
+	
+def get_prepositions():
+	query = "SELECT word FROM prepositions;"
+	return run_query (query)
+	
 
 def get_adjacent_rooms (room_id):
 	#query = "SELECT name FROM room INNER JOIN passage WHERE from_id = {0};".format (room_id)
