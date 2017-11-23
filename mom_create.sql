@@ -1,0 +1,291 @@
+CREATE DATABASE IF NOT EXISTS MOM_GAME;
+USE MOM_GAME;
+
+DROP TABLE IF EXISTS PLAYER_CLUE;
+DROP TABLE IF EXISTS CLUE;
+DROP TABLE IF EXISTS MURDER;
+DROP TABLE IF EXISTS MAPPED_NPC;
+DROP TABLE IF EXISTS NPC_DETAIL;
+DROP TABLE IF EXISTS NPC;
+DROP TABLE IF EXISTS DETAIL;
+DROP TABLE IF EXISTS PASSAGE;
+DROP TABLE IF EXISTS ROOM;
+DROP TABLE IF EXISTS DIRECTION;
+
+CREATE TABLE DIRECTION (
+	direction_id	VARCHAR (10) NOT NULL,
+	name			VARCHAR (40) NOT NULL,
+	
+	PRIMARY KEY (direction_id)
+);
+
+CREATE TABLE ROOM (
+	room_id		INT NOT NULL,
+	name		VARCHAR (40) NOT NULL,
+	description	TEXT, 
+	
+	PRIMARY KEY (room_id)
+);
+
+CREATE TABLE PASSAGE (
+	from_id 	INT NOT NULL,
+	to_id 		INT NOT NULL,
+	direction 	VARCHAR (10) NOT NULL,
+	
+	PRIMARY KEY (from_id, to_id),
+	
+	FOREIGN KEY (from_id) 	REFERENCES ROOM(room_id),
+	FOREIGN KEY (to_id) 	REFERENCES ROOM(room_id)
+);
+
+CREATE TABLE DETAIL (
+	detail_id 	INT NOT NULL,
+	name 		VARCHAR (40) NOT NULL,
+	description TEXT,
+
+	PRIMARY KEY (detail_id)
+);
+
+CREATE TABLE NPC (
+	npc_id 		INT NOT NULL,
+	first_name 	VARCHAR (40) NOT NULL,
+	last_name 	VARCHAR (40) NOT NULL,
+	description	TEXT,
+
+	map_group	ENUM ('A', 'B') NOT NULL,
+	sub_group	INT NOT NULL,
+	
+	PRIMARY KEY (npc_id)
+);
+CREATE UNIQUE INDEX MOM_GAME ON NPC (first_name, last_name);
+
+CREATE TABLE NPC_DETAIL (
+	npc 	INT NOT NULL,
+	detail 	INT NOT NULL,
+	
+	PRIMARY KEY (npc, detail),
+	
+	FOREIGN KEY (npc) 		REFERENCES NPC(npc_id),
+	FOREIGN KEY (detail) 	REFERENCES DETAIL (detail_id)
+);
+
+/*
+There will be a intricate set of rules as how to map NPC table to MAPPED NPC.
+This will be handled in Python.
+*/
+
+CREATE TABLE MAPPED_NPC (
+	mapped_id	INT NOT NULL,
+	npc 		INT NOT NULL,
+	location	INT NOT NULL,
+	state 		ENUM (
+					'not murderer',
+					'murdering',
+					'arrested',
+					'escaped'
+				) NOT NULL,
+	
+	PRIMARY KEY (mapped_id),
+	
+	FOREIGN KEY (npc)		REFERENCES NPC (npc_id),
+	FOREIGN KEY (location)	REFERENCES ROOM (room_id)
+);
+CREATE UNIQUE INDEX MOM_GAME ON MAPPED_NPC (npc);
+
+CREATE TABLE MURDER (
+	victim 		INT NOT NULL,
+	murderer 	INT NOT NULL,
+	solved		BOOLEAN NOT NULL,
+
+	PRIMARY KEY (victim),
+	
+	FOREIGN KEY (victim) 	REFERENCES MAPPED_NPC (mapped_id),
+	FOREIGN KEY (murderer) 	REFERENCES MAPPED_NPC (mapped_id)
+);
+
+CREATE TABLE CLUE (
+	clue_id 	INT NOT NULL AUTO_INCREMENT,
+	victim 		INT NOT NULL,
+	witness		INT NOT NULL,
+	detail 		INT NOT NULL,
+
+	PRIMARY KEY (clue_id),
+	
+	FOREIGN KEY (victim) 	REFERENCES MURDER (victim),
+	FOREIGN KEY (witness) 	REFERENCES MAPPED_NPC (mapped_id),
+	FOREIGN KEY (detail) 	REFERENCES DETAIL (detail_id)
+
+);
+CREATE UNIQUE INDEX MOM_GAME ON CLUE (victim, witness, 	detail);
+
+CREATE TABLE PLAYER_CLUE (
+	victim INT NOT NULL,
+	detail INT NOT NULL,
+
+	PRIMARY KEY (victim, detail),
+
+	FOREIGN KEY (victim) REFERENCES MURDER (victim),
+	FOREIGN KEY (detail) REFERENCES DETAIL (detail_id)
+);
+
+INSERT INTO DIRECTION VALUES ('n', 'north');
+INSERT INTO DIRECTION VALUES ('ne', 'northeast');
+INSERT INTO DIRECTION VALUES ('e', 'east');
+INSERT INTO DIRECTION VALUES ('se', 'southeast');
+INSERT INTO DIRECTION VALUES ('s', 'south');
+INSERT INTO DIRECTION VALUES ('sw', 'southwest');
+INSERT INTO DIRECTION VALUES ('w', 'west');
+INSERT INTO DIRECTION VALUES ('nw', 'northwest');
+INSERT INTO DIRECTION VALUES ('up', 'upstairs');
+INSERT INTO DIRECTION VALUES ('down', 'downstairs');
+/*
+ALTER TABLE DIRECTION ADD opposite VARCHAR (10) NOT NULL;
+
+UPDATE DIRECTION SET opposite = 's' WHERE direction_id = 'n';
+UPDATE DIRECTION SET opposite = 'n' WHERE direction_id = 's';
+UPDATE DIRECTION SET opposite = 'w' WHERE direction_id = 'e';
+UPDATE DIRECTION SET opposite = 'e' WHERE direction_id = 'w';
+UPDATE DIRECTION SET opposite = 'sw' WHERE direction_id = 'ne';
+UPDATE DIRECTION SET opposite = 'ne' WHERE direction_id = 'sw';
+UPDATE DIRECTION SET opposite = 'se' WHERE direction_id = 'nw';
+UPDATE DIRECTION SET opposite = 'nw' WHERE direction_id = 'se';
+UPDATE DIRECTION SET opposite = 'up' WHERE direction_id = 'down';
+UPDATE DIRECTION SET opposite = 'down' WHERE direction_id = 'up';
+*/
+
+INSERT INTO ROOM VALUES (1, 'front yard', NULL);
+INSERT INTO ROOM VALUES (2, 'entrance', NULL);
+INSERT INTO ROOM VALUES (3, 'social', NULL);
+INSERT INTO ROOM VALUES (4, 'hall', NULL);
+
+-- Front Yard
+INSERT INTO PASSAGE VALUES (1, 2, 'n');
+-- Entrance
+INSERT INTO PASSAGE VALUES (2, 1, 'w');
+INSERT INTO PASSAGE VALUES (2, 3, 'e');
+INSERT INTO PASSAGE VALUES (2, 4, 'w');
+
+/*
+Get room names and directions:
+SELECT F.name, T.name, D.name
+FROM PASSAGE 
+	INNER JOIN ROOM AS F
+		ON F.room_id = PASSAGE.from_id
+	
+	INNER JOIN ROOM AS T
+		ON T.room_id = PASSAGE.to_id
+	
+	INNER JOIN DIRECTION AS D
+		ON D.direction_id = PASSAGE.direction;
+*/
+
+INSERT INTO DETAIL VALUES (1, 'pocket watch', NULL);
+INSERT INTO DETAIL VALUES (2, 'red scarf', NULL);
+INSERT INTO DETAIL VALUES (3, 'duck-headed cane', NULL);
+INSERT INTO DETAIL VALUES (4, 'flower of clove', NULL);
+INSERT INTO DETAIL VALUES (5, 'hat with feathers', NULL);
+INSERT INTO DETAIL VALUES (6, 'thick moustache', NULL);
+INSERT INTO DETAIL VALUES (7, 'some sauce on their clothes', NULL);
+INSERT INTO DETAIL VALUES (8, 'pearl necklace', NULL);
+INSERT INTO DETAIL VALUES (9, 'lace collar', null);
+INSERT INTO DETAIL VALUES (10, 'flashy earrings', null);
+INSERT INTO DETAIL VALUES (11, 'pompous cravat', NULL);
+INSERT INTO DETAIL VALUES (12, 'extravagant monocle', NULL);
+INSERT INTO DETAIL VALUES (13, 'bulging manhood', NULL);
+INSERT INTO DETAIL VALUES (14, 'wine glass in pocket', null);
+
+INSERT INTO NPC VALUES (1, "Snorkeldink", "Crumplehorn", NULL, 'A', 1);
+INSERT INTO NPC VALUES (2, "Brewery", "Chickenbroth", NULL, 'A', 1);
+INSERT INTO NPC VALUES (3, "Rinkydink", "Chuckecheese", NULL, 'A', 2);
+INSERT INTO NPC VALUES (4, "Brandenburg", "Creamsicle", NULL, 'A', 2);
+INSERT INTO NPC VALUES (5, "Benadryl", "Moldyspore", NULL, 'B', 1);
+INSERT INTO NPC VALUES (6, "Bumberstump", "Cumbercooch", NULL,'B', 1);
+INSERT INTO NPC VALUES (7, "Benetton", "Camouflage", NULL, 'B', 2);
+INSERT INTO NPC VALUES (8, "Bentobox", "Cottagecheese", NULL, 'B', 2);
+
+INSERT INTO NPC_DETAIL VALUES (1, 1);
+INSERT INTO NPC_DETAIL VALUES (1, 4);
+INSERT INTO NPC_DETAIL VALUES (1, 5);
+INSERT INTO NPC_DETAIL VALUES (1, 9);
+INSERT INTO NPC_DETAIL VALUES (1, 10);
+INSERT INTO NPC_DETAIL VALUES (2, 3);
+INSERT INTO NPC_DETAIL VALUES (2, 5);
+INSERT INTO NPC_DETAIL VALUES (2, 6);
+INSERT INTO NPC_DETAIL VALUES (2, 8);
+INSERT INTO NPC_DETAIL VALUES (2, 10);
+INSERT INTO NPC_DETAIL VALUES (3, 2);
+INSERT INTO NPC_DETAIL VALUES (3, 3);
+INSERT INTO NPC_DETAIL VALUES (3, 4);
+INSERT INTO NPC_DETAIL VALUES (3, 7);
+INSERT INTO NPC_DETAIL VALUES (3, 10);
+INSERT INTO NPC_DETAIL VALUES (4, 1);
+INSERT INTO NPC_DETAIL VALUES (4, 4);
+INSERT INTO NPC_DETAIL VALUES (4, 5);
+INSERT INTO NPC_DETAIL VALUES (4, 7);
+INSERT INTO NPC_DETAIL VALUES (4, 9);
+INSERT INTO NPC_DETAIL VALUES (5, 1);
+INSERT INTO NPC_DETAIL VALUES (5, 3);
+INSERT INTO NPC_DETAIL VALUES (5, 4);
+INSERT INTO NPC_DETAIL VALUES (5, 6);
+INSERT INTO NPC_DETAIL VALUES (5, 7);
+INSERT INTO NPC_DETAIL VALUES (6, 2);
+INSERT INTO NPC_DETAIL VALUES (6, 3);
+INSERT INTO NPC_DETAIL VALUES (6, 4);
+INSERT INTO NPC_DETAIL VALUES (6, 8);
+INSERT INTO NPC_DETAIL VALUES (6, 10);
+INSERT INTO NPC_DETAIL VALUES (7, 3);
+INSERT INTO NPC_DETAIL VALUES (7, 5);
+INSERT INTO NPC_DETAIL VALUES (7, 6);
+INSERT INTO NPC_DETAIL VALUES (7, 7);
+INSERT INTO NPC_DETAIL VALUES (7, 9);
+INSERT INTO NPC_DETAIL VALUES (8, 4);
+INSERT INTO NPC_DETAIL VALUES (8, 5);
+INSERT INTO NPC_DETAIL VALUES (8, 6);
+INSERT INTO NPC_DETAIL VALUES (8, 9);
+INSERT INTO NPC_DETAIL VALUES (8, 10);
+
+INSERT INTO MAPPED_NPC VALUES (1, 7, 1, 'not murderer');
+INSERT INTO MAPPED_NPC VALUES (2, 6, 1, 'murdering');
+INSERT INTO MAPPED_NPC VALUES (3, 4, 1, 'not murderer');
+INSERT INTO MAPPED_NPC VALUES (4, 5, 1, 'murdering');
+INSERT INTO MAPPED_NPC VALUES (5, 2, 1, 'not murderer');
+INSERT INTO MAPPED_NPC VALUES (6, 3, 1, 'arrested');
+INSERT INTO MAPPED_NPC VALUES (7, 1, 1, 'escaped');
+INSERT INTO MAPPED_NPC VALUES (8, 8, 1, 'not murderer');
+
+INSERT INTO MURDER VALUES (3, 4, False);
+INSERT INTO MURDER VALUES (8, 4, False);
+INSERT INTO MURDER VALUES (7, 5, True);
+
+INSERT INTO CLUE VALUES (null, 3, 1, 1);
+INSERT INTO CLUE VALUES (null, 3, 5, 2);
+INSERT INTO CLUE VALUES (null, 3, 2, 3);
+INSERT INTO CLUE VALUES (null, 8, 1, 5);
+INSERT INTO CLUE VALUES (null, 8, 7, 4);
+
+
+/*
+Clues that person W(itness) knows about killer of V(ictim)
+SELECT DETAIL.name
+FROM CLUE
+	
+	INNER JOIN MAPPED_NPC as M_W
+		ON M_W.mapped_id = CLUE.witness
+		INNER JOIN NPC as W
+			ON W.npc_id = M_W.npc
+	
+	INNER JOIN MURDER
+		ON MURDER.murder_id = CLUE.murder
+		INNER JOIN MAPPED_NPC as M_V
+			ON M_V.mapped_id = MURDER.victim
+			INNER JOIN NPC as V
+				ON V.npc_id = M_V.npc
+
+	INNER JOIN DETAIL
+		ON DETAIL.detail_id = CLUE.detail
+
+WHERE
+	V.last_name = "[Victims last name]" AND
+	W.last_name = "[Witness' last name]";
+	
+*/
