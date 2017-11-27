@@ -19,6 +19,6 @@ def move(target):
 			message = 'Moved to {0}'.format(target)
 		else:
 			message = "You can't move there!"
-	if target in directions:
+
 		
 	return message

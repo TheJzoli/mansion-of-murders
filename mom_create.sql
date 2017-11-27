@@ -276,14 +276,6 @@ WHERE
 */
 
 -- parser section
-/*
-DROP TABLE IF EXISTS ACTIONS;
-DROP TABLE IF EXISTS OBJECTS;
-DROP TABLE IF EXISTS PREPOSITIONS;
-DROP TABLE IF EXISTS VERB_SYNONYMS;
-DROP TABLE IF EXISTS VERB;
-*/
-
 CREATE TABLE VERB (
 	id INT NOT NULL,
 	verb VARCHAR(100),
@@ -304,16 +296,17 @@ CREATE TABLE PREPOSITIONS (
 
 CREATE TABLE ACTIONS (
 	id INT NOT NULL,
-	verb VARCHAR(40) NOT NULL,
-	preposition VARCHAR(10),
+	verb VARCHAR(100) NOT NULL,
+	preposition VARCHAR(100),
 	has_target BOOLEAN NOT NULL,
 	FOREIGN KEY (verb) REFERENCES VERB_SYNONYMS(word),
 	FOREIGN KEY (preposition) REFERENCES PREPOSITIONS(word)
 );
 
-
-
-
+CREATE TABLE synonyms (
+	word VARCHAR (100) NOT NULL,
+	main_word VARCHAR (100) NOT NULL
+);
 
 INSERT INTO VERB VALUES (0, 'look');
 INSERT INTO VERB VALUES (1, 'move');
@@ -355,7 +348,6 @@ INSERT INTO VERB_SYNONYMS VALUES ('prosecute', 3);
 INSERT INTO VERB_SYNONYMS VALUES ('indict', 3);
 INSERT INTO VERB_SYNONYMS VALUES ('arraign', 3);
 
-
 INSERT INTO PREPOSITIONS VALUES ('to');
 INSERT INTO PREPOSITIONS VALUES ('at');
 INSERT INTO PREPOSITIONS VALUES ('about');
@@ -385,4 +377,17 @@ INSERT INTO ACTIONS VALUES (11, 'move', NULL, True);
 INSERT INTO ACTIONS VALUES (20, 'look', 'at', True);
 INSERT INTO ACTIONS VALUES (21, 'look', 'around', False);
 INSERT INTO ACTIONS VALUES (30, 'ask', 'about', True);
+INSERT INTO ACTIONS VALUES (40, 'blame', 'for killing', True);
 
+INSERT INTO synonyms VALUES ('eye', 'look');
+INSERT INTO synonyms VALUES ('glance', 'look');
+INSERT INTO synonyms VALUES ('glimpse', 'look');
+INSERT INTO synonyms VALUES ('peek', 'look');
+INSERT INTO synonyms VALUES ('view', 'look');
+INSERT INTO synonyms VALUES ('gander', 'look');
+INSERT INTO synonyms VALUES ('gaze', 'look');
+INSERT INTO synonyms VALUES ('inspect', 'look');
+INSERT INTO synonyms VALUES ('leer', 'look');
+INSERT INTO synonyms VALUES ('observe', 'look');
+INSERT INTO synonyms VALUES ('watch', 'look');
+INSERT INTO synonyms VALUES ('examine', 'look');

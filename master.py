@@ -53,22 +53,40 @@ move.current_room = 1
 playing = True
 while (playing):
 
-	# Take input
-	command = input (">>").lower().split()
-	'''
-	range = len(command) - 2
-	i = 0
-	while i < range:
-		parts = sql.get_two_part_words(command[i])
-		if command [i + 1] in parts:
-			command[i] += " " + command[i+1]
-			del command[i+1]
-			range -= 1
-		else:
-			i + 1
+	# Receive and process input
+	# Get input, lower and split it
+	# Look for two part words
+	# Look for synonyms, and swap
+	raw_command = input (">>").lower().split()
+	command = []
+	word_range = len(raw_command)
+	index = 0
+	while index < word_range:
+		word = raw_command[index]
 		
+		if index < word_range - 1:
+			next = raw_command [index + 1]
+			
+			parts = sql.get_two_part_words(word)
+			if parts != None and next in parts:
+				command_word = "{0} {1}".format(word, next)
+				index += 1
+			
+			else:
+				command_word = word
+		
+		else:
+			command_word = word
+		
+		# Check for synonyms
+		command_word = sql.get_word_from_synonym(command_word)
+		
+		command.append (command_word)
+		index += 1
+	# End of command process loop
+	
 	print(command)
-	'''
+	
 	
 	# Parse input
 	verb = None
@@ -77,24 +95,29 @@ while (playing):
 	target2 = None
 	
 	for word in command:
-	
+		
 		if verb == None:
 			if word in verbs:
 				verb = word
-			
-			# Direction only is enough too
+				
 			elif word in directions:
 				target1 = word
-			
-		elif target1 == None:
 		
-			if word in targets:
+		elif preposition == None:
+			
+			if word in targets and target1 == None:
 				target1 = word
-			
-			elif preposition == None and word in prepositions:
+				
+			elif word in prepositions:
 				preposition = word
-		
-	
+				
+		elif target2 == None:
+			
+			if word in targets:
+				target2 = word
+				DEBUG("target2: " + word)
+				
+				
 	# Check if player entered only direction
 	if target1 in long_directions:
 		target1 = sql.short_direction(target1)
@@ -142,42 +165,13 @@ while (playing):
 	else:
 		fprint("There was no verb, what do you want to do?")
 			
-	DEBUG ("{0} {1} {2}".format(verb, preposition, target1))
+	DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
 
 	# Update location
 	look.current_room = move.current_room
 ## END GAME LOOP	
 	
 sql.end()
-
-
-
-
-
-
-'''
-
-### move
-def move(place, item, person):
-
-input = "Move Jack to Mountain"
-
-place = "Mountain"
-item = None
-person = "Jack"
-
-verb = "move"
-
-
-sql_result = do_sql_stuff(verb)
-
-#result = "move"
-
-method = getattr(self, verb)
-
-method (target1, target2, target3)
-
-'''
 
 
 

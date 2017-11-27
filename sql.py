@@ -41,14 +41,21 @@ def query_single (query):
 	
 
 ## PARSER FUNCTIONS
-def get_two_part_word (word):
-	query = "SELECT word_2 FROM two_part_words WHERE word_1 = '{0}'".format(word)
+def get_two_part_words (word):
+	query = "SELECT word_2 FROM two_part_words WHERE word_1 = '{0}';".format(word)
 	result = run_query (query)
 	if result:
 		return column_as_list (result, 0)
 	else:
 		return None
 
+def get_word_from_synonym (word):
+	query = "SELECT main_word FROM synonyms WHERE word = '{0}';".format(word)
+	result = query_single (query)
+	if result == None:
+		result = word
+	return result
+		
 def get_verbs():
 	query = "SELECT word FROM verb_synonyms;"
 	result = run_query(query)
