@@ -3,3 +3,8 @@ ACTIONS:
 	1X: Move
 	2X: Look
 	3X: Ask
+
+OPENING URLs
+	import webbrowser
+	webbrowser.open_new('google.com')
+>>>>>>> 44b72b7b92fc4ff2743de83871bfbf43b28c994d
