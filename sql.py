@@ -75,7 +75,11 @@ def short_direction(long_direction):
 	return run_query(query)[0][0]
 	
 ## MOVE FUNCTIONS
-
+def get_room_id (target):
+	query = "SELECT room_id FROM room WHERE name = " + target + ";"
+	return query_single(query)
+	
+def 
 ## LOOK FUNCTIONS
 
 ## ASK FUNCTIONS
