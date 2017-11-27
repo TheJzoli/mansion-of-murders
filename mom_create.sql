@@ -1,16 +1,9 @@
-CREATE DATABASE IF NOT EXISTS MOM_GAME;
+DROP DATABASE IF EXISTS MOM_GAME;
+CREATE DATABASE MOM_GAME;
 USE MOM_GAME;
 
-DROP TABLE IF EXISTS PLAYER_CLUE;
-DROP TABLE IF EXISTS CLUE;
-DROP TABLE IF EXISTS MURDER;
-DROP TABLE IF EXISTS MAPPED_NPC;
-DROP TABLE IF EXISTS NPC_DETAIL;
-DROP TABLE IF EXISTS NPC;
-DROP TABLE IF EXISTS DETAIL;
-DROP TABLE IF EXISTS PASSAGE;
-DROP TABLE IF EXISTS ROOM;
-DROP TABLE IF EXISTS DIRECTION;
+CREATE TABLE ERROR (message TEXT NOT NULL);
+INSERT INTO ERROR VALUES ("Default message");
 
 CREATE TABLE DIRECTION (
 	direction_id	VARCHAR (10) NOT NULL,
@@ -136,24 +129,10 @@ INSERT INTO DIRECTION VALUES ('s', 'south');
 INSERT INTO DIRECTION VALUES ('sw', 'southwest');
 INSERT INTO DIRECTION VALUES ('w', 'west');
 INSERT INTO DIRECTION VALUES ('nw', 'northwest');
-INSERT INTO DIRECTION VALUES ('up', 'upstairs');
-INSERT INTO DIRECTION VALUES ('down', 'downstairs');
-/*
-ALTER TABLE DIRECTION ADD opposite VARCHAR (10) NOT NULL;
+INSERT INTO DIRECTION VALUES ('u', 'up');
+INSERT INTO DIRECTION VALUES ('d', 'down');
 
-UPDATE DIRECTION SET opposite = 's' WHERE direction_id = 'n';
-UPDATE DIRECTION SET opposite = 'n' WHERE direction_id = 's';
-UPDATE DIRECTION SET opposite = 'w' WHERE direction_id = 'e';
-UPDATE DIRECTION SET opposite = 'e' WHERE direction_id = 'w';
-UPDATE DIRECTION SET opposite = 'sw' WHERE direction_id = 'ne';
-UPDATE DIRECTION SET opposite = 'ne' WHERE direction_id = 'sw';
-UPDATE DIRECTION SET opposite = 'se' WHERE direction_id = 'nw';
-UPDATE DIRECTION SET opposite = 'nw' WHERE direction_id = 'se';
-UPDATE DIRECTION SET opposite = 'up' WHERE direction_id = 'down';
-UPDATE DIRECTION SET opposite = 'down' WHERE direction_id = 'up';
-*/
-
-INSERT INTO ROOM VALUES (1, 'front yard', NULL);
+INSERT INTO ROOM VALUES (1, 'front-yard', NULL);
 INSERT INTO ROOM VALUES (2, 'entrance', NULL);
 INSERT INTO ROOM VALUES (3, 'social', NULL);
 INSERT INTO ROOM VALUES (4, 'hall', NULL);
@@ -194,14 +173,14 @@ INSERT INTO DETAIL VALUES (12, 'extravagant monocle', NULL);
 INSERT INTO DETAIL VALUES (13, 'bulging manhood', NULL);
 INSERT INTO DETAIL VALUES (14, 'wine glass in pocket', null);
 
-INSERT INTO NPC VALUES (1, "Snorkeldink", "Crumplehorn", NULL, 'A', 1);
-INSERT INTO NPC VALUES (2, "Brewery", "Chickenbroth", NULL, 'A', 1);
-INSERT INTO NPC VALUES (3, "Rinkydink", "Chuckecheese", NULL, 'A', 2);
-INSERT INTO NPC VALUES (4, "Brandenburg", "Creamsicle", NULL, 'A', 2);
-INSERT INTO NPC VALUES (5, "Benadryl", "Moldyspore", NULL, 'B', 1);
-INSERT INTO NPC VALUES (6, "Bumberstump", "Cumbercooch", NULL,'B', 1);
-INSERT INTO NPC VALUES (7, "Benetton", "Camouflage", NULL, 'B', 2);
-INSERT INTO NPC VALUES (8, "Bentobox", "Cottagecheese", NULL, 'B', 2);
+INSERT INTO NPC VALUES (1, "snorkeldink", "crumplehorn", NULL, 'A', 1);
+INSERT INTO NPC VALUES (2, "brewery", "chickenbroth", NULL, 'A', 1);
+INSERT INTO NPC VALUES (3, "rinkydink", "chuckecheese", NULL, 'A', 2);
+INSERT INTO NPC VALUES (4, "brandenburg", "creamsicle", NULL, 'A', 2);
+INSERT INTO NPC VALUES (5, "benadryl", "moldyspore", NULL, 'B', 1);
+INSERT INTO NPC VALUES (6, "bumberstump", "cumbercooch", NULL,'B', 1);
+INSERT INTO NPC VALUES (7, "benetton", "camouflage", NULL, 'B', 2);
+INSERT INTO NPC VALUES (8, "bentobox", "cottagecheese", NULL, 'B', 2);
 
 INSERT INTO NPC_DETAIL VALUES (1, 1);
 INSERT INTO NPC_DETAIL VALUES (1, 4);
@@ -316,20 +295,14 @@ CREATE TABLE PREPOSITIONS (
 	PRIMARY KEY (word)
 );
 
-CREATE TABLE OBJECTS (
-	word VARCHAR(40) NOT NULL,
-	PRIMARY KEY (word)
-);
-
 CREATE TABLE ACTIONS (
 	id INT NOT NULL,
 	verb VARCHAR(40) NOT NULL,
 	preposition VARCHAR(10),
-	objects VARCHAR(40),
+	has_target BOOLEAN NOT NULL,
 	PRIMARY KEY (id),
 	FOREIGN KEY (verb) REFERENCES VERBS(word),
-	FOREIGN KEY (preposition) REFERENCES PREPOSITIONS(word),
-	FOREIGN KEY (objects) REFERENCES OBJECTS(word)
+	FOREIGN KEY (preposition) REFERENCES PREPOSITIONS(word)
 );
 
 
@@ -388,7 +361,7 @@ INSERT INTO PREPOSITIONS VALUES ('within');
 INSERT INTO PREPOSITIONS VALUES ('without');
 INSERT INTO PREPOSITIONS VALUES ('around');
 
-INSERT INTO ACTIONS VALUES (0, 'move', 'to', NULL);
-INSERT INTO ACTIONS VALUES (3, 'move', NULL, NULL);
-INSERT INTO ACTIONS VALUES (1, 'look', 'at', NULL);
-INSERT INTO ACTIONS VALUES (2, 'look', 'around', NULL);
+INSERT INTO ACTIONS VALUES (10, 'move', 'to', True);
+INSERT INTO ACTIONS VALUES (11, 'move', NULL, True);
+INSERT INTO ACTIONS VALUES (20, 'look', 'at', True);
+INSERT INTO ACTIONS VALUES (21, 'look', 'around', False);

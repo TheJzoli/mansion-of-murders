@@ -1,5 +1,10 @@
 import mysql.connector
 
+def DEBUG(message):
+	print("SQL DEBUG: " + str(message));
+
+default = "SELECT message FROM error;"
+
 ## DATABASE
 database = mysql.connector.connect(
 	host = 'localhost',
@@ -7,45 +12,75 @@ database = mysql.connector.connect(
 	passwd = 'dbpass',
 	db = 'mom_game',
 	buffered = True)
-print ("Connect to sql")
+DEBUG ("Connect to sql")
 
+# Close and reset database
 def end ():
 	database.rollback()
 	database.close()
+
+# Return single column from sql table as array	
+def column_as_array (table, column_id):
+	column = [] 
+	for row in table:
+		column.append(row[column_id])
+	return column
 	
 ## SQL FUNCTIONS
 def run_query (query):
 	cursor = database.cursor()
 	cursor.execute (query)
 	return cursor.fetchall()
+	
+def query_single (query):
+	result = run_query(query)
+	if result:
+		return result [0][0]
+	else:
+		return None
+	
 
 ## PARSER FUNCTIONS
 def get_verbs():
 	query = "SELECT word FROM verbs;"
-	verbs = []
 	result = run_query(query)
-	for record in result:
-		verbs.append(record[0])
-	return verbs
-	
+	return column_as_array (result, 0)
+
 def get_prepositions():
 	query = "SELECT word FROM prepositions;"
-	prepositions = []
 	result = run_query (query)
-	for record in result:
-		prepositions.append(record[0])
-	return prepositions
-	
+	return column_as_array (result, 0)
 
-def get_adjacent_rooms (room_id):
-	#query = "SELECT name FROM room INNER JOIN passage WHERE from_id = {0};".format (room_id)
-	query = "SELECT to_id FROM passage WHERE from_id = {0};".format(room_id)
-	return run_query(query)[0]
+def get_rooms ():
+	query = "SELECT name FROM room;"
+	result = run_query (query)
+	return column_as_array (result, 0)
 	
-def get_room_id (room_name):
-	query = "SELECT room_id FROM room WHERE name = '{0}';".format(room_name)
+def get_npcs ():
+	query = "SELECT first_name, last_name FROM npc;"
+	result = run_query (query);
+	return [column_as_array(result, 0), column_as_array (result, 1)]
+	
+def get_directions ():
+	query = "SELECT direction_id, name FROM direction;"
+	result = run_query (query)
+	return [column_as_array(result, 0), column_as_array (result, 1)]
+
+def long_direction (short_direction):
+	query = "SELECT name FROM direction WHERE direction_id = '{0}';".format(short_direction)
 	return run_query(query)[0][0]
 
-def get_room_name (room_id):
-	query = "SELECT name FROM room WHERE room_id = {0};".format(room_id)
+def short_direction(long_direction):
+	query = "SELECT direction_id FROM direction WHERE name = '{0}';".format(long_direction)
 	return run_query(query)[0][0]
+	
+## MOVE FUNCTIONS
+
+## LOOK FUNCTIONS
+
+## ASK FUNCTIONS
+	
+	
+	
+	
+	

@@ -1,0 +1,4 @@
+ACTIONS:
+	tens in id tells group
+	10s: Move
+	20s: Look
