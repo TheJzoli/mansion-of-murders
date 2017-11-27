@@ -41,6 +41,14 @@ def query_single (query):
 	
 
 ## PARSER FUNCTIONS
+def get_two_part_word (word):
+	query = "SELECT word_2 FROM two_part_words WHERE word_1 = '{0}'".format(word)
+	result = run_query (query)
+	if result:
+		return column_as_list (result, 0)
+	else:
+		return None
+
 def get_verbs():
 	query = "SELECT word FROM verb_synonyms;"
 	result = run_query(query)
@@ -55,7 +63,8 @@ def get_rooms ():
 	query = "SELECT name FROM room;"
 	result = run_query (query)
 	return column_as_list (result, 0)
-	
+
+# [0] is first name, [1] is last name
 def get_npcs ():
 	query = "SELECT first_name, last_name FROM npc;"
 	result = run_query (query);
@@ -81,8 +90,8 @@ def short_direction(long_direction):
 def get_room_id (target):
 	query = "SELECT room_id FROM room WHERE name = " + target + ";"
 	return query_single(query)
-	
-def 
+
+
 ## LOOK FUNCTIONS
 
 ## ASK FUNCTIONS

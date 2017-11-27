@@ -55,7 +55,21 @@ while (playing):
 
 	# Take input
 	command = input (">>").lower().split()
-
+	'''
+	range = len(command) - 2
+	i = 0
+	while i < range:
+		parts = sql.get_two_part_words(command[i])
+		if command [i + 1] in parts:
+			command[i] += " " + command[i+1]
+			del command[i+1]
+			range -= 1
+		else:
+			i + 1
+		
+	print(command)
+	'''
+	
 	# Parse input
 	verb = None
 	target1 = None
@@ -82,10 +96,10 @@ while (playing):
 		
 	
 	# Check if player entered only direction
-	if target in long_directions:
+	if target1 in long_directions:
 		target = sql.short_direction(target)
 	
-	if verb == None and target in directions:
+	if verb == None and target1 in directions:
 		verb = 'move'
 		
 	# Build SQL-query from parsed commands
@@ -100,7 +114,7 @@ while (playing):
 			query += " and preposition IS NULL"
 		
 		# target -------------------------------------------------------
-		if target:
+		if target1:
 			has_target = True
 		else:
 			has_target = False
@@ -118,17 +132,17 @@ while (playing):
 			sub = action - super
 			
 			if super == 1:
-				fprint(move.move(target))
+				fprint(move.move(target1))
 				
 			if super == 2:
-				fprint(look.look(target))
+				fprint(look.look(target1))
 		
 		
 		
 	else:
 		fprint("There was no verb, what do you want to do?")
 			
-	DEBUG ("{0} {1} {2}".format(verb, preposition, target))
+	DEBUG ("{0} {1} {2}".format(verb, preposition, target1))
 
 	# Update location
 	look.current_room = move.current_room
