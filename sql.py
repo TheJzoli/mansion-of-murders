@@ -88,7 +88,7 @@ def short_direction(long_direction):
 	
 ## MOVE FUNCTIONS
 def get_room_id (target):
-	query = "SELECT room_id FROM room WHERE name = " + target + ";"
+	query = "SELECT room_id FROM room WHERE name = '" + target + "';"
 	return query_single(query)
 
 

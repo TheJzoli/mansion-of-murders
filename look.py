@@ -11,3 +11,4 @@ def look (target):
 		return "You look at {0}".format (target)
 	else:
 		return "You look around"
+		

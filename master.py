@@ -88,7 +88,7 @@ while (playing):
 			
 		elif target1 == None:
 		
-			if word in targets and preposition == None:
+			if word in targets:
 				target1 = word
 			
 			elif preposition == None and word in prepositions:
@@ -97,7 +97,7 @@ while (playing):
 	
 	# Check if player entered only direction
 	if target1 in long_directions:
-		target = sql.short_direction(target)
+		target1 = sql.short_direction(target1)
 	
 	if verb == None and target1 in directions:
 		verb = 'move'
