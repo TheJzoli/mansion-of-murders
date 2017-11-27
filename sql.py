@@ -20,7 +20,7 @@ def end ():
 	database.close()
 
 # Return single column from sql table as array	
-def column_as_array (table, column_id):
+def column_as_list (table, column_id):
 	column = [] 
 	for row in table:
 		column.append(row[column_id])
@@ -42,30 +42,33 @@ def query_single (query):
 
 ## PARSER FUNCTIONS
 def get_verbs():
-	query = "SELECT word FROM verbs;"
+	query = "SELECT word FROM verb_synonyms;"
 	result = run_query(query)
-	return column_as_array (result, 0)
+	return column_as_list (result, 0)
 
 def get_prepositions():
 	query = "SELECT word FROM prepositions;"
 	result = run_query (query)
-	return column_as_array (result, 0)
+	return column_as_list (result, 0)
 
 def get_rooms ():
 	query = "SELECT name FROM room;"
 	result = run_query (query)
-	return column_as_array (result, 0)
+	return column_as_list (result, 0)
 	
 def get_npcs ():
 	query = "SELECT first_name, last_name FROM npc;"
 	result = run_query (query);
-	return [column_as_array(result, 0), column_as_array (result, 1)]
+	return [column_as_list(result, 0), column_as_list (result, 1)]
 	
+# [0] are short cuts and [1] are full names
 def get_directions ():
 	query = "SELECT direction_id, name FROM direction;"
 	result = run_query (query)
-	return [column_as_array(result, 0), column_as_array (result, 1)]
+	return [column_as_list(result, 0), column_as_list (result, 1)]
 
+	
+## CONVERSIONS
 def long_direction (short_direction):
 	query = "SELECT name FROM direction WHERE direction_id = '{0}';".format(short_direction)
 	return run_query(query)[0][0]

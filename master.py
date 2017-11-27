@@ -19,9 +19,9 @@ prepositions = sql.get_prepositions()
 rooms = sql.get_rooms()
 
 # sql.get_npcs returns a list where [0] is first names and [1] is last names
-npcs = sql.get_npcs()
-first_names = npcs [0]
-last_names = npcs [1]
+sql_npcs = sql.get_npcs()
+first_names = sql_npcs [0]
+last_names = sql_npcs [1]
 npcs = first_names + last_names
 
 # sql.get_directions returns list, [0] is shortcut, [1] is full name
@@ -41,6 +41,13 @@ move.short_directions = short_directions
 move.long_directions = long_directions
 
 ## INITIALIZE LOOK
+import look
+look.npcs = npcs
+
+
+
+## INITIALIZE PLAYER
+move.current_room = 1
 
 ## GAME LOOP
 playing = True
@@ -51,8 +58,9 @@ while (playing):
 
 	# Parse input
 	verb = None
+	target1 = None
 	preposition = None
-	target = None
+	target2 = None
 	
 	for word in command:
 	
@@ -60,17 +68,18 @@ while (playing):
 			if word in verbs:
 				verb = word
 			
+			# Direction only is enough too
 			elif word in directions:
-				target = word
+				target1 = word
 			
-		elif target == None:
+		elif target1 == None:
 		
-			if word in targets:
-				target = word
+			if word in targets and preposition == None:
+				target1 = word
 			
 			elif preposition == None and word in prepositions:
 				preposition = word
-	
+		
 	
 	# Check if player entered only direction
 	if target in long_directions:
@@ -101,11 +110,65 @@ while (playing):
 		query += ";"
 		
 		action = sql.query_single(query)
+		DEBUG(query)
 		DEBUG("Action: " + str(action))
+		
+		if (action):
+			super = int(action / 10)
+			sub = action - super
+			
+			if super == 1:
+				fprint(move.move(target))
+				
+			if super == 2:
+				fprint(look.look(target))
+		
+		
 		
 	else:
 		fprint("There was no verb, what do you want to do?")
 			
 	DEBUG ("{0} {1} {2}".format(verb, preposition, target))
 
+	# Update location
+	look.current_room = move.current_room
+## END GAME LOOP	
+	
 sql.end()
+
+
+
+
+
+
+'''
+
+### move
+def move(place, item, person):
+
+input = "Move Jack to Mountain"
+
+place = "Mountain"
+item = None
+person = "Jack"
+
+verb = "move"
+
+
+sql_result = do_sql_stuff(verb)
+
+#result = "move"
+
+method = getattr(self, verb)
+
+method (target1, target2, target3)
+
+'''
+
+
+
+
+
+
+
+

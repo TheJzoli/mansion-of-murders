@@ -373,5 +373,5 @@ INSERT INTO ACTIONS VALUES (10, 'move', 'to', True);
 INSERT INTO ACTIONS VALUES (11, 'move', NULL, True);
 INSERT INTO ACTIONS VALUES (20, 'look', 'at', True);
 INSERT INTO ACTIONS VALUES (21, 'look', 'around', False);
+INSERT INTO ACTIONS VALUES (30, 'ask', 'about', True);
 
-/* 
