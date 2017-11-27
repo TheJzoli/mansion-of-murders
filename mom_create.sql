@@ -300,7 +300,6 @@ CREATE TABLE ACTIONS (
 	verb VARCHAR(40) NOT NULL,
 	preposition VARCHAR(10),
 	has_target BOOLEAN NOT NULL,
-	PRIMARY KEY (id),
 	FOREIGN KEY (verb) REFERENCES VERB_SYNONYMS(word),
 	FOREIGN KEY (preposition) REFERENCES PREPOSITIONS(word)
 );
@@ -374,4 +373,3 @@ INSERT INTO ACTIONS VALUES (11, 'move', NULL, True);
 INSERT INTO ACTIONS VALUES (20, 'look', 'at', True);
 INSERT INTO ACTIONS VALUES (21, 'look', 'around', False);
 
-/* 
