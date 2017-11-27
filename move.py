@@ -12,9 +12,11 @@ current_room = 1
 def move(target):
 	if target in rooms:
 		target_room_id = sql.get_room_id(target)
-		adjacent_rooms = 
-		
-		
+		adjacent_rooms = sql.get_adjacent_rooms(current_room)
+		if target_room_id in adjacent_rooms:
+			current_room = target_room_id
+			message = 'Moved to {0}'.format(target)
+		else
 	elif target in directions:
 		query =
 		
