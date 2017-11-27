@@ -2,3 +2,7 @@ ACTIONS:
 	tens in id tells group
 	10s: Move
 	20s: Look
+	
+OPENING URLs
+	import webbrowser
+	webbrowser.open_new('google.com')
