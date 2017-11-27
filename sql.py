@@ -79,10 +79,13 @@ def short_direction(long_direction):
 	
 ## MOVE FUNCTIONS
 def get_room_id (target):
-	query = "SELECT room_id FROM room WHERE name = " + target + ";"
+	query = "SELECT room_id FROM room WHERE name = '{0}';".format(target)
 	return query_single(query)
 	
-def 
+def get_adjacent_rooms (current_room):
+	query = "SELECT to_id FROM passage WHERE from_id = '{0}';".format(current_room)
+	return column_as_list(run_query(query), 0)
+	
 ## LOOK FUNCTIONS
 
 ## ASK FUNCTIONS

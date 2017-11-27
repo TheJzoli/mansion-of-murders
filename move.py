@@ -16,16 +16,8 @@ def move(target):
 		if target_room_id in adjacent_rooms:
 			current_room = target_room_id
 			message = 'Moved to {0}'.format(target)
-		else
-	elif target in directions:
-		query =
+		else:
+			message = "You can't move there!"
+	if target in directions:
 		
-	else:
-		
-	
-	
-	
-	
-	
-	
 	return message
