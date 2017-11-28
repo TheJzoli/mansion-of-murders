@@ -57,7 +57,7 @@ def get_word_from_synonym (word):
 	return result
 		
 def get_verbs():
-	query = "SELECT word FROM verb_synonyms;"
+	query = "SELECT word FROM verb;"
 	result = run_query(query)
 	return column_as_list (result, 0)
 
@@ -117,5 +117,5 @@ def get_room_name (room_id):
 ## LOOK FUNCTIONS
 
 ## ASK FUNCTIONS
-def live_npcs_in_room ():
+#def live_npcs_in_room ():
 	
