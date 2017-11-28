@@ -115,7 +115,7 @@ def get_target_room_name (target_room):
 	return query_single(query)
 
 ## LOOK FUNCTIONS
-
+def live_npcsid_in_room ():
+	query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + current_room + "');"
+	return column_as_list(run_query(query), 0)
 ## ASK FUNCTIONS
-def live_npcs_in_room ():
-	
