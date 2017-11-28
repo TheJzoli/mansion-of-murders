@@ -74,7 +74,7 @@ def get_rooms ():
 # [0] is first name, [1] is last name
 def get_npcs ():
 	query = "SELECT first_name, last_name FROM npc;"
-	result = run_query (query);
+	result = run_query (query)
 	return [column_as_list(result, 0), column_as_list (result, 1)]
 	
 # [0] are short cuts and [1] are full names
@@ -117,8 +117,5 @@ def get_room_name (room_id):
 ## LOOK FUNCTIONS
 
 ## ASK FUNCTIONS
-	
-	
-	
-	
+def live_npcs_in_room ():
 	
