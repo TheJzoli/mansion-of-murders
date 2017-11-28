@@ -8,15 +8,12 @@ current_room = 1
 '''
 import sql
 #vaihda first_name yms haku id
-query = "SELECT room.name FROM room WHERE room.room_id ='" + current_room + "';"
-current_room_name = sql.query_single(query)
 
+current_room_name = sql.get_room_name(player.location)
 
-query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + current_room + "');"
-live_npcsid_in_room = sql.run_query(query)
+live_npcsid_in_room = sql.live_npcsid_in_room(player.location)
 
-query= "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + current_room + "';"
-dead_npcsid_in_room = sql.run_query(query)
+dead_npcsid_in_room = sql.dead_npcsid_in_room(player.location)
 
 query = "SELECT first_name, last_name FROM npc WHERE npc_id ='" + live_npcsid_in_room + "';"
 live_npcs_in_room =sql.run_query(query)

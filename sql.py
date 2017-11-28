@@ -98,12 +98,12 @@ def get_room_id (target):
 	query = "SELECT room_id FROM room WHERE name = '{0}';".format(target)
 	return query_single(query)
 	
-def get_adjacent_rooms (current_room):
-	query = "SELECT to_id FROM passage WHERE from_id = '{0}';".format(current_room)
+def get_adjacent_rooms (room_id):
+	query = "SELECT to_id FROM passage WHERE from_id = '{0}';".format(room_id)
 	return column_as_list(run_query(query), 0)
 
-def get_available_directions(current_room):
-	query = "SELECT direction FROM passage WHERE from_id = '{0}';".format(current_room)
+def get_available_directions(room_id):
+	query = "SELECT direction FROM passage WHERE from_id = '{0}';".format(room_id)
 	return column_as_list(run_query(query), 0)
 
 def get_target_room_id (target):
@@ -115,7 +115,12 @@ def get_room_name (room_id):
 	return query_single(query)
 
 ## LOOK FUNCTIONS
-def live_npcsid_in_room ():
-	query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + current_room + "');"
+def live_npcsid_in_room (room_id):
+	query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + room_id + "');"
 	return column_as_list(run_query(query), 0)
+
+def dead_npcsid_in_room (room_id):
+	query= "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + room_id + "';"
+	return column_as_list(run_query(query), 0)
+
 ## ASK FUNCTIONS
