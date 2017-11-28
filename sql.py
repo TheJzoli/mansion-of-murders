@@ -74,7 +74,7 @@ def get_rooms ():
 # [0] is first name, [1] is last name
 def get_npcs ():
 	query = "SELECT first_name, last_name FROM npc;"
-	result = run_query (query);
+	result = run_query (query)
 	return [column_as_list(result, 0), column_as_list (result, 1)]
 	
 # [0] are short cuts and [1] are full names
@@ -107,7 +107,7 @@ def get_available_directions(current_room):
 	return column_as_list(run_query(query), 0)
 
 def get_target_room_id (target):
-	query "SELECT to_id FROM passage WHERE direction = '{0}';".format(target)
+	query = "SELECT to_id FROM passage WHERE direction = '{0}';".format(target)
 	return query_single(query)
 	
 def get_target_room_name (target_room):
@@ -117,8 +117,5 @@ def get_target_room_name (target_room):
 ## LOOK FUNCTIONS
 
 ## ASK FUNCTIONS
-	
-	
-	
-	
+def live_npcs_in_room ():
 	
