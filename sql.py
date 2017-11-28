@@ -110,8 +110,8 @@ def get_target_room_id (target):
 	query = "SELECT to_id FROM passage WHERE direction = '{0}';".format(target)
 	return query_single(query)
 	
-def get_target_room_name (target_room):
-	query = "SELECT name FROM room WHERE room_id = '{0}';".format(target_room)
+def get_room_name (room_id):
+	query = "SELECT name FROM room WHERE room_id = '{0}';".format(room_id)
 	return query_single(query)
 
 ## LOOK FUNCTIONS
