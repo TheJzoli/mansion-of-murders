@@ -7,8 +7,8 @@ db= mysql.connector.connect(host="localhost",
                             buffered= True)
 cur=db.cursor()
 #sql
-murderers = "SELECT npc.first_name, npc.last_name FROM mapped_npc INNER JOIN npc ON npc.npc_id = mapped_npc.npc ON mapped_npc.state = 'murdering';"
-cur.execute(murderers)
+sql = "SELECT npc.first_name, npc.last_name FROM mapped_npc INNER JOIN npc ON npc.npc_id = mapped_npc.npc ON mapped_npc.state = 'murdering';"
+cur.execute(sql)
 
 
 #Blaming method : blame x of murdering y
