@@ -1,6 +1,6 @@
 import sql
 import move
-import look
+#import look
 
 # This controls text output beyond vanilla print
 def fprint (text):
@@ -42,12 +42,13 @@ move.directions = directions
 move.short_directions = short_directions
 move.long_directions = long_directions
 
+'''
 ## INITIALIZE LOOK
 look.rooms = rooms
 look.npcs = npcs
 look.first_names = first_names
 look.last_names = last_names
-
+'''
 
 ## INITIALIZE PLAYER
 class Player(object):
@@ -55,7 +56,7 @@ class Player(object):
 
 player = Player()
 move.player = player
-look.player = player
+#look.player = player
 #ask.player = player
 #blame.player = player
 
@@ -148,16 +149,23 @@ while (playing):
 		
 		# preposition --------------------------------------------------
 		if (preposition):
-			query += " and preposition = '{0}'".format(preposition)
+			query += " AND preposition = '{0}'".format(preposition)
 		else:
-			query += " and preposition IS NULL"
+			query += " AND preposition IS NULL"
 		
-		# target -------------------------------------------------------
-		if target2:
-			has_target = True
+		# targets ------------------------------------------------------
+		if target1:
+			has_target1 = True
 		else:
-			has_target = False
-		query += " and has_target = {0}".format(has_target)
+			has_target1 = False
+		query += " AND has_target1 = {0}".format(has_target1)
+			
+			
+		if target2:
+			has_target2 = True
+		else:
+			has_target2 = False
+		query += " AND has_target2 = {0}".format(has_target2)
 		
 		#---------------------------------------------------------------
 		query += ";"

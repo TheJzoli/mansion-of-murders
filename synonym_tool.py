@@ -1,7 +1,7 @@
 print ("Welcome to Synonmys adding tool!\n")
 
 print (
-				"'W'\tchangeword\n"
+				"'W'\tchange word\n"
 				"'A'\tadd synonyms\n"
 				"'S'\tshow\n"
 				"'P'\tprint SQL-queries\n"
@@ -22,6 +22,7 @@ char_removables = [' ']
 
 main_word = None
 synonyms = []
+longest_length = 0
 
 
 ## MAIN LOOP
@@ -38,7 +39,7 @@ while not command in cmd_exit:
 	if command in cmd_word:
 		change = True
 		if main_word != None:
-			confirm = input("Current word is '{0}'. Do you want to change it? (y) ".format(word))
+			confirm = input("Current word is '{0}'. Do you want to change it? (y) ".format(main_word))
 			change = confirm in answer_yes
 		
 		if change:
@@ -61,7 +62,10 @@ while not command in cmd_exit:
 						word = word[:-1]
 												
 					processed_words.append(word)
-			
+					
+					if len(word) > longest_length:
+						longest_length = len(word)
+					
 			synonyms += processed_words
 			print (" Added: {0}".format(processed_words))
 			
@@ -78,7 +82,8 @@ while not command in cmd_exit:
 			print()
 			
 			for item in synonyms:
-				query = "INSERT INTO synonyms VALUES ('{0}', '{1}');".format(item, main_word)
+				formatted_item = "'{0}',".format(item)
+				query = "INSERT INTO synonyms VALUES ({0:{1}} '{2}');".format(formatted_item, longest_length + 3, main_word)
 				print (query)
 				
 				words = item.split()
@@ -90,8 +95,9 @@ while not command in cmd_exit:
 		confirm = input ("Clear word and synonyms? All will be lost (y) ")
 		
 		if confirm == 'Y' or confirm == 'y':
-			main_word == None
-			synonyms == None
+			main_word = None
+			synonyms = []
+			longest_length = 0
 			print ("Cleared!")
 		else:
 			print ("Not cleared")

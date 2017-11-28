@@ -142,14 +142,15 @@ INSERT INTO TWO_PART_WORDS VALUES ('front', 'yard');
 INSERT INTO ROOM VALUES (2, 'entrance', NULL);
 INSERT INTO ROOM VALUES (3, 'social', NULL);
 INSERT INTO ROOM VALUES (4, 'hall', NULL);
+INSERT INTO ROOM VALUES (18, 'lounge', NULL);
 
 -- Front Yard
 INSERT INTO PASSAGE VALUES (1, 2, 'n');
 -- Entrance
-INSERT INTO PASSAGE VALUES (2, 1, 'w');
+INSERT INTO PASSAGE VALUES (2, 1, 's');
 INSERT INTO PASSAGE VALUES (2, 3, 'e');
 INSERT INTO PASSAGE VALUES (2, 4, 'w');
-
+INSERT INTO PASSAGE VALUES (2, 18, 'u');
 /*
 Get room names and directions:
 SELECT F.name, T.name, D.name
@@ -277,16 +278,8 @@ WHERE
 
 -- parser section
 CREATE TABLE VERB (
-	id INT NOT NULL,
-	verb VARCHAR(100),
-	PRIMARY KEY (id)
-);
-
-CREATE TABLE VERB_SYNONYMS (
-	word VARCHAR(100) NOT NULL,
-	synon INT NOT NULL,
-	PRIMARY KEY (word),
-	FOREIGN KEY (synon) REFERENCES VERB(id)
+	word VARCHAR(100),
+	PRIMARY KEY (word)
 );
 
 CREATE TABLE PREPOSITIONS (
@@ -300,7 +293,7 @@ CREATE TABLE ACTIONS (
 	has_target1 BOOLEAN NOT NULL,
 	preposition VARCHAR(100),
 	has_target2 BOOLEAN NOT NULL,
-	FOREIGN KEY (verb) REFERENCES VERB 		(word),
+	FOREIGN KEY (verb) REFERENCES VERB (word),
 	FOREIGN KEY (preposition) REFERENCES PREPOSITIONS(word)
 );
 
@@ -309,45 +302,10 @@ CREATE TABLE synonyms (
 	main_word VARCHAR (100) NOT NULL
 );
 
-INSERT INTO VERB VALUES (0, 'look');
-INSERT INTO VERB VALUES (1, 'move');
-INSERT INTO VERB VALUES (2, 'ask');
-INSERT INTO VERB VALUES (3, 'blame');
-
-INSERT INTO VERB_SYNONYMS VALUES ('look', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('eye', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('glance', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('glimpse', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('peek', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('view', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('gander', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('gaze', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('inspect', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('leer', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('observe', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('watch', 0);
-INSERT INTO VERB_SYNONYMS VALUES ('examine', 0);
-
-INSERT INTO VERB_SYNONYMS VALUES ('move', 1);
-INSERT INTO VERB_SYNONYMS VALUES ('go', 1);
-INSERT INTO VERB_SYNONYMS VALUES ('walk', 1);
-INSERT INTO VERB_SYNONYMS VALUES ('run', 1);
-INSERT INTO VERB_SYNONYMS VALUES ('jog', 1);
-INSERT INTO VERB_SYNONYMS VALUES ('tiptoe', 1);
-INSERT INTO VERB_SYNONYMS VALUES ('stomp', 1);
-INSERT INTO VERB_SYNONYMS VALUES ('shimmy', 1);
-INSERT INTO VERB_SYNONYMS VALUES ('crawl', 1);
-
-INSERT INTO VERB_SYNONYMS VALUES ('ask', 2);
-INSERT INTO VERB_SYNONYMS VALUES ('inquire', 2);
-INSERT INTO VERB_SYNONYMS VALUES ('question', 2);
-INSERT INTO VERB_SYNONYMS VALUES ('interrogate', 2);
-
-INSERT INTO VERB_SYNONYMS VALUES ('blame', 3);
-INSERT INTO VERB_SYNONYMS VALUES ('accuse', 3);
-INSERT INTO VERB_SYNONYMS VALUES ('prosecute', 3);
-INSERT INTO VERB_SYNONYMS VALUES ('indict', 3);
-INSERT INTO VERB_SYNONYMS VALUES ('arraign', 3);
+INSERT INTO VERB VALUES ('look');
+INSERT INTO VERB VALUES ('move');
+INSERT INTO VERB VALUES ('ask');
+INSERT INTO VERB VALUES ('blame');
 
 INSERT INTO PREPOSITIONS VALUES ('to');
 INSERT INTO PREPOSITIONS VALUES ('at');
@@ -380,15 +338,34 @@ INSERT INTO ACTIONS VALUES (21, 'look', False, 'around', False);
 INSERT INTO ACTIONS VALUES (30, 'ask', True, 'about', True);
 INSERT INTO ACTIONS VALUES (40, 'blame', True, 'for killing', True);
 
-INSERT INTO synonyms VALUES ('eye', 'look');
-INSERT INTO synonyms VALUES ('glance', 'look');
+INSERT INTO synonyms VALUES ('accuse',    'blame');
+INSERT INTO synonyms VALUES ('prosecute', 'blame');
+INSERT INTO synonyms VALUES ('indict',    'blame');
+INSERT INTO synonyms VALUES ('arraign',   'blame');
+
+INSERT INTO synonyms VALUES ('inquire',     'ask');
+INSERT INTO synonyms VALUES ('question',    'ask');
+INSERT INTO synonyms VALUES ('interrogate', 'ask');
+
+INSERT INTO synonyms VALUES ('eye',     'look');
+INSERT INTO synonyms VALUES ('glance',  'look');
 INSERT INTO synonyms VALUES ('glimpse', 'look');
-INSERT INTO synonyms VALUES ('peek', 'look');
-INSERT INTO synonyms VALUES ('view', 'look');
-INSERT INTO synonyms VALUES ('gander', 'look');
-INSERT INTO synonyms VALUES ('gaze', 'look');
+INSERT INTO synonyms VALUES ('peek',    'look');
+INSERT INTO synonyms VALUES ('view',    'look');
+INSERT INTO synonyms VALUES ('gander',  'look');
+INSERT INTO synonyms VALUES ('gaze',    'look');
 INSERT INTO synonyms VALUES ('inspect', 'look');
-INSERT INTO synonyms VALUES ('leer', 'look');
+INSERT INTO synonyms VALUES ('leer',    'look');
 INSERT INTO synonyms VALUES ('observe', 'look');
-INSERT INTO synonyms VALUES ('watch', 'look');
+INSERT INTO synonyms VALUES ('watch',   'look');
 INSERT INTO synonyms VALUES ('examine', 'look');
+INSERT INTO synonyms VALUES ('see',     'look');
+
+INSERT INTO synonyms VALUES ('go',     'move');
+INSERT INTO synonyms VALUES ('walk',   'move');
+INSERT INTO synonyms VALUES ('run',    'move');
+INSERT INTO synonyms VALUES ('jog',    'move');
+INSERT INTO synonyms VALUES ('tiptoe', 'move');
+INSERT INTO synonyms VALUES ('stomp',  'move');
+INSERT INTO synonyms VALUES ('shimmy', 'move');
+INSERT INTO synonyms VALUES ('crawl',  'move');

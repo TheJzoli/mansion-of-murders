@@ -7,7 +7,7 @@ short_directions = [] 	# Directions ids
 long_directions = [] 	# Full names of directions
 '''
 import sql
-import webbrowser
+#import webbrowser
 print("INIT MOVE")
 
 
@@ -29,8 +29,8 @@ def move(target):
 			message = 'Moved to the {0}'.format(sql.get_room_name(player.location))
 		else:
 			message = "You can't move there!"
-	elif target == 'hell':
-		webbrowser.open_new('https://www.youtube.com/watch?v=l482T0yNkeo')
+	
 	else:
 		message = "That is not somewhere you can go!"
+		
 	return message
