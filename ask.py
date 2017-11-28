@@ -1,9 +1,4 @@
 import sql
 
-def ask(question):
-	answer = ""
-	if (question == 'alive'):
-		answer = commands[3] + "? Who is that?"
-	else:
-		answer = "Well I remember that the murderer had..."
-	return answer
+def ask(witness, victim):
+	print("Ask {0} about {1}'s killer".format(witness, victim))

@@ -11,6 +11,7 @@ import sql
 query = "SELECT room.name FROM room WHERE room.room_id ='" + current_room + "';"
 current_room_name = sql.query_single(query)
 
+
 query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npcWHERE mapped_npc.location = '" + current_room + "');"
 live_npcsid_in_room = sql.run_query(query)
 
@@ -53,3 +54,4 @@ def look(target):
         return message
                 
                 
+

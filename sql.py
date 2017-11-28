@@ -20,7 +20,7 @@ def end ():
 	database.close()
 
 # Return single column from sql table as array	
-def column_as_array (table, column_id):
+def column_as_list (table, column_id):
 	column = [] 
 	for row in table:
 		column.append(row[column_id])
@@ -41,31 +41,50 @@ def query_single (query):
 	
 
 ## PARSER FUNCTIONS
+def get_two_part_words (word):
+	query = "SELECT word_2 FROM two_part_words WHERE word_1 = '{0}';".format(word)
+	result = run_query (query)
+	if result:
+		return column_as_list (result, 0)
+	else:
+		return None
+
+def get_word_from_synonym (word):
+	query = "SELECT main_word FROM synonyms WHERE word = '{0}';".format(word)
+	result = query_single (query)
+	if result == None:
+		result = word
+	return result
+		
 def get_verbs():
-	query = "SELECT word FROM verbs;"
+	query = "SELECT word FROM verb_synonyms;"
 	result = run_query(query)
-	return column_as_array (result, 0)
+	return column_as_list (result, 0)
 
 def get_prepositions():
 	query = "SELECT word FROM prepositions;"
 	result = run_query (query)
-	return column_as_array (result, 0)
+	return column_as_list (result, 0)
 
 def get_rooms ():
 	query = "SELECT name FROM room;"
 	result = run_query (query)
-	return column_as_array (result, 0)
-	
+	return column_as_list (result, 0)
+
+# [0] is first name, [1] is last name
 def get_npcs ():
 	query = "SELECT first_name, last_name FROM npc;"
 	result = run_query (query);
-	return [column_as_array(result, 0), column_as_array (result, 1)]
+	return [column_as_list(result, 0), column_as_list (result, 1)]
 	
+# [0] are short cuts and [1] are full names
 def get_directions ():
 	query = "SELECT direction_id, name FROM direction;"
 	result = run_query (query)
-	return [column_as_array(result, 0), column_as_array (result, 1)]
+	return [column_as_list(result, 0), column_as_list (result, 1)]
 
+	
+## CONVERSIONS
 def long_direction (short_direction):
 	query = "SELECT name FROM direction WHERE direction_id = '{0}';".format(short_direction)
 	return run_query(query)[0][0]
@@ -75,7 +94,14 @@ def short_direction(long_direction):
 	return run_query(query)[0][0]
 	
 ## MOVE FUNCTIONS
-
+def get_room_id (target):
+	query = "SELECT room_id FROM room WHERE name = '{0}';".format(target)
+	return query_single(query)
+	
+def get_adjacent_rooms (current_room):
+	query = "SELECT to_id FROM passage WHERE from_id = '{0}';".format(current_room)
+	return column_as_list(run_query(query), 0)
+	
 ## LOOK FUNCTIONS
 
 ## ASK FUNCTIONS
