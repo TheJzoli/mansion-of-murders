@@ -297,9 +297,10 @@ CREATE TABLE PREPOSITIONS (
 CREATE TABLE ACTIONS (
 	id INT NOT NULL,
 	verb VARCHAR(100) NOT NULL,
+	has_target1 BOOLEAN NOT NULL,
 	preposition VARCHAR(100),
-	has_target BOOLEAN NOT NULL,
-	FOREIGN KEY (verb) REFERENCES VERB_SYNONYMS(word),
+	has_target2 BOOLEAN NOT NULL,
+	FOREIGN KEY (verb) REFERENCES VERB 		(word),
 	FOREIGN KEY (preposition) REFERENCES PREPOSITIONS(word)
 );
 
@@ -372,12 +373,12 @@ INSERT INTO PREPOSITIONS VALUES ('around');
 INSERT INTO PREPOSITIONS VALUES ('for killing');
 INSERT INTO TWO_PART_WORDS VALUES ('for', 'killing');
 
-INSERT INTO ACTIONS VALUES (10, 'move', 'to', True);
-INSERT INTO ACTIONS VALUES (11, 'move', NULL, True);
-INSERT INTO ACTIONS VALUES (20, 'look', 'at', True);
-INSERT INTO ACTIONS VALUES (21, 'look', 'around', False);
-INSERT INTO ACTIONS VALUES (30, 'ask', 'about', True);
-INSERT INTO ACTIONS VALUES (40, 'blame', 'for killing', True);
+INSERT INTO ACTIONS VALUES (10, 'move', False, 'to', True);
+INSERT INTO ACTIONS VALUES (11, 'move', False, NULL, True);
+INSERT INTO ACTIONS VALUES (20, 'look', False, 'at', True);
+INSERT INTO ACTIONS VALUES (21, 'look', False, 'around', False);
+INSERT INTO ACTIONS VALUES (30, 'ask', True, 'about', True);
+INSERT INTO ACTIONS VALUES (40, 'blame', True, 'for killing', True);
 
 INSERT INTO synonyms VALUES ('eye', 'look');
 INSERT INTO synonyms VALUES ('glance', 'look');

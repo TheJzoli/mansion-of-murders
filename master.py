@@ -42,8 +42,15 @@ move.long_directions = long_directions
 
 ## INITIALIZE LOOK
 import look
+look.rooms = rooms 				# Names of rooms
 look.npcs = npcs
+look.first_names = first_names
+look.last_names = last_names
+look.current_room = move.current_room
 
+### DEV MODE ###
+def look(target):
+	DEBUG ("You are looking at " + str(target))
 
 
 ## INITIALIZE PLAYER
@@ -64,6 +71,7 @@ while (playing):
 	while index < word_range:
 		word = raw_command[index]
 		
+		# Don't look last word, since it can't be first of two part word
 		if index < word_range - 1:
 			next = raw_command [index + 1]
 			
@@ -137,7 +145,7 @@ while (playing):
 			query += " and preposition IS NULL"
 		
 		# target -------------------------------------------------------
-		if target1:
+		if target2:
 			has_target = True
 		else:
 			has_target = False
@@ -155,10 +163,11 @@ while (playing):
 			sub = action - super
 			
 			if super == 1:
-				fprint(move.move(target1))
+				fprint(move.move(target2))
 				
 			if super == 2:
-				fprint(look.look(target1))
+				look(target2)
+				#fprint(look.look(target2))
 		
 		
 		
@@ -166,9 +175,13 @@ while (playing):
 		fprint("There was no verb, what do you want to do?")
 			
 	DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
-
+	
+	'''
+	this maybe wont be needed at all because move and look share same object, if that is how it works
 	# Update location
 	look.current_room = move.current_room
+	'''
+	
 ## END GAME LOOP	
 	
 sql.end()
