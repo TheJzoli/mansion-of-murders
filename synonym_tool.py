@@ -1,3 +1,7 @@
+# Synonym Tool
+# © Leo Tamminen, leo.tamminen@metropolia.fi
+
+
 print ("Welcome to Synonmys adding tool!\n")
 
 print (

@@ -1,4 +1,8 @@
-#Room Tool
+# Room Tool
+# © Leo Tamminen, leo.tamminen@metropolia.fi
+
+from operator import itemgetter
+
 def trim (text):
 	while len(text) > 0 and text [0] in char_removables:
 		text = text[1:]
@@ -16,30 +20,29 @@ def input_list (message):
 		
 	return processed_words
 
-def sort_connections ():
-	for room_index in range(len(connections)):
-		entry = connections[room_index]
-		length = len(entry)
-		for i in range (length - 1):
+def sort_connections (give_connections):
+	sorted_connections = []
+	for entry in give_connections:
+		sort_items = []
+		for item in entry:
+			sort_items.append ([rooms.index (item[0]), item[0], item[1]])
 		
-			smallest_index = 1000
+		sort_items.sort(key = itemgetter (1))
 		
-			for j in range (i, length):
-				index = rooms.index(entry[j][0])
-				if index < smallest_index:
-					smallest_index = index
-			
-			if smallest_index != i:
-				entry[i], entry[smallest_index] = entry [smallest_index], entry [i]
-				
-		connections [room_index] = entry
+		sorted_connections.append ([])
+		for item in sort_items:
+			sorted_connections[-1].append ([item [1], item [2]])
+		
+	return sorted_connections
 		
 print (
 		"Welcome to Room Tool.\n\n"
+		
 		" 'r'/'rooms'	add rooms\n"
 		" 'c'/'connect'	connect rooms\n"
 		" 's'/'show'	show all\n"
 		" 'd'/'delete'	delete room\n"
+		" 'l'/'load'	load rooms from database\n"
 		" 'e'/'exit'	exit\n"
 		)
 		
@@ -49,7 +52,8 @@ cmd_show = ['s', 'show']
 cmd_print = ['p', 'print']
 cmd_delete = ['d', 'delete']
 cmd_exit = ['e', 'exit']
-commands = cmd_add_rooms + cmd_add_connection + cmd_show + cmd_print + cmd_delete + cmd_exit
+cmd_database = ['l', 'load']
+commands = cmd_add_rooms + cmd_add_connection + cmd_show + cmd_print + cmd_delete + cmd_exit + cmd_database
 
 char_removables = [' ']
 cmd_yes = ['y', 'Y']
@@ -57,13 +61,6 @@ cmd_yes = ['y', 'Y']
 longest_length = 0
 rooms = []
 connections = []
-
-## FOR DEBUG
-longest_length = len('kitchen')
-rooms = ['kitchen','hall', 'pool']
-connections = [[['pool','nw'],['hall', 'e']],[['kitchen', 'w']],[['kitchen', 'se']]]
-
-print (connections)
 
 possible_directions = ['u','d','n','e','s','w','ne','se','nw','sw']
 opposite_directions = ['d','u','s','w','n','e','sw','nw','se','ne']
@@ -80,12 +77,23 @@ while not command in cmd_exit:
 	if command in cmd_add_rooms:
 		
 		words = input_list ("Enter room names, separated by comma: \n\n")
+		added = []
+		not_added = []
 		for room in words:
-			if (room != ""):
-				rooms.append (room)
-				connections.append([])
-				if len(room) > longest_length:
-					longest_length = len(room)
+			parts = len(room.split())
+			if room != "":
+				if parts <= 2:
+					rooms.append (room)
+					connections.append([])
+					if len(room) > longest_length:
+						longest_length = len(room)
+					added.append(room)
+				else:
+					not_added.append(room)
+	
+		print ("Added: {0}".format(added))
+		if len(not_added) > 0:
+			print ("Too many parts, could not add: {0}".format(not_added))
 	
 	## CONNECT ROOMS ----------------------------------------------------------
 	elif command in cmd_add_connection:
@@ -140,7 +148,7 @@ while not command in cmd_exit:
 		confirm = input ("Print SQL-queries? (y) ")
 		
 		if confirm == 'Y' or confirm == 'y':
-			sort_connections()
+			connections = sort_connections(connections)
 			
 			printout_rooms = ""
 			printout_passages = ""
@@ -150,6 +158,10 @@ while not command in cmd_exit:
 				from_index = i + 1
 				printout_rooms += "INSERT INTO room VALUES ({0}, '{1}', NULL);\n".format(from_index, rooms [i])
 				
+				room_words = rooms[i].split()
+				if len(room_words) == 2:
+					printout_rooms += "INSERT INTO two_part_words VALUES ('{0}', '{1}');\n".format(room_words[0], room_words[1])
+				
 				printout_passages += "-- {0}\n".format(rooms[i])
 				count = len(connections [i])
 				for j in range (count):
@@ -158,13 +170,14 @@ while not command in cmd_exit:
 					
 					printout_passages += "INSERT INTO passage VALUES ({0}, {1}, '{2}');\n".format(from_index, to_index, direction);
 			
+			print()
 			print(printout_rooms)
 			print()
 			print(printout_passages)
 			
 	## PRINT IN CONSOLE -------------------------------------------------------
 	elif command in cmd_show:
-		sort_connections()
+		connections = sort_connections(connections)
 		for i in range (len(rooms)):
 			print ("{0:{1}}: {2}".format(rooms[i], longest_length, connections[i]))
 	
@@ -180,11 +193,14 @@ while not command in cmd_exit:
 				
 				length = len(connections[index])
 				for i in range(length):
-				
+					
 					other_index = rooms.index(connections[index][i][0])
 					other_length = len(connections[other_index])
-					for i in range (other_length):
-						other_item = connections[other_index][i]
+					print (connections[other_index])
+					print ("len " + str(other_length))
+					for j in range (other_length):
+						print (j)
+						other_item = connections[other_index][j]
 						if other_item [0] == room_name:
 							print (connections[other_index])
 							print (other_item)
@@ -194,7 +210,88 @@ while not command in cmd_exit:
 		else:
 			print ("There is no such room.")
 	
+	## LOAD FROM DATABASE -----------------------------------------------------
+	elif command in cmd_database:
+		confirm = trim(input("Load Rooms and Passages from database? (y) "))
+		
+		if rooms != [] and confirm in cmd_yes:
+			confirm = trim(input("This will cause current rooms and connections to lose. Continue? (y) "))
+			
+		if confirm in cmd_yes:
+			rooms = []
+			connections = []
+			longest_length = 0
+			
+			print ("....")
+			
+			import mysql.connector
+			database = mysql.connector.connect(
+								host = 'localhost',
+								user = 'dbuser',
+								passwd = 'dbpass',
+								db = 'mom_game',
+								buffered = True)
+			cursor = database.cursor()
+			
+			rooms_query = "SELECT name FROM room ORDER BY room.room_id;"
+			cursor.execute(rooms_query)
+			rooms_result = cursor.fetchall()
 
+			passage_query = (
+								"SELECT f.name, t.name, direction "
+								"FROM passage "
+								"INNER JOIN room AS f ON f.room_id = passage.from_id "
+								"INNER JOIN room AS t ON t.room_id = passage.to_id "
+								"ORDER BY f.room_id;"
+							)
+			cursor.execute(passage_query)
+			passage_result = cursor.fetchall()
+			
+			
+			for record in rooms_result:
+				rooms.append (record[0])
+				connections.append ([])
+				if len(record[0]) > longest_length:
+					longest_length = len(record [0])
+	
+
+			for record in passage_result:
+				index = rooms.index (record[0])
+				connections[index].append([record[1], record[2]])
+		
+		database.rollback()
+		database.close()
+		
+		print ("Loaded!\n")
+	
+	## CONFIRM EXIT -----------------------------------------------------------
+	elif command in cmd_exit:
+		confirm = trim(input("All data will be lost. Do you want to quit? (y) "))
+		if not confirm in cmd_yes:
+			command = None
+		else:
+			print ("Good Riddance!\n")
+		
 ## END PROGRAM LOOP
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	

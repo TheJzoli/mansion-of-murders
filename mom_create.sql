@@ -142,15 +142,22 @@ INSERT INTO TWO_PART_WORDS VALUES ('front', 'yard');
 INSERT INTO ROOM VALUES (2, 'entrance', NULL);
 INSERT INTO ROOM VALUES (3, 'social', NULL);
 INSERT INTO ROOM VALUES (4, 'hall', NULL);
-INSERT INTO ROOM VALUES (18, 'lounge', NULL);
+INSERT INTO ROOM VALUES (5, 'lounge', NULL);
 
--- Front Yard
-INSERT INTO PASSAGE VALUES (1, 2, 'n');
--- Entrance
-INSERT INTO PASSAGE VALUES (2, 1, 's');
-INSERT INTO PASSAGE VALUES (2, 3, 'e');
-INSERT INTO PASSAGE VALUES (2, 4, 'w');
-INSERT INTO PASSAGE VALUES (2, 18, 'u');
+-- front yard
+INSERT INTO passage VALUES (1, 2, 'n');
+-- entrance
+INSERT INTO passage VALUES (2, 1, 's');
+INSERT INTO passage VALUES (2, 4, 'w');
+INSERT INTO passage VALUES (2, 5, 'u');
+INSERT INTO passage VALUES (2, 3, 'e');
+-- social
+INSERT INTO passage VALUES (3, 2, 'w');
+-- hall
+INSERT INTO passage VALUES (4, 2, 'e');
+-- lounge
+INSERT INTO passage VALUES (5, 2, 'd');
+
 /*
 Get room names and directions:
 SELECT F.name, T.name, D.name

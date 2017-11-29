@@ -60,16 +60,31 @@ move.player = player
 #ask.player = player
 #blame.player = player
 
+# Start at full used actions, so that npcs will move on first turn
+player_actions = 3
+player_actions_used = player_actions
+
 ### DEV MODE ###
 def look(target):
 	room_name = sql.get_room_name (player.location)
-	DEBUG ("You are looking at " + room_name)
-
+	message = "You are looking at " + room_name
+	message += "\nYou can move to:\n"
+	passages = sql.get_adjacent_rooms(player.location)
+	for item in passages:
+		message += "\t{0}\n".format(sql.get_room_name(item))
+	
+	return message
 	
 ## GAME LOOP
 playing = True
 while (playing):
-
+	
+	# Check if its time for npcs to move
+	if player_actions_used == player_actions:
+		fprint("Npcs move")
+		player_actions_used = 0
+	
+	
 	# Receive and process input
 	# Get input, lower and split it
 	# Look for two part words
@@ -102,8 +117,6 @@ while (playing):
 		command.append (command_word)
 		index += 1
 	# End of command process loop
-	
-	print(command)
 	
 	
 	# Parse input
@@ -173,30 +186,25 @@ while (playing):
 		# Get Action id
 		action = sql.query_single(query)
 		
+		# Do action, and spend action points
 		if (action):
 			super = int(action / 10)
 			sub = action - super
 			
 			if super == 1:
-				#fprint(move (target2, current_room))
 				fprint(move.move(target2))
 				
 			if super == 2:
 				fprint(look(target2))
 				#fprint(look.look(target2))
 		
-		
+			player_actions_used +=1
 		
 	else:
 		fprint("There was no verb, what do you want to do?")
 			
 	#DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
-	
-	'''
-	this maybe wont be needed at all because move and look share same object, if that is how it works
-	# Update location
-	look.current_room = move.current_room
-	'''
+
 	
 ## END GAME LOOP	
 	
