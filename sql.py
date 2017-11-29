@@ -120,8 +120,20 @@ def live_npcsid_in_room (room_id):
 	return column_as_list(run_query(query), 0)
 
 def dead_npcsid_in_room (room_id):
-	query= "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + room_id + "';"
+	query = "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + room_id + "';"
 	return column_as_list(run_query(query), 0)
 
+def live_npcs_in_room (room_id):
+	query = "SELECT first_name, last_name FROM npc WHERE npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + room_id + "');"
+	return column_as_list(run_query(query), 0)
+
+def dead_npcs_in_room (room_id):
+	query = "SELECT first_name, last_name FROM npc WHERE npc_id IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + room_id + "');"
+	return column_as_list(run_query(query), 0)
+	
 ## ASK FUNCTIONS
+def dead_npcs ():
+	query = "SELECT first_name, last_name FROM npc WHERE npc_id IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc);"
+	return column_as_list(run_query(query), 0)
+
 

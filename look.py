@@ -10,16 +10,10 @@ import sql
 #vaihda first_name yms haku id
 
 current_room_name = sql.get_room_name(player.location)
-
 live_npcsid_in_room = sql.live_npcsid_in_room(player.location)
-
 dead_npcsid_in_room = sql.dead_npcsid_in_room(player.location)
-
-query = "SELECT first_name, last_name FROM npc WHERE npc_id ='" + live_npcsid_in_room + "';"
-live_npcs_in_room =sql.run_query(query)
-
-query ="SELECT first_name, last_name FROM npc WHERE npc_id ='" + dead_npcsid_in_room + "';"
-dead_npcs_in_room = sql.run_query(query)
+live_npcs_in_room =sql.live_npcs_in_room(player.location)
+dead_npcs_in_room = sql.dead_npcs_in_room(player.location)
 
 def id_from_name(mapped_id):
         query ="SELECT first_name, last_name FROM mapped_npc INNER JOIN npc ON 

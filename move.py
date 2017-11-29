@@ -20,7 +20,7 @@ def move(target):
 			player.location = target_room_id
 			message = 'Moved to the {0}'.format(target)
 		else:
-			message = "You can't move there!"
+			message = "You can't move there from this room!"
 	elif target in directions:
 		available_directions = sql.get_available_directions(player.location)
 		if target in available_directions:
@@ -28,7 +28,7 @@ def move(target):
 			player.location = target_room
 			message = 'Moved to the {0}'.format(sql.get_room_name(player.location))
 		else:
-			message = "You can't move there!"
+			message = "You try to go in that direction and hit your face against the wall, ouch!"
 	
 	else:
 		message = "That is not somewhere you can go!"
