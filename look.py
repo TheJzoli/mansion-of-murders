@@ -9,26 +9,11 @@ current_room = 1
 import sql
 
 #onko jo olemassa
-def get_room_id(target):
-        query = "SELECT room.room_id FROM room WHERE room.name ='" + target + "';"
-        room_id = sql.query_single(query)
-        return room_id
 
-def id_from_name(target):
-        #first_name = target?? 
-        query ="SELECT npc_id FROM mapped_npc INNER JOIN npc ON mapped_npc.npc = npc.npc_id WHERE npc.first_name ='" + target + "';"
-        npc_id = sql.query_single(query)
-        return npc_id
-
-def live_in_room(npc_id):
-        query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npcWHERE mapped_npc.location = '" + current_room + "');"
-        live_id = sql.run_query(query)
-        return live_id
-
-def dead_in_room(npc_id):
-        query= "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + current_room + "';"
-        dead_id = sql.run_query(query)
-        return dead_id
+live_npcsid_in_room = sql.live_npcsid_in_room(player.location)
+dead_npcsid_in_room = sql.dead_npcsid_in_room(player.location)
+get_room_id = sql.get_room_id
+id_from_name = sql.id_from_name
 
 def look(target):
         message = ""
