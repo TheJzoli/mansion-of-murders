@@ -1,7 +1,6 @@
 # Room Tool
 # © Leo Tamminen, leo.tamminen@metropolia.fi
 
-from operator import itemgetter
 
 def trim (text):
 	while len(text) > 0 and text [0] in char_removables:
@@ -20,6 +19,9 @@ def input_list (message):
 		
 	return processed_words
 
+'''
+# This doesn't work
+from operator import itemgetter
 def sort_connections (give_connections):
 	sorted_connections = []
 	for entry in give_connections:
@@ -34,6 +36,7 @@ def sort_connections (give_connections):
 			sorted_connections[-1].append ([item [1], item [2]])
 		
 	return sorted_connections
+'''
 		
 print (
 		"Welcome to Room Tool.\n\n"
@@ -148,7 +151,7 @@ while not command in cmd_exit:
 		confirm = input ("Print SQL-queries? (y) ")
 		
 		if confirm == 'Y' or confirm == 'y':
-			connections = sort_connections(connections)
+			#connections = sort_connections(connections)
 			
 			printout_rooms = ""
 			printout_passages = ""
@@ -177,9 +180,9 @@ while not command in cmd_exit:
 			
 	## PRINT IN CONSOLE -------------------------------------------------------
 	elif command in cmd_show:
-		connections = sort_connections(connections)
+		#connections = sort_connections(connections)
 		for i in range (len(rooms)):
-			print ("{0:{1}}: {2}".format(rooms[i], longest_length, connections[i]))
+			print ("{0:2} {1:{2}}: {3}".format(i + 1, rooms[i], longest_length + 1, connections[i]))
 	
 	## DELETE -----------------------------------------------------------------
 	elif command in cmd_delete:
@@ -246,15 +249,13 @@ while not command in cmd_exit:
 							)
 			cursor.execute(passage_query)
 			passage_result = cursor.fetchall()
-			
-			
+				
 			for record in rooms_result:
 				rooms.append (record[0])
 				connections.append ([])
 				if len(record[0]) > longest_length:
 					longest_length = len(record [0])
 	
-
 			for record in passage_result:
 				index = rooms.index (record[0])
 				connections[index].append([record[1], record[2]])

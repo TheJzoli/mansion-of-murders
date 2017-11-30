@@ -114,6 +114,7 @@ while (playing):
 		# Check for full name after synonyms
 		if command_word in first_names or command_word in last_names:
 			command_word = sql.get_full_name(command_word)
+			DEBUG ("cmd test: " + str(command_word))
 		
 		command.append (command_word)
 		index += 1

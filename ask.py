@@ -32,3 +32,5 @@ Search for other VICTIMS(id) with the same MURDERER ---- Done ----
 search for WITNESSES who have seen both murders(VICTIMS)
 if current WITNESS is one of them ^, make him say	
 the earlier VICTIM's name.
+
+'''

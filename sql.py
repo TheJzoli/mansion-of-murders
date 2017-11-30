@@ -91,19 +91,27 @@ def get_directions ():
 def get_full_name (name):
 	# This is not complete, and works only when no same first or last name exist
 	all_names = get_npcs ()
-	first_name = None
-	last_name = None
-	
-	for i in range(len(all_names [0])):
+	first_name = False
+	last_name = False
+
+	for i in range(len(all_names)):
+		
+		# case john wilsom and john johnson
 		if name == all_names[i][0]:
 			first_name = name
-			last_name = all_names [i][1]
-			break
+			if last_name == False:
+				last_name = all_names [i][1]
+			else:
+				last_name = None
 			
+			
+		# case john wilson and maria wilson
 		elif name == all_names [i][1]:
-			first_name = all_names[i][0]
 			last_name = name
-			break
+			if first_name == False:
+				first_name = all_names[i][0]
+			else:
+				first_name = None
 	
 	return first_name, last_name
 	
@@ -178,10 +186,21 @@ def get_room_name (room_id):
 	
 	
 ## LOOK FUNCTIONS -------------------------------------------------------------
+'''
 def live_npcsid_in_room (room_id):
 	query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + str(room_id) + "');"
 	return column_as_list(run_query(query), 0)
+'''
+	
+def live_npcsid_in_room (room_id):
+	query = (
+			"SELECT mapped_id FROM mapped_npc "
+			"WHERE mapped_id NOT IN (SELECT victim FROM murder)"
+			"AND location = {0};"
+			).format (room_id)			
 
+	return column_as_list(run_query(query), 0)	
+	
 def dead_npcsid_in_room (room_id):
 	query = "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + str(room_id) + "';"
 	return column_as_list(run_query(query), 0)

@@ -9,7 +9,11 @@ player					# player instance, holds location
 import sql
 
 #onko jo olemassa
-
+## Heh, aika paljon kommentteja, mut nyt tää yhteys enimmäkseen toimii
+## ainakin kuitenkin kun kattoo ketä npc:tä huoneessa on, niin ne näkyy oikein,
+## mutta kun yrittää kattoo vaik 'look at benetton', niin sit tää sanoo, että se ei ole täällä
+## poista toki näitä sitä mukaa ku oot käyny läpi
+## laitoin tollasen kyhäyksen tosta look_aroundista, niin jatka siitä ja tee kivan näkönen
 
 
 def look(target):

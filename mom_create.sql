@@ -137,26 +137,82 @@ INSERT INTO DIRECTION VALUES ('nw', 'northwest');
 INSERT INTO DIRECTION VALUES ('u', 'up');
 INSERT INTO DIRECTION VALUES ('d', 'down');
 
-INSERT INTO ROOM VALUES (1, 'front yard', NULL);
-INSERT INTO TWO_PART_WORDS VALUES ('front', 'yard');
-INSERT INTO ROOM VALUES (2, 'entrance', NULL);
-INSERT INTO ROOM VALUES (3, 'social', NULL);
-INSERT INTO ROOM VALUES (4, 'hall', NULL);
-INSERT INTO ROOM VALUES (5, 'lounge', NULL);
+INSERT INTO room VALUES (1, 'front yard', NULL);
+INSERT INTO two_part_words VALUES ('front', 'yard');
+INSERT INTO room VALUES (2, 'entrance', NULL);
+INSERT INTO room VALUES (3, 'tea room', NULL);
+INSERT INTO two_part_words VALUES ('tea', 'room');
+INSERT INTO room VALUES (4, 'dining', NULL);
+INSERT INTO room VALUES (5, 'bar', NULL);
+INSERT INTO room VALUES (6, 'kitchen', NULL);
+INSERT INTO room VALUES (7, 'billiard room', NULL);
+INSERT INTO two_part_words VALUES ('billiard', 'room');
+INSERT INTO room VALUES (8, 'hall', NULL);
+INSERT INTO room VALUES (9, 'butlers room', NULL);
+INSERT INTO two_part_words VALUES ('butlers', 'room');
+INSERT INTO room VALUES (10, 'music room', NULL);
+INSERT INTO two_part_words VALUES ('music', 'room');
+INSERT INTO room VALUES (11, 'ballroom', NULL);
+INSERT INTO room VALUES (12, 'terrace', NULL);
+INSERT INTO room VALUES (13, 'gallery', NULL);
+INSERT INTO room VALUES (14, 'servants', NULL);
+INSERT INTO room VALUES (15, 'bathroom', NULL);
+INSERT INTO room VALUES (16, 'kitchen maids', NULL);
+INSERT INTO two_part_words VALUES ('kitchen', 'maids');
+INSERT INTO room VALUES (17, 'back yard', NULL);
+INSERT INTO two_part_words VALUES ('back', 'yard');
+
 
 -- front yard
 INSERT INTO passage VALUES (1, 2, 'n');
 -- entrance
 INSERT INTO passage VALUES (2, 1, 's');
-INSERT INTO passage VALUES (2, 4, 'w');
-INSERT INTO passage VALUES (2, 5, 'u');
 INSERT INTO passage VALUES (2, 3, 'e');
--- social
+INSERT INTO passage VALUES (2, 8, 'w');
+-- tea room
 INSERT INTO passage VALUES (3, 2, 'w');
+INSERT INTO passage VALUES (3, 4, 'n');
+INSERT INTO passage VALUES (3, 7, 'se');
+-- dining
+INSERT INTO passage VALUES (4, 3, 's');
+INSERT INTO passage VALUES (4, 5, 'w');
+-- bar
+INSERT INTO passage VALUES (5, 4, 'e');
+INSERT INTO passage VALUES (5, 6, 'n');
+-- kitchen
+INSERT INTO passage VALUES (6, 5, 's');
+-- billiard room
+INSERT INTO passage VALUES (7, 3, 'nw');
 -- hall
-INSERT INTO passage VALUES (4, 2, 'e');
--- lounge
-INSERT INTO passage VALUES (5, 2, 'd');
+INSERT INTO passage VALUES (8, 2, 'e');
+INSERT INTO passage VALUES (8, 9, 's');
+INSERT INTO passage VALUES (8, 10, 'n');
+-- butlers room
+INSERT INTO passage VALUES (9, 8, 'n');
+-- music room
+INSERT INTO passage VALUES (10, 8, 's');
+INSERT INTO passage VALUES (10, 11, 'w');
+-- ballroom
+INSERT INTO passage VALUES (11, 10, 'e');
+INSERT INTO passage VALUES (11, 12, 's');
+INSERT INTO passage VALUES (11, 13, 'w');
+-- terrace
+INSERT INTO passage VALUES (12, 11, 'n');
+-- gallery
+INSERT INTO passage VALUES (13, 11, 'e');
+INSERT INTO passage VALUES (13, 14, 's');
+-- servants
+INSERT INTO passage VALUES (14, 13, 'n');
+INSERT INTO passage VALUES (14, 15, 'w');
+-- bathroom
+INSERT INTO passage VALUES (15, 14, 'e');
+INSERT INTO passage VALUES (15, 16, 'n');
+-- kitchen maids
+INSERT INTO passage VALUES (16, 15, 's');
+INSERT INTO passage VALUES (16, 17, 'n');
+-- back yard
+INSERT INTO passage VALUES (17, 16, 's');
+
 
 /*
 Get room names and directions:
@@ -346,6 +402,7 @@ INSERT INTO ACTIONS VALUES (21, 'look', False, NULL, FALSE);
 INSERT INTO ACTIONS VALUES (30, 'ask', True, 'about', True);
 INSERT INTO ACTIONS VALUES (40, 'blame', True, 'for killing', True);
 
+-- VERBS
 INSERT INTO synonyms VALUES ('accuse',    'blame');
 INSERT INTO synonyms VALUES ('prosecute', 'blame');
 INSERT INTO synonyms VALUES ('indict',    'blame');
