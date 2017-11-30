@@ -21,3 +21,14 @@ def ask(witness, victim):
 	
 	return message
 #print("Ask {0} about {1}'s killer".format(witness, victim))
+
+
+''' 
+How do I see if the Witness has seen another murder by the Murderer....!!!
+
+
+Check the id of the MURDERER of the current VICTIM... ----SELECT mapped_id FROM mapped_npc INNER JOIN murder ON mapped_id = murder.murderer WHERE murder.victim = sql.victim_id(victim);----
+Search for other VICTIMS(id) with the same MURDERER
+search for WITNESSES who have seen both murders
+if current WITNESS is one of them ^, make him say
+the earlier VICTIM's name.
