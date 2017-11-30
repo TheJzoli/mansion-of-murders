@@ -42,6 +42,9 @@ def look(target):
 			## NOORA laitoin vaan tän tähän
 			id_from_name = sql.id_from_name(target)
 			
+			
+			## Tänne pitää kans laittaa ne detailit näkyviin
+			
 			if(id_from_name in live_npcsid_in_room):
 					query = "SELECT description FROM npc WHERE npc_id = " + str(id_from_name) + ";"
 					result = sql.query_single(query)
@@ -76,7 +79,6 @@ def look_around ():
 	if len(npcs) > 0:
 		message += "These NPCS are here:\n"
 		for id in npcs:
-			id = id[0]
 			message += "\t{0}\n".format(sql.npc_name_from_id(id))
 	else:
 		message += "There are no one here."
