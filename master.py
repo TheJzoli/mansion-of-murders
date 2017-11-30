@@ -1,6 +1,6 @@
 import sql
 import move
-#import look
+import look
 
 # This controls text output beyond vanilla print
 def fprint (text):
@@ -42,13 +42,14 @@ move.directions = directions
 move.short_directions = short_directions
 move.long_directions = long_directions
 
-'''
+
 ## INITIALIZE LOOK
 look.rooms = rooms
 look.npcs = npcs
 look.first_names = first_names
 look.last_names = last_names
-'''
+look.directions = directions
+
 
 ## INITIALIZE PLAYER
 class Player(object):
@@ -56,7 +57,7 @@ class Player(object):
 
 player = Player()
 move.player = player
-#look.player = player
+look.player = player
 #ask.player = player
 #blame.player = player
 
@@ -65,6 +66,7 @@ player_actions = 3
 player_actions_used = player_actions
 
 ### DEV MODE ###
+'''
 def look(target):
 	room_name = sql.get_room_name (player.location)
 	message = "You are looking at " + room_name
@@ -74,6 +76,7 @@ def look(target):
 		message += "\t{0}\n".format(sql.get_room_name(item))
 	
 	return message
+'''
 	
 ## GAME LOOP
 playing = True
@@ -183,6 +186,16 @@ while (playing):
 		#---------------------------------------------------------------
 		query += ";"
 		
+		
+		# Complete to full name
+		if target1 in npcs:
+			target1 = sql.get_full_name (target1)
+			DEBUG (target1)
+		
+		if target2 in npcs:
+			target2 = sql.get_full_name (target2)
+			DEBUG (target2)
+		
 		# Get Action id
 		action = sql.query_single(query)
 		
@@ -195,8 +208,8 @@ while (playing):
 				fprint(move.move(target2))
 				
 			if super == 2:
-				fprint(look(target2))
-				#fprint(look.look(target2))
+				#fprint(look(target2))
+				fprint(look.look(target2))
 		
 			player_actions_used +=1
 		
