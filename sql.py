@@ -26,7 +26,7 @@ def column_as_list (table, column_id):
 		column.append(row[column_id])
 	return column
 	
-## SQL FUNCTIONS
+## SQL FUNCTIONS --------------------------------------------------------------
 def run_query (query):
 	cursor = database.cursor()
 	cursor.execute (query)
@@ -40,7 +40,7 @@ def query_single (query):
 		return None
 	
 
-## PARSER FUNCTIONS
+## PARSER FUNCTIONS -----------------------------------------------------------
 def get_two_part_words (word):
 	query = "SELECT word_2 FROM two_part_words WHERE word_1 = '{0}';".format(word)
 	result = run_query (query)
@@ -83,8 +83,27 @@ def get_directions ():
 	result = run_query (query)
 	return [column_as_list(result, 0), column_as_list (result, 1)]
 
+def get_full_name (name):
+	# This is not complete, and works only when no same first or last name exist
+	all_names = get_npcs ()
+	first_name = None
+	last_name = None
 	
-## CONVERSIONS
+	for i in range(len(all_names [0])):
+		if name == all_names[i][0]:
+			first_name = name
+			last_name = all_names [i][1]
+			break
+			
+		elif name == all_names [i][1]:
+			first_name = all_names[i][0]
+			last_name = name
+			break
+	
+	return first_name, last_name
+	
+	
+## CONVERSIONS ----------------------------------------------------------------
 def long_direction (short_direction):
 	query = "SELECT name FROM direction WHERE direction_id = '{0}';".format(short_direction)
 	return run_query(query)[0][0]
@@ -93,7 +112,9 @@ def short_direction(long_direction):
 	query = "SELECT direction_id FROM direction WHERE name = '{0}';".format(long_direction)
 	return run_query(query)[0][0]
 	
-## MOVE FUNCTIONS
+	
+	
+## MOVE FUNCTIONS -------------------------------------------------------------
 def get_room_id (target):
 	query = "SELECT room_id FROM room WHERE name = '{0}';".format(target)
 	return query_single(query)
@@ -114,27 +135,31 @@ def get_room_name (room_id):
 	query = "SELECT name FROM room WHERE room_id = '{0}';".format(room_id)
 	return query_single(query)
 
-## LOOK FUNCTIONS
+	
+	
+## LOOK FUNCTIONS -------------------------------------------------------------
 def live_npcsid_in_room (room_id):
-	query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + room_id + "');"
+	query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + str(room_id) + "');"
 	return column_as_list(run_query(query), 0)
 
 def dead_npcsid_in_room (room_id):
-	query = "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + room_id + "';"
+	query = "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + str(room_id) + "';"
 	return column_as_list(run_query(query), 0)
 
 def live_npcs_in_room (room_id):
-	query = "SELECT first_name, last_name FROM npc WHERE npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + room_id + "');"
+	query = "SELECT first_name, last_name FROM npc WHERE npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + str(room_id) + "');"
 	return column_as_list(run_query(query), 0)
 
 def dead_npcs_in_room (room_id):
-	query = "SELECT first_name, last_name FROM npc WHERE npc_id IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + room_id + "');"
+	query = "SELECT first_name, last_name FROM npc WHERE npc_id IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + str(room_id) + "');"
 	return column_as_list(run_query(query), 0)
 
 def id_from_name (target):
 	query = "SELECT npc_id FROM mapped_npc INNER JOIN npc ON mapped_npc.npc = npc.npc_id WHERE first_name = '{0}' AND last_name = '{1}';".format(target[0], target[1])
 	return query_single(query)
-## ASK FUNCTIONS
+	
+	
+## ASK FUNCTIONS --------------------------------------------------------------
 def dead_npcs ():
 	query = "SELECT first_name, last_name FROM npc WHERE npc_id IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc);"
 	return column_as_list(run_query(query), 0)
