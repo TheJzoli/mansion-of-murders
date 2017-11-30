@@ -139,6 +139,10 @@ def dead_npcs ():
 	query = "SELECT first_name, last_name FROM npc WHERE npc_id IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc);"
 	return column_as_list(run_query(query), 0)
 
+def live_npcs ():
+	query = "SELECT first_name, last_name FROM npc WHERE npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc);"
+	return column_as_list(run_query(query), 0)
+
 def witness_id (witness):
 	query = "SELECT npc_id FROM npc WHERE first_name = '{0}' AND last_name = '{1}';".format(witness[0], witness[1])
 	return query_single(query)
@@ -147,3 +151,6 @@ def victim_id (victim):
 	query = "SELECT npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE first_name = '{0}' AND last_name = '{1}';".format(victim[0], victim[1])
 	return query_single(query)
 
+def murderer_detail ():
+	query = "SELECT detail.name FROM detail INNER JOIN clue ON clue.detail = detail.detail_id WHERE witness = {0} AND victim = {1};".format(witness_id(witness), victim_id(victim))
+	return run_query(query) #Multiple details? What then?
