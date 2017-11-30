@@ -1,6 +1,7 @@
 import sql
 import move
 import look
+import ask
 
 # This controls text output beyond vanilla print
 def fprint (text):
@@ -20,10 +21,10 @@ prepositions = sql.get_prepositions()
 rooms = sql.get_rooms()
 
 # sql.get_npcs returns a list where [0] is first names and [1] is last names
-sql_npcs = sql.get_npcs()
+sql_npcs = sql.get_npcs_names()
 first_names = sql_npcs [0]
 last_names = sql_npcs [1]
-npcs = first_names + last_names
+npcs = sql.get_npcs()
 
 # sql.get_directions returns list, [0] is shortcut, [1] is full name
 directions = sql.get_directions()
@@ -51,6 +52,9 @@ look.last_names = last_names
 look.directions = directions
 
 
+## INITIALIZE ASK
+
+
 ## INITIALIZE PLAYER
 class Player(object):
 	location = 1
@@ -58,26 +62,14 @@ class Player(object):
 player = Player()
 move.player = player
 look.player = player
-#ask.player = player
+ask.player = player
 #blame.player = player
 
 # Start at full used actions, so that npcs will move on first turn
 player_actions = 3
 player_actions_used = player_actions
 
-### DEV MODE ###
-'''
-def look(target):
-	room_name = sql.get_room_name (player.location)
-	message = "You are looking at " + room_name
-	message += "\nYou can move to:\n"
-	passages = sql.get_adjacent_rooms(player.location)
-	for item in passages:
-		message += "\t{0}\n".format(sql.get_room_name(item))
-	
-	return message
-'''
-	
+
 ## GAME LOOP
 playing = True
 while (playing):
@@ -114,13 +106,19 @@ while (playing):
 		else:
 			command_word = word
 		
+
+		
 		# Check for synonyms
 		command_word = sql.get_word_from_synonym(command_word)
+		
+		# Check for full name after synonyms
+		if command_word in first_names or command_word in last_names:
+			command_word = sql.get_full_name(command_word)
 		
 		command.append (command_word)
 		index += 1
 	# End of command process loop
-	
+	DEBUG (command)
 	
 	# Parse input
 	verb = None
@@ -150,6 +148,8 @@ while (playing):
 			if word in targets:
 				target2 = word
 				
+
+	DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
 				
 	# Check if player entered only direction
 	if target1 in long_directions:
@@ -186,37 +186,39 @@ while (playing):
 		#---------------------------------------------------------------
 		query += ";"
 		
-		
-		# Complete to full name
-		if target1 in npcs:
-			target1 = sql.get_full_name (target1)
-			DEBUG (target1)
-		
-		if target2 in npcs:
-			target2 = sql.get_full_name (target2)
-			DEBUG (target2)
-		
+
 		# Get Action id
 		action = sql.query_single(query)
 		
 		# Do action, and spend action points
 		if (action):
 			super = int(action / 10)
-			sub = action - super
+			sub = action - super * 10
 			
-			if super == 1:
+			DEBUG("super: {0}, sub: {1}".format(super, sub))
+			
+			if super == 1: # MOVE
 				fprint(move.move(target2))
 				
-			if super == 2:
-				#fprint(look(target2))
-				fprint(look.look(target2))
+				player_actions_used +=1
+				
+			elif super == 2: # LOOK
+				if sub == 0:
+					fprint(look.look(target2))
+				
+				elif sub == 1:
+					fprint(look.look_around())
 		
-			player_actions_used +=1
+			elif super == 3: # ASK
+				fprint(ask.ask(target1, target2))
+				
+				player_actions_used += 1
+			
 		
 	else:
 		fprint("There was no verb, what do you want to do?")
 			
-	#DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
+
 
 	
 ## END GAME LOOP	
