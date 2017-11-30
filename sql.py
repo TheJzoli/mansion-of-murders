@@ -225,3 +225,11 @@ def victim_id (victim):
 def murderer_detail ():
 	query = "SELECT detail.name FROM detail INNER JOIN clue ON clue.detail = detail.detail_id WHERE witness = {0} AND victim = {1};".format(witness_id(witness), victim_id(victim))
 	return run_query(query) #Multiple details? What then?
+	
+def current_victims_murderer_id (victim):
+	query = "SELECT mapped_id FROM mapped_npc INNER JOIN murder ON mapped_id = murder.murderer WHERE murder.victim = {0};".format(victim_id(victim))
+	return query_single(query)
+	
+def witnessed_multiple_murders (victim): #by the current victim's murderer
+	query = "SELECT clue.witness FROM clue WHERE clue.victim IN (SELECT mapped_id FROM mapped_npc INNER JOIN murder ON mapped_id = murder.victim WHERE murder.murderer IN ({0})) GROUP BY victim;".format(current_victims_murderer_id(victim))
+	return column_as_list(run_query(query), 0)
