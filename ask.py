@@ -8,9 +8,20 @@ def ask(witness, victim):
 		if victim in sql.dead_npcs():
 			details = sql.murderer_detail(witness, victim)
 			if (details == None):
-				message = "Wait? {0} has been murdered? How horrible! I didn't know!".format (victim)
+				message = "{0}: Wait? {1} has been murdered? How horrible! I didn't know!".format (witness, victim)
 			else:
 				message = "{0}: How horrible... If I remember correctly, the murderer had a {1}.".format(witness, details)
+				if (sql.npc_id_from_name(witness) in sql.witnessed_multiple_murders(victim)):
+					message += " Oh and also, the murderer was the same person who murdered "
+					all_but = sql.all_but_current_murder_victims(victim)
+					for i in all_but:
+						message += "{0}".format(sql.npc_name_from_id(i))
+						if (i != all_but[-1]):
+							message += ", "
+							if (len(all_but) >= 2):
+								if (i == all_but[-2]):
+									message += "and "
+					message += "."
 		elif (victim in sql.live_npcs()):
 			message = "{0}: {1}? What are you talking about? They haven't been murdered.".format(witness, victim)
 		else:
