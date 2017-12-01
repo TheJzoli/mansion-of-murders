@@ -56,10 +56,10 @@ look.directions = directions
 
 
 ## INITIALIZE PLAYER
-class Player(object):
+class Player:
 	location = 1
 
-player = Player()
+player = Player
 move.player = player
 look.player = player
 ask.player = player
@@ -69,6 +69,8 @@ ask.player = player
 player_actions = 3
 player_actions_used = player_actions
 
+## INITIALIZE MURDERS
+next_murderer_id = 0
 
 ## GAME LOOP
 playing = True
@@ -76,7 +78,27 @@ while (playing):
 	
 	# Check if its time for npcs to move
 	if player_actions_used == player_actions:
-		fprint("Npcs move")
+		fprint("------------ Npcs move --------------")
+		'''
+		murderers = sql.get_active_murderers ()
+		next_murderer_id = get_next_smallest(murderers, next_murderer_id)
+		
+		targets = get_npcs_in_room(next_murderer_id)
+		victim = get_random_from_list(targets)
+		
+		murder.add(victim, murderer)
+		
+		### CLUES TOO
+		'''
+		'''
+		for npc in npcs:
+			directions = sql.get_possible_directions(npc.location)
+			destination = get_random_from_list(directions)
+			npc.location = destination
+		'''
+		
+		
+		
 		player_actions_used = 0
 	
 	

@@ -221,11 +221,6 @@ def id_from_name (target):
 	
 ## ASK FUNCTIONS --------------------------------------------------------------
 def dead_npcs ():
-	''' tämä vissiin väärä
-	query = "SELECT first_name, last_name FROM npc WHERE npc_id IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.npc = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc);"
-	return column_as_list(run_query(query), 0)
-	'''
-	
 	query = "SELECT first_name, last_name FROM npc WHERE npc_id IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc);"
 	return run_query(query)
 
@@ -233,20 +228,22 @@ def live_npcs ():
 	query = "SELECT first_name, last_name FROM npc WHERE npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc);"
 	return run_query(query)
 
-def witness_id (witness):
-	query = "SELECT mapped_id FROM npc INNER JOIN mapped_npc ON npc.npc_id = mapped_npc.npc WHERE first_name = '{0}' AND last_name = '{1}';".format(witness[0], witness[1])
-	return query_single(query)
-
-def victim_id (victim):
-	query = "SELECT mapped_id FROM murder INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE first_name = '{0}' AND last_name = '{1}';".format(victim[0], victim[1])
-	return query_single(query)
-
-def murderer_detail ():
-	query = "SELECT detail.name FROM detail INNER JOIN clue ON clue.detail = detail.detail_id WHERE witness = {0} AND victim = {1};".format(witness_id(witness), victim_id(victim))
-	return run_query(query) #Multiple details? What then?
+def murderer_detail (witness, victim):
+	#DEBUG((witness, victim))
+	query = (
+			"SELECT detail.name "
+			"FROM detail "
+			"INNER JOIN clue ON clue.detail = detail.detail_id "
+			"WHERE witness = {0} AND victim = {1};"
+			).format(npc_id_from_name(witness), npc_id_from_name(victim))
+	result = run_query(query)
+	if result == []:
+		return None
+	else:
+		return column_as_list(result, 0) #Multiple details? What then?
 	
 def current_victims_murderer_id (victim):
-	query = "SELECT mapped_id FROM mapped_npc INNER JOIN murder ON mapped_id = murder.murderer WHERE murder.victim = {0};".format(victim_id(victim))
+	query = "SELECT mapped_id FROM mapped_npc INNER JOIN murder ON mapped_id = murder.murderer WHERE murder.victim = {0};".format(npc_id_from_name(victim))
 	return query_single(query)
 	
 def witnessed_multiple_murders (victim): #by the current victim's murderer
