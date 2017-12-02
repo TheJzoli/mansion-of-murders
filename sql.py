@@ -339,3 +339,7 @@ def current_victims_murderer_id (victim):
 def witnessed_multiple_murders (victim): #by the current victim's murderer
 	query = "SELECT clue.witness FROM clue WHERE clue.victim IN (SELECT mapped_id FROM mapped_npc INNER JOIN murder ON mapped_id = murder.victim WHERE murder.murderer IN ({0})) GROUP BY victim;".format(current_victims_murderer_id(victim))
 	return column_as_list(run_query(query), 0)
+	
+def all_but_current_murder_victims(victim):
+	query = "SELECT mapped_id FROM mapped_npc INNER JOIN murder ON mapped_id = murder.victim WHERE murder.murderer IN ({0}) AND mapped_id != {1}".format(current_victims_murderer_id(victim), npc_id_from_name(victim))
+	return column_as_list(run_query(query), 0)
