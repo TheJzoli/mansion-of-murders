@@ -38,9 +38,11 @@ def query_single (query):
 		return result [0][0]
 	else:
 		return None
-	
-	
 
+def run_update (update):
+	cursor = database.cursor()
+	cursor.execute(update)
+	
 ## PARSER FUNCTIONS -----------------------------------------------------------
 def get_two_part_words (word):
 	query = "SELECT word_2 FROM two_part_words WHERE word_1 = '{0}';".format(word)
@@ -152,6 +154,7 @@ def room_name_from_id (room_id):
 			"FROM room "
 			"WHERE room_id = {0};"
 			).format(room_id)
+	return query_single(query)
 
 def room_id_from_name (room_name):
 	query = (
@@ -161,6 +164,93 @@ def room_id_from_name (room_name):
 			).format(room_name)
 	return query_single(query)
 
+## NPC CONTROLLING ------------------------------------------------------------
+def get_living_npcs ():
+	query = ("SELECT mapped_id FROM mapped_npc "
+			"WHERE mapped_id NOT IN (SELECT victim FROM murder);")
+	return column_as_list(run_query(query), 0)
+
+def get_npc_location (mapped_id):
+	query = "SELECT location FROM mapped_npc WHERE mapped_id = {0};".format(mapped_id)
+	return query_single(query)
+	
+def get_npc_possible_directions (mapped_id):
+	query = (
+			"SELECT to_id "
+			"FROM passage "
+			"WHERE from_id = ("
+				"SELECT location "
+				"FROM mapped_npc "
+				"WHERE mapped_id = {0}"
+			");"
+			).format (mapped_id)
+	return column_as_list (run_query(query), 0)
+
+def move_npc (mapped_id, room_id):
+	update = "UPDATE mapped_npc SET location = {0} WHERE mapped_id = {1};".format(room_id, mapped_id)
+	run_update (update)
+	
+## MURDERING ------------------------------------------------------------------
+def get_active_murderers ():
+	query = (
+			"SELECT mapped_id FROM mapped_npc "
+			"WHERE state = 'murdering' "
+			"AND mapped_id NOT IN "
+				"(SELECT victim FROM murder) "
+			"ORDER BY mapped_id;"
+			)
+	return column_as_list (run_query(query), 0)
+
+	
+# Next two methods would profit from yield structure
+def rooms_in_order (first_room):
+	room_count = query_single ("SELECT COUNT(*) FROM room;")
+	rooms = [first_room]
+	
+	# Add rooms to list in order
+	# Take room at current index and get all rooms adjacent to it
+	# If they are not in list already, add them
+	for i in range(room_count):
+		other_rooms = get_adjacent_rooms(rooms[i])
+		for item in other_rooms:
+			if not item in rooms:
+				rooms.append(item)
+				
+	return rooms
+	
+def get_targets(murderer_mapped_id):
+	rooms = rooms_in_order(get_npc_location(murderer_mapped_id))
+	targets = None
+	
+	# Loop through rooms in order and return all npcs in first room that is not empty
+	for i in range (len(rooms)):
+		targets = live_npcsid_in_room(rooms[i])
+		
+		if murderer_mapped_id in targets:
+			targets.remove(murderer_mapped_id)
+			
+		if targets != None and targets != []:
+			room = rooms[i]
+			break
+	
+	if targets == []:
+		targets = None
+		
+	return targets
+	
+'''
+def get_npcs_in_same_room (murderer_mapped_id):
+	query = (
+			"SELECT mapped_id FROM mapped_npc "
+			"WHERE location = "
+				"(SELECT location FROM mapped_npc WHERE mapped_id = {0});"
+			).format(murderer_mapped_id)
+	return column_as_list (run_query(query), 0)
+'''	
+	
+def murder(victim_mapped_id, murderer_mapped_id):
+	insert = "INSERT INTO murder VALUES ({0}, {1});".format(victim_mapped_id, murderer_mapped_id)
+	run_update (insert)
 	
 ## MOVE FUNCTIONS -------------------------------------------------------------
 def get_room_id (target):
@@ -183,7 +273,7 @@ def get_room_name (room_id):
 	query = "SELECT name FROM room WHERE room_id = '{0}';".format(room_id)
 	return query_single(query)
 
-	
+
 	
 ## LOOK FUNCTIONS -------------------------------------------------------------
 '''

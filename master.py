@@ -1,3 +1,5 @@
+import random
+
 import sql
 import move
 import look
@@ -56,50 +58,79 @@ look.directions = directions
 
 
 ## INITIALIZE PLAYER
-class Player:
+class Player():
 	location = 1
+	
+player_actions = 1
+player_actions_used = player_actions
 
-player = Player
+player = Player()
 move.player = player
 look.player = player
 ask.player = player
 #blame.player = player
 
 # Start at full used actions, so that npcs will move on first turn
-player_actions = 3
-player_actions_used = player_actions
 
 ## INITIALIZE MURDERS
-next_murderer_id = 0
+current_murderer_id = 0
 
 ## GAME LOOP
+round = 0
 playing = True
 while (playing):
 	
 	# Check if its time for npcs to move
 	if player_actions_used == player_actions:
-		fprint("------------ Npcs move --------------")
-		'''
-		murderers = sql.get_active_murderers ()
-		next_murderer_id = get_next_smallest(murderers, next_murderer_id)
-		
-		targets = get_npcs_in_room(next_murderer_id)
-		victim = get_random_from_list(targets)
-		
-		murder.add(victim, murderer)
-		
-		### CLUES TOO
-		'''
-		'''
-		for npc in npcs:
-			directions = sql.get_possible_directions(npc.location)
-			destination = get_random_from_list(directions)
-			npc.location = destination
-		'''
-		
-		
-		
 		player_actions_used = 0
+		round += 1
+		
+		fprint("------------ Round {0} --------------".format(round))
+
+		# Find murderer
+		murderers = sql.get_active_murderers()
+
+		next_murderer_id = None
+		for npc in murderers:
+			if npc > current_murderer_id:
+				next_murderer_id = npc
+				break
+		
+		if next_murderer_id == None:
+			current_murderer_id = murderers[0]
+		else:
+			current_murderer_id = next_murderer_id
+		
+		# Find victim
+		possible_targets = sql.get_targets(current_murderer_id)#sql.live_npcsid_in_room(sql.get_npc_location(current_murderer_id))
+		
+		if possible_targets != None:
+			victim_id = random.choice(possible_targets)
+			
+			murderer_location = sql.get_npc_location (current_murderer_id)
+			victim_location = sql.get_npc_location(victim_id)
+			sql.move_npc(current_murderer_id, victim_location)
+			
+			if victim_location != murderer_location:
+				DEBUG ("Murderer {0} moved from {1} to {2} to kill {3}!".format(sql.npc_name_from_id(current_murderer_id), sql.room_name_from_id(murderer_location), sql.room_name_from_id(victim_location), sql.npc_name_from_id(victim_id)))
+			else:
+				DEBUG ("Murderer {0} killed {1} in {2}!".format(sql.npc_name_from_id(current_murderer_id), sql.npc_name_from_id(victim_id), sql.room_name_from_id(victim_location)))
+			
+			sql.murder(victim_id, current_murderer_id)
+		
+		else:
+			DEBUG("No targets left for remaining killer {0}.".format(sql.npc_name_from_id(current_murderer_id)))
+			
+		### CLUES TOO
+		# Npcs move
+		living_npcs = sql.get_living_npcs()
+		for npc in living_npcs:
+			do_move = random.choice([True, False])
+			if do_move:
+				possible_directions = sql.get_npc_possible_directions(npc)
+				destination = random.choice(sql.get_npc_possible_directions(npc))
+				# DEBUG("{0} move to {1}: {2}.".format(sql.npc_name_from_id(npc), destination, sql.room_name_from_id(destination)))
+				sql.move_npc(npc, destination)
 	
 	
 	# Receive and process input
@@ -116,7 +147,6 @@ while (playing):
 		# Don't look last word, since it can't be first of two part word
 		if index < word_range - 1:
 			next = raw_command [index + 1]
-			
 			parts = sql.get_two_part_words(word)
 			if parts != None and next in parts:
 				command_word = "{0} {1}".format(word, next)
@@ -141,7 +171,7 @@ while (playing):
 		command.append (command_word)
 		index += 1
 	# End of command process loop
-	DEBUG (command)
+	# DEBUG (command)
 	
 	# Parse input
 	verb = None
@@ -172,7 +202,7 @@ while (playing):
 				target2 = word
 				
 
-	DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
+	#DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
 				
 	# Check if player entered only direction
 	if target1 in long_directions:
@@ -218,12 +248,11 @@ while (playing):
 			super = int(action / 10)
 			sub = action - super * 10
 			
-			DEBUG("super: {0}, sub: {1}".format(super, sub))
-			
+			# DEBUG("super: {0}, sub: {1}".format(super, sub))
+			use_action_point = False
 			if super == 1: # MOVE
 				fprint(move.move(target2))
-				
-				player_actions_used +=1
+				use_action_point = True
 				
 			elif super == 2: # LOOK
 				if sub == 0:
@@ -234,10 +263,15 @@ while (playing):
 		
 			elif super == 3: # ASK
 				fprint(ask.ask(target1, target2))
+				use_action_point = True
+			
+			elif super == 9: # WAIT
+				fprint ("Some time passes.")
+				use_action_point = True
 				
+			if use_action_point:
 				player_actions_used += 1
 			
-		
 	else:
 		fprint("There was no verb, what do you want to do?")
 			
