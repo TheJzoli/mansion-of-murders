@@ -20,7 +20,7 @@ def input_list (message):
 	return processed_words
 
 '''
-# This doesn't work
+## This doesn't work
 from operator import itemgetter
 def sort_connections (give_connections):
 	sorted_connections = []

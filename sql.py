@@ -26,6 +26,10 @@ def column_as_list (table, column_id):
 		column.append(row[column_id])
 	return column
 	
+	
+	
+	
+	
 ## SQL FUNCTIONS --------------------------------------------------------------
 def run_query (query):
 	cursor = database.cursor()
@@ -42,6 +46,9 @@ def query_single (query):
 def run_update (update):
 	cursor = database.cursor()
 	cursor.execute(update)
+	
+	
+	
 	
 ## PARSER FUNCTIONS -----------------------------------------------------------
 def get_two_part_words (word):
@@ -77,6 +84,10 @@ def get_rooms ():
 def get_npcs ():
 	query = "SELECT first_name, last_name FROM npc;"
 	return run_query (query)
+	
+def get_last_name (first_name):
+	query = "SELECT last_name FROM npc WHERE first_name = '{0}';".format(first_name)
+	return query_single (query)
 	
 # [0] is first name, [1] is last name
 def get_npcs_names ():
@@ -163,7 +174,43 @@ def room_id_from_name (room_name):
 			"WHERE name = '{0}';"
 			).format(room_name)
 	return query_single(query)
+	
+def detail_name_from_id (detail_id):
+	query = "SELECT name FROM detail WHERE detail_id = {0};".format(detail_id)
+	return query_single(query)
 
+	
+	
+	
+## NPC INIT -------------------------------------------------------------------
+def map_npcs (npc_ids, room_ids, murderer_ids):
+	count = len (npc_ids)
+	rooms_count = len(room_ids)
+	
+	for i in range(count):
+		mapped_id  = i + 1
+		npc_id = npc_ids[i]
+		room_id = room_ids[i % rooms_count]
+		if npc_id in murderer_ids:
+			state = 'murdering'
+		else:
+			state = 'not murderer'
+		
+		insert = "INSERT INTO mapped_npc VALUES ({0}, {1}, {2}, '{3}');\n".format(mapped_id, npc_id, room_id, state)
+		run_update(insert)
+
+def get_murderers (sub_A, sub_B):
+	query = (
+			"SELECT npc_id FROM npc "
+			"WHERE (map_group = 'A' AND sub_group = {0}) "
+				"OR (map_group = 'B' AND sub_group = {1});"
+			).format(sub_A, sub_B)
+	return column_as_list (run_query(query), 0)
+
+	
+	
+	
+	
 ## NPC CONTROLLING ------------------------------------------------------------
 def get_living_npcs ():
 	query = ("SELECT mapped_id FROM mapped_npc "
@@ -189,6 +236,11 @@ def get_npc_possible_directions (mapped_id):
 def move_npc (mapped_id, room_id):
 	update = "UPDATE mapped_npc SET location = {0} WHERE mapped_id = {1};".format(room_id, mapped_id)
 	run_update (update)
+
+	
+	
+	
+	
 	
 ## MURDERING ------------------------------------------------------------------
 def get_active_murderers ():
@@ -200,7 +252,6 @@ def get_active_murderers ():
 			"ORDER BY mapped_id;"
 			)
 	return column_as_list (run_query(query), 0)
-
 	
 # Next two methods would profit from yield structure
 def rooms_in_order (first_room):
@@ -238,18 +289,12 @@ def get_targets(murderer_mapped_id):
 		
 	return targets
 	
-'''
-def get_npcs_in_same_room (murderer_mapped_id):
-	query = (
-			"SELECT mapped_id FROM mapped_npc "
-			"WHERE location = "
-				"(SELECT location FROM mapped_npc WHERE mapped_id = {0});"
-			).format(murderer_mapped_id)
-	return column_as_list (run_query(query), 0)
-'''	
-	
 def murder(victim_mapped_id, murderer_mapped_id):
 	insert = "INSERT INTO murder VALUES ({0}, {1});".format(victim_mapped_id, murderer_mapped_id)
+	run_update (insert)
+	
+def add_clue (victim_mapped_id, witness_mapped_id, detail_id):
+	insert = "INSERT INTO clue VALUES ({0}, {1}, {2});".format(victim_mapped_id, witness_mapped_id, detail_id)
 	run_update (insert)
 	
 ## MOVE FUNCTIONS -------------------------------------------------------------
@@ -272,6 +317,7 @@ def get_target_room_id (target):
 def get_room_name (room_id):
 	query = "SELECT name FROM room WHERE room_id = '{0}';".format(room_id)
 	return query_single(query)
+
 
 
 	
@@ -306,8 +352,17 @@ def dead_npcs_in_room (room_id):
 def id_from_name (target):
 	query = "SELECT npc_id FROM mapped_npc INNER JOIN npc ON mapped_npc.npc = npc.npc_id WHERE first_name = '{0}' AND last_name = '{1}';".format(target[0], target[1])
 	return query_single(query)
+
+def get_details (mapped_id):
+	query = (
+			"SELECT detail FROM npc_detail "
+			"INNER JOIN mapped_npc ON mapped_npc.npc = npc_detail.npc "
+			"WHERE mapped_id = {0};"
+			).format(mapped_id)
+	return column_as_list (run_query(query), 0)
 	
-	
+
+
 	
 ## ASK FUNCTIONS --------------------------------------------------------------
 def dead_npcs ():

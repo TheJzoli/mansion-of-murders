@@ -79,6 +79,7 @@ CREATE TABLE MAPPED_NPC (
 	state 		ENUM (
 					'not murderer',
 					'murdering',
+					'wait for witness',
 					'arrested',
 					'escaped'
 				) NOT NULL,
@@ -101,12 +102,12 @@ CREATE TABLE MURDER (
 );
 
 CREATE TABLE CLUE (
-	clue_id 	INT NOT NULL AUTO_INCREMENT,
+	/*clue_id 	INT NOT NULL AUTO_INCREMENT,*/
 	victim 		INT NOT NULL,
 	witness		INT NOT NULL,
 	detail 		INT NOT NULL,
 
-	PRIMARY KEY (clue_id),
+	/*PRIMARY KEY (clue_id),*/
 	
 	FOREIGN KEY (victim) 	REFERENCES MURDER (victim),
 	FOREIGN KEY (witness) 	REFERENCES MAPPED_NPC (mapped_id),
@@ -250,24 +251,24 @@ INSERT INTO detail VALUES (20, 'thick eyeglasses', null);
 
 INSERT INTO npc VALUES (1, "snorkeldink", "crumplehorn", NULL, 'A', 1);
 INSERT INTO npc VALUES (2, "brewery", "chickenbroth", NULL, 'A', 1);
-INSERT INTO npc VALUES (3, "rinkydink", "chuckecheese", NULL, 'A', 1);
-INSERT INTO npc VALUES (4, "brandenburg", "creamsicle", NULL, 'A', 1);
-INSERT INTO npc VALUES (5, "benadryl", "moldyspore", NULL, 'A', 1);
-INSERT INTO npc VALUES (6, "bumberstump", "cumbercooch", NULL,'A', 2);
-INSERT INTO npc VALUES (7, "benetton", "camouflage", NULL, 'A', 2);
-INSERT INTO npc VALUES (8, "bentobox", "cottagecheese", NULL, 'A', 2);
-INSERT INTO npc VALUES (9, 'bombadil', 'curdlesnoot', NULL, 'A', 2);
-INSERT INTO npc VALUES (10, 'buckingham', 'curdledmilk', NULL, 'A', 2);
+INSERT INTO npc VALUES (3, "rinkydink", "chuckecheese", NULL, 'A', 2);
+INSERT INTO npc VALUES (4, "brandenburg", "creamsicle", NULL, 'A', 2);
+INSERT INTO npc VALUES (5, "benadryl", "moldyspore", NULL, 'A', 3);
+INSERT INTO npc VALUES (6, "bumberstump", "cumbercooch", NULL,'A', 3);
+INSERT INTO npc VALUES (7, "benetton", "camouflage", NULL, 'A', 4);
+INSERT INTO npc VALUES (8, "bentobox", "cottagecheese", NULL, 'A', 4);
+INSERT INTO npc VALUES (9, 'bombadil', 'curdlesnoot', NULL, 'A', 5);
+INSERT INTO npc VALUES (10, 'buckingham', 'curdledmilk', NULL, 'A', 5);
 INSERT INTO npc VALUES (11, 'boilerdang', 'vegemite', NULL, 'B', 1);
 INSERT INTO npc VALUES (12, 'bandersnatch', 'countryside', NULL, 'B', 1);
-INSERT INTO npc VALUES (13, 'syphilis', 'countryside', NULL, 'B', 1);
-INSERT INTO npc VALUES (14, 'bunsenburner', 'cumbersnatch', NULL, 'B', 1);
-INSERT INTO npc VALUES (15, 'burberry', 'crackerdong', NULL, 'B', 1);
-INSERT INTO npc VALUES (16, 'baseballmitt', 'cuckooclock', NULL, 'B', 2);
-INSERT INTO npc VALUES (17, 'blubberbutt', 'crimpysnitch', NULL, 'B', 2);
-INSERT INTO npc VALUES (18, 'barister', 'lingerie', NULL, 'B', 2);
-INSERT INTO npc VALUES (19, 'burlington', 'rivendell', NULL, 'B', 2);
-INSERT INTO npc VALUES (20, 'brewery', 'curdlesnoot', NULL, 'B', 2);
+INSERT INTO npc VALUES (13, 'syphilis', 'countryside', NULL, 'B', 2);
+INSERT INTO npc VALUES (14, 'bunsenburner', 'cumbersnatch', NULL, 'B', 2);
+INSERT INTO npc VALUES (15, 'burberry', 'crackerdong', NULL, 'B', 3);
+INSERT INTO npc VALUES (16, 'baseballmitt', 'cuckooclock', NULL, 'B', 3);
+INSERT INTO npc VALUES (17, 'blubberbutt', 'crimpysnitch', NULL, 'B', 4);
+INSERT INTO npc VALUES (18, 'barister', 'lingerie', NULL, 'B', 4);
+INSERT INTO npc VALUES (19, 'burlington', 'rivendell', NULL, 'B', 5);
+INSERT INTO npc VALUES (20, 'brewery', 'curdlesnoot', NULL, 'B', 5);
 
 
 INSERT INTO npc_detail VALUES (1, 4);
@@ -371,6 +372,7 @@ INSERT INTO npc_detail VALUES (20, 9);
 INSERT INTO npc_detail VALUES (20, 10);
 INSERT INTO npc_detail VALUES (20, 17);
 
+/*
 INSERT INTO mapped_npc VALUES (1, 14, 1, 'not murderer');
 INSERT INTO mapped_npc VALUES (2, 1, 1, 'not murderer');
 INSERT INTO mapped_npc VALUES (3, 10, 1, 'not murderer');
@@ -391,7 +393,7 @@ INSERT INTO mapped_npc VALUES (17, 9, 1, 'not murderer');
 INSERT INTO mapped_npc VALUES (18, 19, 1, 'not murderer');
 INSERT INTO mapped_npc VALUES (19, 17, 1, 'not murderer');
 INSERT INTO mapped_npc VALUES (20, 13, 1, 'murdering');
-
+*/
 
 /*
 Clues that person W(itness) knows about killer of V(ictim)
