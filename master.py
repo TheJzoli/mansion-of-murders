@@ -4,6 +4,7 @@ import sql
 import move
 import look
 import ask
+#import blame
 
 # This controls text output beyond vanilla print
 def fprint (text):
@@ -13,6 +14,12 @@ def fprint (text):
 # This is just to make debug messages stand out, in code and output
 def DEBUG (message):
 	print ("DEBUG: " + str(message))
+	
+def shuffle (list):
+	count = len(list)
+	for i in range (count - 1):
+		random_index = random.randint(i, count - 1)
+		list[i], list[random_index] = list[random_index], list[i]
 	
 ## VOCABULARY
 # Get verbs and prepositions from database
@@ -57,11 +64,12 @@ look.directions = directions
 ## INITIALIZE ASK
 
 
-## INITIALIZE PLAYER
+## INITIALIZE PLAYER ==========================================================
 class Player():
 	location = 1
 	
-player_actions = 1
+# Start at full used actions, so that npcs will move on first turn
+player_actions = 3
 player_actions_used = player_actions
 
 player = Player()
@@ -70,24 +78,52 @@ look.player = player
 ask.player = player
 #blame.player = player
 
-# Start at full used actions, so that npcs will move on first turn
+## INITIALIZE NPCS ============================================================
+npcs_amount = len(first_names)
+npc_ids = []
+for i in range(npcs_amount):
+	npc_ids.append(i + 1)
+shuffle (npc_ids)
 
-## INITIALIZE MURDERS
+rooms_amount = len(rooms)
+room_ids = []
+for i in range(rooms_amount):
+	room_ids.append (i + 1)
+shuffle (rooms)
+
+murder_sub_A = random.randint(1, 5)
+murder_sub_B = random.randint(1, 5)
+possible_murderers = sql.get_murderers(murder_sub_A, murder_sub_B)
+shuffle (possible_murderers)
+
+number_murderers = int(npcs_amount / 10)
+selected_murderers = possible_murderers [:number_murderers]
+
+sql.map_npcs(npc_ids, room_ids, selected_murderers)
+
+
+## INITIALIZE MURDERS ========================================================
+# First murder must happen in entrance, so that player finds it early
+first_murderer = sql.query_single("SELECT MIN(mapped_id) FROM mapped_npc WHERE state = 'murdering';")
+DEBUG ("First murderer is {0}.".format(sql.npc_name_from_id(first_murderer)))
+sql.move_npc(first_murderer, sql.room_id_from_name('entrance'))
+
+# Still start murderer index from 0
 current_murderer_id = 0
 
-## GAME LOOP
+## GAME LOOP ==================================================================
 round = 0
 playing = True
 while (playing):
 	
-	# Check if its time for npcs to move
+	# Check if its time for npcs to do npc things
 	if player_actions_used == player_actions:
 		player_actions_used = 0
 		round += 1
 		
 		fprint("------------ Round {0} --------------".format(round))
 
-		# Find murderer
+		# Find murderer -------------------------------------------------------
 		murderers = sql.get_active_murderers()
 
 		next_murderer_id = None
@@ -101,8 +137,8 @@ while (playing):
 		else:
 			current_murderer_id = next_murderer_id
 		
-		# Find victim
-		possible_targets = sql.get_targets(current_murderer_id)#sql.live_npcsid_in_room(sql.get_npc_location(current_murderer_id))
+		# Find victim ---------------------------------------------------------
+		possible_targets = sql.get_targets(current_murderer_id)
 		
 		if possible_targets != None:
 			victim_id = random.choice(possible_targets)
@@ -121,15 +157,34 @@ while (playing):
 		else:
 			DEBUG("No targets left for remaining killer {0}.".format(sql.npc_name_from_id(current_murderer_id)))
 			
-		### CLUES TOO
-		# Npcs move
+		# Clues ---------------------------------------------------------------
+		if victim_id:
+			DEBUG ("{0} was killed".format(sql.npc_name_from_id(victim_id)))
+			clues = sql.get_details(current_murderer_id);
+			shuffle(clues)
+			witnesses = sql.live_npcsid_in_room(sql.get_npc_location(current_murderer_id))
+			if current_murderer_id in witnesses:
+				witnesses.remove (current_murderer_id)
+			shuffle(witnesses)
+			
+			if len(witnesses) > 0:
+				for i in range (5):
+					clue = clues [i]
+					witness_id = witnesses [i % len(witnesses)]
+					sql.add_clue (victim_id, witness_id, clue)
+	#				DEBUG("Added clue {0} to {1}.".format(sql.detail_name_from_id(clue), sql.npc_name_from_id(witness_id)))
+			else:
+				DEBUG ("No witnesses")
+			
+		# Reset killing -------------------------------------------------------
+		victim_id = None
+		
+		# Npcs move -----------------------------------------------------------
 		living_npcs = sql.get_living_npcs()
 		for npc in living_npcs:
 			do_move = random.choice([True, False])
 			if do_move:
-				possible_directions = sql.get_npc_possible_directions(npc)
 				destination = random.choice(sql.get_npc_possible_directions(npc))
-				# DEBUG("{0} move to {1}: {2}.".format(sql.npc_name_from_id(npc), destination, sql.room_name_from_id(destination)))
 				sql.move_npc(npc, destination)
 	
 	
@@ -143,13 +198,14 @@ while (playing):
 	index = 0
 	while index < word_range:
 		word = raw_command[index]
+		next_word = None
 		
-		# Don't look last word, since it can't be first of two part word
+		# Don't look last word, since it can't be first of two part word ------
 		if index < word_range - 1:
-			next = raw_command [index + 1]
+			next_word = raw_command [index + 1]
 			parts = sql.get_two_part_words(word)
-			if parts != None and next in parts:
-				command_word = "{0} {1}".format(word, next)
+			if parts != None and next_word in parts:
+				command_word = "{0} {1}".format(word, next_word)
 				index += 1
 			
 			else:
@@ -159,21 +215,44 @@ while (playing):
 			command_word = word
 		
 
-		
-		# Check for synonyms
+		# Check for synonyms --------------------------------------------------
 		command_word = sql.get_word_from_synonym(command_word)
 		
-		# Check for full name after synonyms
-		if command_word in first_names or command_word in last_names:
-			command_word = sql.get_full_name(command_word)
+		# Check for full name after synonyms ----------------------------------
+		if command_word in first_names and next_word == sql.get_last_name(command_word):
+			command_word = command_word, next_word
+			DEBUG ("phase 1: " + str(command_word))
+			index += 1
+			
+		elif command_word in first_names or command_word in last_names:
+			first_name = None
+			last_name = None
+
+			for i in range(len(first_names)):
+				
+				if command_word == first_names [i]:
+					first_name = command_word
+					if last_name is None:
+						last_name = last_names [i]
+					else:
+						last_name = False
+						
+				elif command_word == last_names [i]:
+					last_name = command_word
+					if first_name is None:
+						first_name = first_names[i]
+					else:
+						first_name = False		
+				
+			command_word = first_name, last_name
 			DEBUG ("cmd test: " + str(command_word))
+		# ---------------------------------------------------------------------
 		
 		command.append (command_word)
 		index += 1
-	# End of command process loop
-	# DEBUG (command)
+	# End of command process loop ---------------------------------------------
 	
-	# Parse input
+	# Parse command -----------------------------------------------------------
 	verb = None
 	target1 = None
 	preposition = None
@@ -181,42 +260,43 @@ while (playing):
 	
 	for word in command:
 		
-		if verb == None:
+		if verb is None:
 			if word in verbs:
 				verb = word
 				
-			elif word in directions:
+		
+		elif word in directions:
 				target1 = word
 		
-		elif preposition == None:
+		elif preposition is None:
 			
-			if word in targets and target1 == None:
+			if word in targets and target1 is None:
 				target1 = word
 				
 			elif word in prepositions:
 				preposition = word
 				
-		elif target2 == None:
+		elif target2 is None:
 			
 			if word in targets:
 				target2 = word
 				
 
-	#DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
+	DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
 				
-	# Check if player entered only direction
+	# Check if player entered only direction ----------------------------------
 	if target1 in long_directions:
 		target1 = sql.short_direction(target1)
 	
 	if verb == None and target1 in directions:
 		verb = 'move'
 		
-	# Build SQL-query from parsed commands
+	# Build SQL-query from parsed commands ------------------------------------
 	if verb:
-		# verb ----------------------------------------------------------
+		# verb ----------------------------------------------------------------
 		query = "SELECT id FROM actions WHERE verb = '{0}'".format(verb)
 		
-		# preposition --------------------------------------------------
+		# preposition ---------------------------------------------------------
 		if (preposition):
 			query += " AND preposition = '{0}'".format(preposition)
 		else:

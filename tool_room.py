@@ -1,7 +1,6 @@
 # Room Tool
 # © Leo Tamminen, leo.tamminen@metropolia.fi
 
-
 def trim (text):
 	while len(text) > 0 and text [0] in char_removables:
 		text = text[1:]
@@ -20,7 +19,7 @@ def input_list (message):
 	return processed_words
 
 '''
-# This doesn't work
+## This doesn't work
 from operator import itemgetter
 def sort_connections (give_connections):
 	sorted_connections = []
