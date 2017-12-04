@@ -338,7 +338,11 @@ def live_npcsid_in_room (room_id):
 	return column_as_list(run_query(query), 0)	
 	
 def dead_npcsid_in_room (room_id):
-	query = "SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location ='" + str(room_id) + "';"
+	query = (
+			"SELECT mapped_id FROM mapped_npc "
+			"WHERE mapped_id IN (SELECT victim FROM murder)"
+			"AND location = {0};"
+			).format (room_id)
 	return column_as_list(run_query(query), 0)
 
 def live_npcs_in_room (room_id):

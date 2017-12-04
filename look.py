@@ -9,7 +9,7 @@ player					# player instance, holds location
 import sql
 
 def all_npcids_in_room(room_id):
-        query = "SELECT npc.npc_id FROM npc, mapped_npc WHERE npc.npc_id = mapped_npc.npc AND mapped_npc.location = '" + str(room_id) + "';"
+        query = "SELECT mapped_npc.mapped_id FROM npc, mapped_npc WHERE npc.npc_id = mapped_npc.npc AND mapped_npc.location = '" + str(room_id) + "';"
         result = sql.column_as_list(sql.run_query(query),0)
         return result
 
@@ -40,8 +40,9 @@ def single_npc_description(id_from_name):
         result = sql.query_single(query)
         return result
 
-def single_npc_details():
-        query = "SELECT description FROM detail, npc_detail WHERE detail.detail_id = npc_detail.detail AND npc_detail.npc = '" + str(id_from_name) + "';"
+def single_npc_details(target_id):
+        #väärä
+        query = "SELECT description FROM detail, npc_detail WHERE detail.detail_id = npc_detail.detail AND npc_detail.npc = '" + str(target_id) + "';"
         return column_as_list(run_query(query),0)
 
 def look(target):
@@ -70,7 +71,7 @@ def look(target):
 			if(target_id in live_npcsid_in_room):
                                 
 					message = single_npc_description(target_id)
-					details = single_npc_detail()#lista
+					details = single_npc_detail(target_id)#lista
 					message += "\n They have the following details: \n"
 					for detail in details:
                                                 message += "\t{0}\n".format(detail)
