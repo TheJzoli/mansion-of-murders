@@ -43,7 +43,7 @@ def single_npc_description(id_from_name):
 def single_npc_details(target_id):
         #väärä
         query = "SELECT description FROM detail, npc_detail WHERE detail.detail_id = npc_detail.detail AND npc_detail.npc = '" + str(target_id) + "';"
-        return column_as_list(run_query(query),0)
+        return sql.column_as_list(sql.run_query(query),0)
 
 def look(target):
 ## mutta kun yrittää kattoo vaik 'look at benetton', niin sit tää sanoo, että se ei ole täällä
@@ -69,14 +69,17 @@ def look(target):
                                 print(sql.npc_name_from_id(npc))
 			
 			if(target_id in live_npcsid_in_room):
-                                
+                    
 					message = single_npc_description(target_id)
-					details = single_npc_detail(target_id)#lista
+					
+					details = single_npc_details(target_id)#lista
 					message += "\n They have the following details: \n"
 					for detail in details:
-                                                message += "\t{0}\n".format(detail)
-					
-			if(target_id in dead_npcsid_in_room):
+						message += "\t{0}\n".format(detail)
+						
+			# Noora tässä oli syy!
+			#if(target_id in dead_npcsid_in_room):
+			elif(target_id in dead_npcsid_in_room):
 					message = "Here lies the dead body of'" + str(target) + "';" 
 			else:
 					message = "They're not here."

@@ -1,7 +1,6 @@
 # Room Tool
 # © Leo Tamminen, leo.tamminen@metropolia.fi
 
-
 def trim (text):
 	while len(text) > 0 and text [0] in char_removables:
 		text = text[1:]
