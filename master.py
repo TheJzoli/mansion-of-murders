@@ -46,7 +46,6 @@ long_directions = directions [1]
 directions = short_directions + long_directions
 
 specials = sql.get_specials()
-DEBUG(specials)
 targets = rooms + npcs + directions + specials
 
 ## PARSER CONTEXTS ============================================================
@@ -239,7 +238,7 @@ while (playing):
 			
 		# Clues ---------------------------------------------------------------
 		if victim_id:
-			DEBUG ("{0} was killed".format(sql.npc_name_from_id(victim_id)))
+		#	DEBUG ("{0} was killed".format(sql.npc_name_from_id(victim_id)))
 			clues = sql.get_details(current_murderer_id);
 			shuffle(clues)
 			witnesses = sql.live_npcsid_in_room(sql.get_npc_location(current_murderer_id))
@@ -254,9 +253,9 @@ while (playing):
 					sql.add_clue (victim_id, witness_id, clue)
 					
 					# DEBUG("Added clue {0} to {1}.".format(sql.detail_name_from_id(clue), sql.npc_name_from_id(witness_id)))
-				DEBUG ("Yes witnesses")
-			else:
-				DEBUG ("No witnesses")
+		#		DEBUG ("Yes witnesses")
+		#	else:
+		#		DEBUG ("No witnesses")
 				
 		#Reset
 		victim_id = None
@@ -267,18 +266,13 @@ while (playing):
 	# Look for two part words
 	# Look for synonyms, and swap
 	raw_command = input (">> ").lower().split()
-
+	if len(raw_command) == 0:
+		continue
+	
 	# instant terminate
 	if raw_command[0] == 'exit':
 		playing = False
 		continue
-	
-	'''	
-	# view notes, make action later
-	elif raw_command[0] == 'notes':
-		view_notes()
-		continue
-	'''
 	
 	verb = None
 	target1 = None
@@ -332,8 +326,6 @@ while (playing):
 			else:
 				context = None
 			
-			#DEBUG(context)
-			
 			if command_word in first_names:
 				first_name = command_word
 				last_name = find_other_name(context, first_name)
@@ -350,12 +342,13 @@ while (playing):
 				elif not second_filled_npc:
 					second_filled_npc = sql.npc_id_from_name(command_word)
 					
-				DEBUG ("cmd test: " + str(command_word))
+				#DEBUG ("cmd test: " + str(command_word))
+				
+			## MESSAGE HERE TO TELL PLAYER TO BE MORE SPECIFIC ABOUT NAME
 		# ---------------------------------------------------------------------
 		
 		#command.append (command_word)
 		
-		#DEBUG((command_word, specials, command_word in specials))
 		if verb is None:
 			if command_word in verbs:
 				verb = command_word
@@ -370,7 +363,7 @@ while (playing):
 				
 			elif command_word in prepositions:
 				preposition = command_word
-				
+					
 		elif target2 is None:
 			
 			if command_word in targets:
@@ -379,21 +372,25 @@ while (playing):
 		index += 1
 	# End of command parsing loop ---------------------------------------------
 
-	DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
+	
 				
 	# Check if player entered only direction ----------------------------------
 	if target1 in long_directions:
 		target1 = sql.short_direction(target1)
 	
-	if verb == None:
-		DEBUG("No verb")
+	if verb is None:
 		if target1 in directions:
 			verb = 'move'
-		if target1 == 'notes':
-			verb = 'look'
+			target2 = target1
 			target1 = None
-			preposition = 'at'
-			target2 = 'notes'
+			
+	if target1 == 'notes' and (verb is None or verb == 'look'):
+		verb = 'look'
+		target1 = None
+		preposition = 'at'
+		target2 = 'notes'
+			
+	# DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
 	
 	# Build SQL-query from parsed commands ------------------------------------
 	if verb:
@@ -435,8 +432,11 @@ while (playing):
 			# DEBUG("super: {0}, sub: {1}".format(super, sub))
 			use_action_point = False
 			if super == 1: # MOVE
-				fprint(move.move(target2))
-				use_action_point = True
+				movement = move.move(target2)
+				fprint (movement[1])
+				if movement [0]:
+					fprint(look.look(sql.room_name_from_id(player.location)))
+					use_action_point = True
 				
 			elif super == 2: # LOOK
 				if sub == 0:
@@ -465,50 +465,3 @@ while (playing):
 ## END GAME LOOP	
 	
 sql.end()
-
-
-			
-'''	
-elif command_word in first_names or command_word in last_names:
-	npcs_in_room = sql.all_npc_names_in_room(player.location)
-	
-	first_name = None
-	last_name = None
-
-	# if npc in room
-	for i in range(len(npcs_in_room)):
-
-		if command_word == npcs_in_room [i][0]:
-			first_name = command_word
-			if last_name is None:
-				last_name = npcs_in_room[i][1]
-			else:
-				last_name = False
-				
-		elif command_word == npcs_in_room [i][1]:
-			last_name = command_word
-			if first_name is None:
-				first_name = npcs_in_room[i][0]
-			else:
-				first_name = False
-
-	# if npc exists but not in room
-	if first_name is None and last_name is None:
-
-		for i in range(len(first_names)):
-			
-			if command_word == first_names [i]:
-				first_name = command_word
-				if last_name is None:
-					last_name = last_names [i]
-				else:
-					last_name = False
-					
-			elif command_word == last_names [i]:
-				last_name = command_word
-				if first_name is None:
-					first_name = first_names[i]
-				else:
-					first_name = False
-
-	'''

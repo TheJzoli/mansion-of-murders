@@ -18,29 +18,54 @@ def all_npcids_in_room(room_id):
         return result
 
 def look_around ():
-    message = "You are in {0}.\n".format(sql.get_room_name(player.location))
-    query = "SELECT description FROM room WHERE room.room_id ='" + str(player.location) + "';"
-    result = sql.query_single(query)
-    
-    message += "You can move to:\n"
-    passages = sql.get_adjacent_rooms(player.location)
-    for item in passages:
-        message += "\t{0}\n".format(sql.get_room_name(item))#and direction, uusi sql? name + direction
-        
-    npcs = all_npcids_in_room(player.location)
-    dead = sql.dead_npcsid_in_room(player.location)
-    if len(npcs) > 0:
-                message += "These people are here:\n"
-                for item in npcs:
-                        message +="\t{0}\n".format(sql.npc_name_from_id(item))#nimen muotoilut
-                if len(dead) > 0:
-                        message += "But these people seem to be dead!:\n"
-                        for item in dead:
-                                message += "\t{0}\n".format(sql.npc_name_from_id(item))
-    else:
-        message += "There is no one in here."
+	message = "You are in {0}.\n".format(sql.get_room_name(player.location))
+	query = "SELECT description FROM room WHERE room.room_id ='" + str(player.location) + "';"
+	result = sql.query_single(query)
 
-    return message
+	message += "You can move to:\n"
+
+	#---------------------------
+	passages = sql.get_adjacent_rooms_and_directions(player.location)
+
+	room_names = []
+	directions = []
+	longest_length = 0
+	count = 0
+	
+	for item in passages:
+		room_names.append(sql.room_name_from_id(item [0]))
+		length = len(room_names[-1])
+		if length > longest_length:
+			longest_length = length
+		directions.append (sql.long_direction(item[1]))
+		count += 1
+		
+	for i in range(count):
+		message += "\t{0:{1}}\t{2}\n".format(room_names[i], longest_length, directions[i])
+	#-----------------------------
+	'''
+	for item in passages:
+		message += "\t{0}\n".format(sql.get_room_name(item))#and direction, uusi sql? name + direction
+	'''
+
+	#live_npcs = all_npcids_in_room(player.location)
+	live_npcs = sql.live_npcsid_in_room(player.location)
+	dead_npcs = sql.dead_npcsid_in_room(player.location)
+	total_npcs = len (live_npcs) + len (dead_npcs)
+	if total_npcs > 0:
+		message += "These people are here:\n"
+		for item in live_npcs:
+			formatted_name = formatter.name (sql.npc_name_from_id(item))
+			message +="\t{0}\n".format(formatted_name)#nimen muotoilut
+		if len(dead_npcs) > 0:
+			message += "But these people seem to be dead!:\n"
+			for item in dead_npcs:
+				formatted_name = formatter.name (sql.npc_name_from_id(item))
+				message +="\t{0}\n".format(formatted_name)
+	else:
+		message += "There is no one in here."
+
+	return message
 
 def single_npc_description(id_from_name):
         query = "SELECT description FROM npc WHERE npc_id = " + str(id_from_name) + ";"
@@ -65,27 +90,23 @@ def look(target):
 	if(target in rooms):
 			
 		room_id = sql.get_room_id(target)
-
 		if(room_id == player.location):
 			message = look_around()
 			if message == None:
 				message = "{0} is rather nice.".format(target)
 		else:
 				message = "You can't look there from here."
+				
 	elif(target in npcs):
 
 		target_id = sql.npc_id_from_name(target)
-		print(sql.room_name_from_id(player.location))
-		for npc in live_npcsid_in_room:
-			print(sql.npc_name_from_id(npc))
-
 		if(target_id in live_npcsid_in_room):
 				
 			message = single_npc_description(target_id)
 
 			details = single_npc_details(target_id)
 			if len(details) > 0:
-				message += "You immediately notice these striking details about them:\n"#ongelma
+				message += "\nYou immediately notice these striking details about them:\n"#ongelma
 				for detail in details:
 					message += "\t{0}\n".format(detail)
 
@@ -94,10 +115,11 @@ def look(target):
 
 		else:
 			message = "They're not here."
+			
 	elif(target in directions):#mikä huone suunnassa
 		message = "Everything looks great in that direction."
+		
 	elif target == 'notes':
-#	def view_notes ():
 		notes = sql.get_notes()
 		message = "NOTES:\n\n"
 		for entry in notes:
@@ -106,8 +128,7 @@ def look(target):
 			message += "{0} was killed in {1}. Clues about their killer:\n".format(victim, room)
 			for item in entry[2]:
 				message += "\t{0}\n".format(sql.detail_name_from_id(item))
-			#fprint (printout)
-#		message = view_notes()
+
 	elif(target == 'hell'):
 		message = "Looks like you looked right into your future."
 

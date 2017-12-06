@@ -13,12 +13,14 @@ print("INIT MOVE")
 
 def move(target):
 	message = ""
+	success = False
 	if target in rooms:
 		target_room_id = sql.get_room_id(target)
 		adjacent_rooms = sql.get_adjacent_rooms(player.location)
 		if target_room_id in adjacent_rooms:
 			player.location = target_room_id
 			message = 'Moved to the {0}'.format(target)
+			success = True
 		else:
 			message = "You can't move there from this room!"
 	elif target in directions:
@@ -27,10 +29,11 @@ def move(target):
 			target_room = sql.get_target_room_id(target)
 			player.location = target_room
 			message = 'Moved to the {0}'.format(sql.get_room_name(player.location))
+			success = True
 		else:
 			message = "You try to go in that direction and hit your face against the wall, ouch!"
 	
 	else:
 		message = "That is not somewhere you can go!"
 		
-	return message
+	return (success, message)

@@ -302,6 +302,7 @@ def get_adjacent_rooms (room_id):
 	query = "SELECT to_id FROM passage WHERE from_id = '{0}';".format(room_id)
 	return column_as_list(run_query(query), 0)
 
+
 def get_available_directions(room_id):
 	query = "SELECT direction FROM passage WHERE from_id = '{0}';".format(room_id)
 	return column_as_list(run_query(query), 0)
@@ -360,6 +361,10 @@ def get_details (mapped_id):
 			"WHERE mapped_id = {0};"
 			).format(mapped_id)
 	return column_as_list (run_query(query), 0)
+
+def get_adjacent_rooms_and_directions(room_id):
+	query = "SELECT to_id, direction FROM passage WHERE from_id = {0}".format(room_id)
+	return run_query(query)
 	
 
 
