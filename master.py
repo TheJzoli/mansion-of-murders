@@ -90,11 +90,16 @@ def find_other_name(context, known):
 	
 	if len(unknown_names) == 1:
 		unknown = unknown_names [0]
+	elif context is None:
+		unknown = None
 	elif context[0] in ['clue', 'murder']:
 		unknown = find_other_name(['room', player.location], known)
 	elif context[0] == 'room':
 		unknown = find_other_name (None, known)
-	else: unknown = None
+	else:
+		#this shouldn't ever occur
+		DEBUG ("Context WTF?")
+		unknown = None
 	
 	return unknown
 
@@ -152,30 +157,41 @@ selected_murderers = possible_murderers [:number_murderers]
 
 sql.map_npcs(npc_ids, room_ids, selected_murderers)
 
+def npc_move_message (moving_npcs, action):
+	move_message = ""
+	
+	if action == 'enter':
+		action_str = 'entered'
+		preposition = ' from'
+	elif action == 'exit':
+		action_str = 'exit'
+		preposition = 'to'
+	
+	current_room = sql.room_name_from_id(player.location)
+	for item in moving_npcs:
+		name = formatter.name(sql.npc_name_from_id(item[0]))
+		other_room = sql.room_name_from_id(item[1])
+		move_message += "{0} has {1} the {2} {3} the {4}.\n".format(
+														name,
+														action_str,
+														current_room,
+														preposition,
+														other_room
+														)
+	
+	return move_message
+
 
 ## INITIALIZE MURDERS ========================================================
 # First murder must happen in entrance, so that player finds it early
+# It is enough to move the first murderer there, because all npcs are dealt evenly across rooms
 first_murderer = sql.query_single("SELECT MIN(mapped_id) FROM mapped_npc WHERE state = 'murdering';")
 sql.move_npc(first_murderer, sql.room_id_from_name('entrance'))
-#DEBUG ("First murderer is {0}.".format(sql.npc_name_from_id(first_murderer)))
 
 # Still start murderer index from 0
 current_murderer_id = 0
 
-
-'''
-def view_notes ():
-	notes = sql.get_notes()
-	for entry in notes:
-		victim = formatter.name(sql.npc_name_from_id(entry[0]))
-		room = formatter.room(sql.room_name_from_id(entry[1]))
-		printout = "{0} was killed in {1}. Clues about their killer:\n".format(victim, room)
-		for item in entry[2]:
-			printout += "\t{0}\n".format(sql.detail_name_from_id(item))
-		fprint (printout)
-'''
-					
-					
+		
 ## GAME LOOP ==================================================================
 round = 0
 playing = True
@@ -186,12 +202,7 @@ while (playing):
 		player_actions_used = 0
 		round += 1
 		
-		fprint("------------ Round {0} --------------".format(round))
-		'''
-		instead, print here npcs who have left or entered players room and to where/ from where
-		
-		
-		'''
+		DEBUG("------------ Round {0} --------------".format(round))
 		# Find murderer -------------------------------------------------------
 		murderers = sql.get_active_murderers()
 
@@ -215,7 +226,7 @@ while (playing):
 			murderer_location = sql.get_npc_location (current_murderer_id)
 			victim_location = sql.get_npc_location(victim_id)
 			sql.move_npc(current_murderer_id, victim_location)
-			
+		'''	
 			if victim_location != murderer_location:
 				DEBUG ("Murderer {0} moved from {1} to {2} to kill {3}!".format(sql.npc_name_from_id(current_murderer_id), sql.room_name_from_id(murderer_location), sql.room_name_from_id(victim_location), sql.npc_name_from_id(victim_id)))
 			else:
@@ -223,19 +234,39 @@ while (playing):
 
 		else:
 			DEBUG("No targets left for remaining killer {0}.".format(sql.npc_name_from_id(current_murderer_id)))
-
+		'''
+			
 		# Npcs move -----------------------------------------------------------
 		living_npcs = sql.get_living_npcs()
 		living_npcs.remove(current_murderer_id)
 		if victim_id:
 			living_npcs.remove(victim_id)
-			
+		
+		# players location
+		npcs_enter = []
+		npcs_exit = []
+		
 		for npc in living_npcs:
 			do_move = random.choice([True, False])
 			if do_move:
 				destination = random.choice(sql.get_npc_possible_directions(npc))
-				sql.move_npc(npc, destination)
 				
+				if destination == player.location:
+					npcs_enter.append((npc, sql.get_npc_location(npc)))
+				
+				elif sql.get_npc_location(npc) == player.location:
+					npcs_exit.append((npc, destination))	
+				
+				sql.move_npc(npc, destination)
+		
+
+		npcs_enter_message = npc_move_message(npcs_enter, 'enter')
+		npcs_exit_message = npc_move_message(npcs_exit, 'exit')
+		
+		## MOVE THESE SOMEWHERE ELSE
+		DEBUG (npcs_enter_message)
+		DEBUG (npcs_exit_message)
+		
 		# Execute -------------------------------------------------------------
 		if victim_id and current_murderer_id:
 			sql.murder(victim_id, current_murderer_id)
@@ -278,15 +309,24 @@ while (playing):
 		playing = False
 		continue
 	
+	if raw_command [0] == 'show' and raw_command[1] == 'murderers':
+		murderers = sql.get_active_murderers()
+		for item in murderers:
+			print ("\t{0}".format(formatter.name(sql.npc_name_from_id(item))))
+		print ("\n\n")
+		continue
+	
+	# Actual meaningful words
 	verb = None
 	target1 = None
 	preposition = None
 	target2 = None
 
-	
+	# For guessing names
 	first_filled_npc = None
 	second_filled_npc = None
-
+	bad_name_message = None
+	
 	word_range = len(raw_command)
 	index = 0
 	while index < word_range:
@@ -338,7 +378,7 @@ while (playing):
 				last_name = command_word
 				first_name = find_other_name(context, last_name)
 
-			if first_name or last_name:
+			if first_name and last_name:
 				command_word = first_name, last_name
 				
 				if not first_filled_npc:
@@ -347,6 +387,13 @@ while (playing):
 					second_filled_npc = sql.npc_id_from_name(command_word)
 					
 				#DEBUG ("cmd test: " + str(command_word))
+				
+			elif first_name:
+				bad_name_message = "Which {0} do you mean?".format(first_name.title())
+				break
+			elif last_name:
+				bad_name_message = "You have to be more specific. Which {0} do you mean?".format(last_name.title())
+				break
 				
 			## MESSAGE HERE TO TELL PLAYER TO BE MORE SPECIFIC ABOUT NAME
 		# ---------------------------------------------------------------------
@@ -375,8 +422,11 @@ while (playing):
 		
 		index += 1
 	# End of command parsing loop ---------------------------------------------
-
 	
+	# Check if bad name found -------------------------------------------------
+	if bad_name_message:
+		fprint(bad_name_message)
+		continue
 				
 	# Check if player entered only direction ----------------------------------
 	if target1 in long_directions:

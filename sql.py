@@ -311,6 +311,13 @@ def get_target_room_id (target):
 	query = "SELECT to_id FROM passage WHERE direction = '{0}';".format(target)
 	return query_single(query)
 	
+def get_room_in_direction(start_room_id, direction):
+	query = (
+			"SELECT to_id FROM passage "
+			"WHERE from_id = {0} AND direction = '{1}';"
+			). format(start_room_id, direction)
+	return query_single(query)
+	
 def get_room_name (room_id):
 	query = "SELECT name FROM room WHERE room_id = '{0}';".format(room_id)
 	return query_single(query)
