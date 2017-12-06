@@ -187,7 +187,11 @@ while (playing):
 		round += 1
 		
 		fprint("------------ Round {0} --------------".format(round))
-
+		'''
+		instead, print here npcs who have left or entered players room and to where/ from where
+		
+		
+		'''
 		# Find murderer -------------------------------------------------------
 		murderers = sql.get_active_murderers()
 

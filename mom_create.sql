@@ -117,8 +117,8 @@ CREATE TABLE CLUE (
 CREATE UNIQUE INDEX MOM_GAME ON CLUE (victim, witness, 	detail);
 
 CREATE TABLE PLAYER_CLUE (
-	victim INT NOT NULL,
-	detail INT NOT NULL,
+	victim 	INT NOT NULL,
+	detail 	INT NOT NULL,
 
 	PRIMARY KEY (victim, detail),
 

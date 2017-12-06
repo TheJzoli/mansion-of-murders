@@ -409,7 +409,7 @@ def all_but_current_murder_victims(victim):
 
 ## PLAYER NOTES ---------------------------------------------------------------
 def  get_notes():
-	result = run_query ("SELECT * FROM player_clue;")
+	result = run_query ("SELECT victim, detail FROM player_clue;")
 	notes = []
 	for record in result:
 		next_victim = record[0]
