@@ -94,11 +94,11 @@ CREATE UNIQUE INDEX MOM_GAME ON MAPPED_NPC (npc);
 CREATE TABLE MURDER (
 	victim 		INT NOT NULL,
 	murderer 	INT NOT NULL,
-
+	
 	PRIMARY KEY (victim),
 	
-	FOREIGN KEY (victim) 	REFERENCES MAPPED_NPC (mapped_id),
-	FOREIGN KEY (murderer) 	REFERENCES MAPPED_NPC (mapped_id)
+	FOREIGN KEY (victim) 	REFERENCES mapped_npc (mapped_id),
+	FOREIGN KEY (murderer) 	REFERENCES mapped_npc (mapped_id)
 );
 
 CREATE TABLE CLUE (
@@ -126,16 +126,16 @@ CREATE TABLE PLAYER_CLUE (
 	FOREIGN KEY (detail) REFERENCES DETAIL (detail_id)
 );
 
-INSERT INTO DIRECTION VALUES ('n', 'north');
-INSERT INTO DIRECTION VALUES ('ne', 'northeast');
-INSERT INTO DIRECTION VALUES ('e', 'east');
-INSERT INTO DIRECTION VALUES ('se', 'southeast');
-INSERT INTO DIRECTION VALUES ('s', 'south');
-INSERT INTO DIRECTION VALUES ('sw', 'southwest');
-INSERT INTO DIRECTION VALUES ('w', 'west');
-INSERT INTO DIRECTION VALUES ('nw', 'northwest');
-INSERT INTO DIRECTION VALUES ('u', 'up');
-INSERT INTO DIRECTION VALUES ('d', 'down');
+INSERT INTO direction VALUES ('n', 'north');
+INSERT INTO direction VALUES ('ne', 'northeast');
+INSERT INTO direction VALUES ('e', 'east');
+INSERT INTO direction VALUES ('se', 'southeast');
+INSERT INTO direction VALUES ('s', 'south');
+INSERT INTO direction VALUES ('sw', 'southwest');
+INSERT INTO direction VALUES ('w', 'west');
+INSERT INTO direction VALUES ('nw', 'northwest');
+INSERT INTO direction VALUES ('u', 'up');
+INSERT INTO direction VALUES ('d', 'down');
 
 INSERT INTO room VALUES (1, 'front yard', NULL);
 INSERT INTO two_part_words VALUES ('front', 'yard');
@@ -270,26 +270,26 @@ INSERT INTO detail VALUES (38, 'drinking horn', null);
 INSERT INTO detail VALUES (39, 'too much danduruff', null);
 INSERT INTO detail VALUES (40, 'sparkling eyelashes', null);
 
-INSERT INTO npc VALUES (1, 'snorkeldink', 'crumplehorn', 'They have some eyes', 'A', 1);
-INSERT INTO npc VALUES (2, 'brewery', 'chickenbroth', 'They have some eyes', 'A', 1);
-INSERT INTO npc VALUES (3, 'rinkydink', 'chuckecheese', 'They have some eyes', 'A', 1);
-INSERT INTO npc VALUES (4, 'brandenburg', 'creamsicle', 'They have some eyes', 'A', 1);
-INSERT INTO npc VALUES (5, 'benadryl', 'moldyspore', 'They have some eyes', 'A', 2);
-INSERT INTO npc VALUES (6, 'bumberstump', 'cumbercooch', 'They have some eyes', 'A', 2);
-INSERT INTO npc VALUES (7, 'benetton', 'camouflage', 'They have some eyes', 'A', 2);
-INSERT INTO npc VALUES (8, 'bentobox', 'cottagecheese', 'They have some eyes', 'A', 2);
-INSERT INTO npc VALUES (9, 'bombadil', 'curdlesnoot', 'They have some eyes', 'A', 3);
-INSERT INTO npc VALUES (10, 'buckingham', 'curdledmilk', 'They have some eyes', 'A', 3);
-INSERT INTO npc VALUES (11, 'boilerdang', 'vegemite', 'They have some eyes', 'A', 3);
-INSERT INTO npc VALUES (12, 'bandersnatch', 'countryside', 'They have some eyes', 'A', 3);
-INSERT INTO npc VALUES (13, 'syphilis', 'countryside', 'They have some eyes', 'A', 4);
-INSERT INTO npc VALUES (14, 'bunsenburner', 'cumbersnatch', 'They have some eyes', 'A', 4);
-INSERT INTO npc VALUES (15, 'burberry', 'crackerdong', 'They have some eyes', 'A', 4);
-INSERT INTO npc VALUES (16, 'baseballmitt', 'cuckooclock', 'They have some eyes', 'A', 4);
-INSERT INTO npc VALUES (17, 'blubberbutt', 'crimpysnitch', 'They have some eyes', 'A', 5);
-INSERT INTO npc VALUES (18, 'barister', 'lingerie', 'They have some eyes', 'A', 5);
-INSERT INTO npc VALUES (19, 'burlington', 'rivendell', 'They have some eyes', 'A', 5);
-INSERT INTO npc VALUES (20, 'brewery', 'curdlesnoot', 'They have some eyes', 'A', 5);
+INSERT INTO npc VALUES (1, 'snorkeldink', 'crumplehorn', 'Generic description.', 'A', 1);
+INSERT INTO npc VALUES (2, 'brewery', 'chickenbroth', 'Generic description.', 'A', 1);
+INSERT INTO npc VALUES (3, 'rinkydink', 'chuckecheese', 'Generic description.', 'A', 1);
+INSERT INTO npc VALUES (4, 'brandenburg', 'creamsicle', 'Generic description.', 'A', 1);
+INSERT INTO npc VALUES (5, 'benadryl', 'moldyspore', 'Generic description.', 'A', 2);
+INSERT INTO npc VALUES (6, 'bumberstump', 'cumbercooch', 'Generic description.', 'A', 2);
+INSERT INTO npc VALUES (7, 'benetton', 'camouflage', 'Generic description.', 'A', 2);
+INSERT INTO npc VALUES (8, 'bentobox', 'cottagecheese', 'Generic description.', 'A', 2);
+INSERT INTO npc VALUES (9, 'bombadil', 'curdlesnoot', 'Generic description.', 'A', 3);
+INSERT INTO npc VALUES (10, 'buckingham', 'curdledmilk', 'Generic description.', 'A', 3);
+INSERT INTO npc VALUES (11, 'boilerdang', 'vegemite', 'Generic description.', 'A', 3);
+INSERT INTO npc VALUES (12, 'bandersnatch', 'countryside', 'Generic description.', 'A', 3);
+INSERT INTO npc VALUES (13, 'syphilis', 'countryside', 'Generic description.', 'A', 4);
+INSERT INTO npc VALUES (14, 'bunsenburner', 'cumbersnatch', 'Generic description.', 'A', 4);
+INSERT INTO npc VALUES (15, 'burberry', 'crackerdong', 'Generic description.', 'A', 4);
+INSERT INTO npc VALUES (16, 'baseballmitt', 'cuckooclock', 'Generic description.', 'A', 4);
+INSERT INTO npc VALUES (17, 'blubberbutt', 'crimpysnitch', 'Generic description.', 'A', 5);
+INSERT INTO npc VALUES (18, 'barister', 'lingerie', 'Generic description.', 'A', 5);
+INSERT INTO npc VALUES (19, 'burlington', 'rivendell', 'Generic description.', 'A', 5);
+INSERT INTO npc VALUES (20, 'brewery', 'curdlesnoot', 'Generic description.', 'A', 5);
 INSERT INTO npc VALUES (21, 'billyray', 'nottinghill', 'Generic description.', 'B', 1);
 INSERT INTO npc VALUES (22, 'bandicoot', 'crucifix', 'Generic description.', 'B', 1);
 INSERT INTO npc VALUES (23, 'liverswort', 'cunningsnatch', 'Generic description.', 'B', 1);
@@ -512,56 +512,8 @@ INSERT INTO npc_detail VALUES ( 40,  28);
 INSERT INTO npc_detail VALUES ( 40,  33);
 INSERT INTO npc_detail VALUES ( 40,  34);
 
-/*
-INSERT INTO mapped_npc VALUES (1, 14, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (2, 1, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (3, 10, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (4, 18, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (5, 16, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (6, 20, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (7, 5, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (8, 15, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (9, 2, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (10, 3, 1, 'murdering');
-INSERT INTO mapped_npc VALUES (11, 11, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (12, 4, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (13, 6, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (14, 8, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (15, 12, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (16, 7, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (17, 9, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (18, 19, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (19, 17, 1, 'not murderer');
-INSERT INTO mapped_npc VALUES (20, 13, 1, 'murdering');
-*/
 
-/*
-Clues that person W(itness) knows about killer of V(ictim)
-SELECT DETAIL.name
-FROM CLUE
-	
-	INNER JOIN MAPPED_NPC as M_W
-		ON M_W.mapped_id = CLUE.witness
-		INNER JOIN NPC as W
-			ON W.npc_id = M_W.npc
-	
-	INNER JOIN MURDER
-		ON MURDER.murder_id = CLUE.murder
-		INNER JOIN MAPPED_NPC as M_V
-			ON M_V.mapped_id = MURDER.victim
-			INNER JOIN NPC as V
-				ON V.npc_id = M_V.npc
-
-	INNER JOIN DETAIL
-		ON DETAIL.detail_id = CLUE.detail
-
-WHERE
-	V.last_name = "[Victims last name]" AND
-	W.last_name = "[Witness' last name]";
-	
-*/
-
--- parser section
+-- PARSER SECTION =============================================================
 CREATE TABLE VERB (
 	word VARCHAR(100),
 	PRIMARY KEY (word)
@@ -580,6 +532,11 @@ CREATE TABLE ACTIONS (
 	has_target2 BOOLEAN NOT NULL,
 	FOREIGN KEY (verb) REFERENCES VERB (word),
 	FOREIGN KEY (preposition) REFERENCES PREPOSITIONS(word)
+);
+
+-- All other targets
+CREATE TABLE specials (
+	word VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE synonyms (
@@ -660,3 +617,7 @@ INSERT INTO synonyms VALUES ('tiptoe', 'move');
 INSERT INTO synonyms VALUES ('stomp',  'move');
 INSERT INTO synonyms VALUES ('shimmy', 'move');
 INSERT INTO synonyms VALUES ('crawl',  'move');
+
+-- OTHERS
+INSERT INTO specials VALUES ('notes');
+INSERT INTO synonyms VALUES ('memo', 'notes');

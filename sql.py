@@ -14,6 +14,12 @@ database = mysql.connector.connect(
 	buffered = True)
 DEBUG ("Connect to sql")
 
+cursor = database.cursor()
+cursor.execute("DELETE FROM player_clue;")
+cursor.execute("DELETE FROM clue;")
+cursor.execute("DELETE FROM murder;")
+cursor.execute("DELETE FROM mapped_npc;")
+
 # Close and reset database
 def end ():
 	database.rollback()
@@ -44,6 +50,7 @@ def query_single (query):
 		return None
 
 def run_update (update):
+
 	cursor = database.cursor()
 	cursor.execute(update)
 	
@@ -101,33 +108,18 @@ def get_directions ():
 	result = run_query (query)
 	return [column_as_list(result, 0), column_as_list (result, 1)]
 
-def get_full_name (name):
-	# This is not complete, and works only when no same first or last name exist
-	all_names = get_npcs ()
-	first_name = False
-	last_name = False
-
-	for i in range(len(all_names)):
-		
-		# case john wilsom and john johnson
-		if name == all_names[i][0]:
-			first_name = name
-			if last_name == False:
-				last_name = all_names [i][1]
-			else:
-				last_name = None
-			
-			
-		# case john wilson and maria wilson
-		elif name == all_names [i][1]:
-			last_name = name
-			if first_name == False:
-				first_name = all_names[i][0]
-			else:
-				first_name = None
+def get_specials ():
+	result = run_query("SELECT word FROM specials;")
+	return column_as_list(result, 0)
 	
-	return first_name, last_name
-	
+def all_npc_names_in_room(room_id):
+	query = (
+			"SELECT first_name, last_name "
+			"FROM mapped_npc "
+			"INNER JOIN npc ON npc_id = mapped_npc.npc "
+			"WHERE location = {0}"
+			).format(room_id)
+	return run_query(query)
 	
 	
 	
@@ -196,8 +188,10 @@ def map_npcs (npc_ids, room_ids, murderer_ids):
 		else:
 			state = 'not murderer'
 		
-		insert = "INSERT INTO mapped_npc VALUES ({0}, {1}, {2}, '{3}');\n".format(mapped_id, npc_id, room_id, state)
+		insert = "INSERT INTO mapped_npc VALUES ({0}, {1}, {2}, '{3}');".format(mapped_id, npc_id, room_id, state)
+
 		run_update(insert)
+
 
 def get_murderers (sub_A, sub_B):
 	query = (
@@ -297,6 +291,8 @@ def add_clue (victim_mapped_id, witness_mapped_id, detail_id):
 	insert = "INSERT INTO clue VALUES ({0}, {1}, {2});".format(victim_mapped_id, witness_mapped_id, detail_id)
 	run_update (insert)
 	
+	
+	
 ## MOVE FUNCTIONS -------------------------------------------------------------
 def get_room_id (target):
 	query = "SELECT room_id FROM room WHERE name = '{0}';".format(target)
@@ -385,6 +381,9 @@ def murderer_detail (witness, victim):
 			"INNER JOIN clue ON clue.detail = detail.detail_id "
 			"WHERE witness = {0} AND victim = {1};"
 			).format(npc_id_from_name(witness), npc_id_from_name(victim))
+			
+	# JOEL TEIN KOKEILUU		
+	query = "SELECT detail FROM clue WHERE witness = {0} AND victim = {1};".format(npc_id_from_name(witness), npc_id_from_name(victim))
 	result = run_query(query)
 	if result == []:
 		return None
@@ -402,3 +401,25 @@ def witnessed_multiple_murders (victim): #by the current victim's murderer
 def all_but_current_murder_victims(victim):
 	query = "SELECT mapped_id FROM mapped_npc INNER JOIN murder ON mapped_id = murder.victim WHERE murder.murderer IN ({0}) AND mapped_id != {1}".format(current_victims_murderer_id(victim), npc_id_from_name(victim))
 	return column_as_list(run_query(query), 0)
+
+## PLAYER NOTES ---------------------------------------------------------------
+def  get_notes():
+	result = run_query ("SELECT * FROM player_clue;")
+	notes = []
+	for record in result:
+		next_victim = record[0]
+		if notes == [] or notes [-1][0] != next_victim:
+			location = get_npc_location(next_victim)
+			notes.append((next_victim, location, []))
+			
+		
+		notes[-1][2].append(record[1])
+	return notes
+
+def add_player_clue(victim, detail):
+	query = "INSERT INTO player_clue VALUES ({0}, {1});".format(victim, detail)
+	DEBUG (query)
+	run_update(query)
+
+
+

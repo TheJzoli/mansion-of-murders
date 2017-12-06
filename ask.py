@@ -7,9 +7,20 @@ def ask(witness, victim):
 	if witness in sql.live_npcs_in_room(player.location):
 		if victim in sql.dead_npcs():
 			details = sql.murderer_detail(witness, victim)
+			
+
 			if (details == None):
 				message = "{0}: Wait? {1} has been murdered? How horrible! I didn't know!".format (witness, victim)
 			else:
+				# JOEL lisäsin tän osan tähän, ni nää tallentuu pelaaja muistioon
+				# muutin myös ton sql.murderer_detail:in palauttaa detail_id:n eikä nimeä
+				for item in details:
+					sql.add_player_clue(sql.npc_id_from_name(victim), item)
+				
+				for i in range (len(details)):
+					details[i] = sql.detail_name_from_id(details[i])
+				# ---------------------------------------------------------------
+				
 				message = "{0}: How horrible... If I remember correctly, the murderer had a {1}.".format(witness, details)
 				if (sql.npc_id_from_name(witness) in sql.witnessed_multiple_murders(victim)):
 					message += " Oh and also, the murderer was the same person who murdered "

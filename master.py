@@ -5,6 +5,7 @@ import move
 import look
 import ask
 #import blame
+import formatter
 
 # This controls text output beyond vanilla print
 def fprint (text):
@@ -20,8 +21,11 @@ def shuffle (list):
 	for i in range (count - 1):
 		random_index = random.randint(i, count - 1)
 		list[i], list[random_index] = list[random_index], list[i]
+
 	
-## VOCABULARY
+
+	
+## VOCABULARY =================================================================
 # Get verbs and prepositions from database
 verbs = sql.get_verbs()
 prepositions = sql.get_prepositions()
@@ -41,10 +45,59 @@ short_directions = directions [0]
 long_directions = directions [1]
 directions = short_directions + long_directions
 
-targets = rooms + npcs + directions
-DEBUG ("targets: " + str(targets) + "\n")
+specials = sql.get_specials()
+DEBUG(specials)
+targets = rooms + npcs + directions + specials
 
+## PARSER CONTEXTS ============================================================
+no_context_query = "SELECT {0} FROM npc WHERE {1} = '{2}';"
+context_room_query = (
+					"SELECT {0} FROM npc "
+					"INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
+					"WHERE {1} = '{2}' AND location = {3};"
+					)
+context_clue_query = (
+					"SELECT {0} FROM npc "
+					"INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
+					"INNER JOIN clue ON victim = mapped_id "
+					"WHERE {1} = '{2}' AND witness = {3};"
+					)
+context_murder_query = (
+					"SELECT {0} FROM npc "
+					"INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
+					"INNER JOIN murder ON victim = mapped_id "
+					"WHERE {1} = '{2}' AND murderer = {3};"
+					)
 
+def find_other_name(context, known):		
+
+	if known in first_names:
+		known_str = 'first_name'
+		unknown_str = 'last_name'
+	else:
+		known_str = 'last_name'
+		unknown_str = 'first_name'
+		
+	if context is None:
+		unknown_query = no_context_query.format(unknown_str, known_str, known)
+	elif context[0] == 'room':
+		unknown_query = context_room_query.format(unknown_str, known_str, known, context[1])
+	elif context[0] == 'clue':
+		unknown_query = context_clue_query.format(unknown_str, known_str, known, context[1])
+	elif context[0] == 'murder':
+		unknown_query = context_murder_query.format(unknown_str, known_str, known, context[1])
+		
+	unknown_names = sql.column_as_list(sql.run_query(unknown_query), 0)
+	
+	if len(unknown_names) == 1:
+		unknown = unknown_names [0]
+	elif context[0] in ['clue', 'murder']:
+		unknown = find_other_name(['room', player.location], known)
+	elif context[0] == 'room':
+		unknown = find_other_name (None, known)
+	else: unknown = None
+	
+	return unknown
 
 ## INITIALIZE MOVE
 move.rooms = rooms
@@ -62,7 +115,6 @@ look.directions = directions
 
 
 ## INITIALIZE ASK
-
 
 ## INITIALIZE PLAYER ==========================================================
 class Player():
@@ -105,12 +157,26 @@ sql.map_npcs(npc_ids, room_ids, selected_murderers)
 ## INITIALIZE MURDERS ========================================================
 # First murder must happen in entrance, so that player finds it early
 first_murderer = sql.query_single("SELECT MIN(mapped_id) FROM mapped_npc WHERE state = 'murdering';")
-DEBUG ("First murderer is {0}.".format(sql.npc_name_from_id(first_murderer)))
 sql.move_npc(first_murderer, sql.room_id_from_name('entrance'))
+#DEBUG ("First murderer is {0}.".format(sql.npc_name_from_id(first_murderer)))
 
 # Still start murderer index from 0
 current_murderer_id = 0
 
+
+'''
+def view_notes ():
+	notes = sql.get_notes()
+	for entry in notes:
+		victim = formatter.name(sql.npc_name_from_id(entry[0]))
+		room = formatter.room(sql.room_name_from_id(entry[1]))
+		printout = "{0} was killed in {1}. Clues about their killer:\n".format(victim, room)
+		for item in entry[2]:
+			printout += "\t{0}\n".format(sql.detail_name_from_id(item))
+		fprint (printout)
+'''
+					
+					
 ## GAME LOOP ==================================================================
 round = 0
 playing = True
@@ -151,11 +217,25 @@ while (playing):
 				DEBUG ("Murderer {0} moved from {1} to {2} to kill {3}!".format(sql.npc_name_from_id(current_murderer_id), sql.room_name_from_id(murderer_location), sql.room_name_from_id(victim_location), sql.npc_name_from_id(victim_id)))
 			else:
 				DEBUG ("Murderer {0} killed {1} in {2}!".format(sql.npc_name_from_id(current_murderer_id), sql.npc_name_from_id(victim_id), sql.room_name_from_id(victim_location)))
-			
-			sql.murder(victim_id, current_murderer_id)
-		
+
 		else:
 			DEBUG("No targets left for remaining killer {0}.".format(sql.npc_name_from_id(current_murderer_id)))
+
+		# Npcs move -----------------------------------------------------------
+		living_npcs = sql.get_living_npcs()
+		living_npcs.remove(current_murderer_id)
+		if victim_id:
+			living_npcs.remove(victim_id)
+			
+		for npc in living_npcs:
+			do_move = random.choice([True, False])
+			if do_move:
+				destination = random.choice(sql.get_npc_possible_directions(npc))
+				sql.move_npc(npc, destination)
+				
+		# Execute -------------------------------------------------------------
+		if victim_id and current_murderer_id:
+			sql.murder(victim_id, current_murderer_id)
 			
 		# Clues ---------------------------------------------------------------
 		if victim_id:
@@ -172,115 +252,132 @@ while (playing):
 					clue = clues [i]
 					witness_id = witnesses [i % len(witnesses)]
 					sql.add_clue (victim_id, witness_id, clue)
-	#				DEBUG("Added clue {0} to {1}.".format(sql.detail_name_from_id(clue), sql.npc_name_from_id(witness_id)))
+					
+					# DEBUG("Added clue {0} to {1}.".format(sql.detail_name_from_id(clue), sql.npc_name_from_id(witness_id)))
+				DEBUG ("Yes witnesses")
 			else:
 				DEBUG ("No witnesses")
-			
-		# Reset killing -------------------------------------------------------
+				
+		#Reset
 		victim_id = None
-		
-		# Npcs move -----------------------------------------------------------
-		living_npcs = sql.get_living_npcs()
-		for npc in living_npcs:
-			do_move = random.choice([True, False])
-			if do_move:
-				destination = random.choice(sql.get_npc_possible_directions(npc))
-				sql.move_npc(npc, destination)
 	
-	
+	# PLAYER ACTION SECTION ===================================================
 	# Receive and process input
 	# Get input, lower and split it
 	# Look for two part words
 	# Look for synonyms, and swap
-	raw_command = input (">>").lower().split()
-	command = []
+	raw_command = input (">> ").lower().split()
+
+	# instant terminate
+	if raw_command[0] == 'exit':
+		playing = False
+		continue
+	
+	'''	
+	# view notes, make action later
+	elif raw_command[0] == 'notes':
+		view_notes()
+		continue
+	'''
+	
+	verb = None
+	target1 = None
+	preposition = None
+	target2 = None
+
+	
+	first_filled_npc = None
+	second_filled_npc = None
+
 	word_range = len(raw_command)
 	index = 0
 	while index < word_range:
-		word = raw_command[index]
+		command_word = raw_command[index]
 		next_word = None
 		
 		# Don't look last word, since it can't be first of two part word ------
 		if index < word_range - 1:
 			next_word = raw_command [index + 1]
-			parts = sql.get_two_part_words(word)
+			parts = sql.get_two_part_words(command_word)
 			if parts != None and next_word in parts:
-				command_word = "{0} {1}".format(word, next_word)
+				command_word = "{0} {1}".format(command_word, next_word)
 				index += 1
-			
-			else:
-				command_word = word
-		
-		else:
-			command_word = word
-		
+
 
 		# Check for synonyms --------------------------------------------------
 		command_word = sql.get_word_from_synonym(command_word)
 		
 		# Check for full name after synonyms ----------------------------------
+		npcs_in_room = sql.all_npc_names_in_room(player.location)
+		
 		if command_word in first_names and next_word == sql.get_last_name(command_word):
 			command_word = command_word, next_word
-			DEBUG ("phase 1: " + str(command_word))
 			index += 1
 			
-		elif command_word in first_names or command_word in last_names:
-			first_name = None
-			last_name = None
+			if not first_filled_npc:
+				first_filled_npc = sql.npc_id_from_name(command_word)
+			elif not second_filled_npc:
+				second_filled_npc = sql.npc_id_from_name(command_word)
 
-			for i in range(len(first_names)):
+		else:
+			first_name = False
+			last_name = False
+	
+			if not first_filled_npc:
+				context = ['room', player.location]
+			elif not second_filled_npc and verb == 'ask': 
+				context = ['clue', first_filled_npc]
+			elif not second_filled_npc and verb == 'blame':
+				context = ['murder', first_filled_npc]
+			else:
+				context = None
+			
+			#DEBUG(context)
+			
+			if command_word in first_names:
+				first_name = command_word
+				last_name = find_other_name(context, first_name)
 				
-				if command_word == first_names [i]:
-					first_name = command_word
-					if last_name is None:
-						last_name = last_names [i]
-					else:
-						last_name = False
-						
-				elif command_word == last_names [i]:
-					last_name = command_word
-					if first_name is None:
-						first_name = first_names[i]
-					else:
-						first_name = False		
+			elif command_word in last_names:				
+				last_name = command_word
+				first_name = find_other_name(context, last_name)
+
+			if first_name or last_name:
+				command_word = first_name, last_name
 				
-			command_word = first_name, last_name
-			DEBUG ("cmd test: " + str(command_word))
+				if not first_filled_npc:
+					first_filled_npc = sql.npc_id_from_name(command_word)
+				elif not second_filled_npc:
+					second_filled_npc = sql.npc_id_from_name(command_word)
+					
+				DEBUG ("cmd test: " + str(command_word))
 		# ---------------------------------------------------------------------
 		
-		command.append (command_word)
-		index += 1
-	# End of command process loop ---------------------------------------------
-	
-	# Parse command -----------------------------------------------------------
-	verb = None
-	target1 = None
-	preposition = None
-	target2 = None
-	
-	for word in command:
+		#command.append (command_word)
 		
+		#DEBUG((command_word, specials, command_word in specials))
 		if verb is None:
-			if word in verbs:
-				verb = word
+			if command_word in verbs:
+				verb = command_word
 				
-		
-		elif word in directions:
-				target1 = word
+			elif command_word in directions or command_word in specials:
+				target1 = command_word
 		
 		elif preposition is None:
 			
-			if word in targets and target1 is None:
-				target1 = word
+			if command_word in targets and target1 is None:
+				target1 = command_word
 				
-			elif word in prepositions:
-				preposition = word
+			elif command_word in prepositions:
+				preposition = command_word
 				
 		elif target2 is None:
 			
-			if word in targets:
-				target2 = word
-				
+			if command_word in targets:
+				target2 = command_word
+		
+		index += 1
+	# End of command parsing loop ---------------------------------------------
 
 	DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
 				
@@ -288,9 +385,16 @@ while (playing):
 	if target1 in long_directions:
 		target1 = sql.short_direction(target1)
 	
-	if verb == None and target1 in directions:
-		verb = 'move'
-		
+	if verb == None:
+		DEBUG("No verb")
+		if target1 in directions:
+			verb = 'move'
+		if target1 == 'notes':
+			verb = 'look'
+			target1 = None
+			preposition = 'at'
+			target2 = 'notes'
+	
 	# Build SQL-query from parsed commands ------------------------------------
 	if verb:
 		# verb ----------------------------------------------------------------
@@ -363,4 +467,48 @@ while (playing):
 sql.end()
 
 
+			
+'''	
+elif command_word in first_names or command_word in last_names:
+	npcs_in_room = sql.all_npc_names_in_room(player.location)
+	
+	first_name = None
+	last_name = None
 
+	# if npc in room
+	for i in range(len(npcs_in_room)):
+
+		if command_word == npcs_in_room [i][0]:
+			first_name = command_word
+			if last_name is None:
+				last_name = npcs_in_room[i][1]
+			else:
+				last_name = False
+				
+		elif command_word == npcs_in_room [i][1]:
+			last_name = command_word
+			if first_name is None:
+				first_name = npcs_in_room[i][0]
+			else:
+				first_name = False
+
+	# if npc exists but not in room
+	if first_name is None and last_name is None:
+
+		for i in range(len(first_names)):
+			
+			if command_word == first_names [i]:
+				first_name = command_word
+				if last_name is None:
+					last_name = last_names [i]
+				else:
+					last_name = False
+					
+			elif command_word == last_names [i]:
+				last_name = command_word
+				if first_name is None:
+					first_name = first_names[i]
+				else:
+					first_name = False
+
+	'''

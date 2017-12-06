@@ -1,10 +1,10 @@
-ACTIONS:
-	tens in id tells group
-	1X: Move
-	2X: Look
-	3X: Ask
-
 OPENING URLs
 	import webbrowser
 	webbrowser.open_new('google.com')
 
+	
+MASTER
+	issues
+		if there are no witnesses, clues are lost
+		make full name getting context(room) sensitive
+		
