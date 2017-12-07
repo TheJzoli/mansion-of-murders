@@ -1,4 +1,5 @@
 import sql
+import formatter
 
 #murderer_detail = sql.murderer_detail
 

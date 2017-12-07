@@ -7,6 +7,7 @@ short_directions = [] 	# Directions ids
 long_directions = [] 	# Full names of directions
 '''
 import sql
+import formatter
 #import webbrowser
 print("INIT MOVE")
 
