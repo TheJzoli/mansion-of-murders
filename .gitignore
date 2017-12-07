@@ -1,2 +1,4 @@
 __pycache__/
 notes.txt
+create_sqlite.sql
+sqlite_test.py

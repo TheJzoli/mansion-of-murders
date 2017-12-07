@@ -11,6 +11,10 @@ import formatter
 def fprint (text):
 	# Obviously its not implemented yet
 	print (text)
+
+def roll_screen(rows):
+	rows = rows * "\n"
+	print (rows)
 	
 # This is just to make debug messages stand out, in code and output
 def DEBUG (message):
@@ -191,7 +195,49 @@ sql.move_npc(first_murderer, sql.room_id_from_name('entrance'))
 # Still start murderer index from 0
 current_murderer_id = 0
 
-		
+
+## INTRO ======================================================================
+title = (
+		"****************************************************************************\n"
+		"    __     __      __      __    __    ______    __    _____    __    __    \n"
+		"   |  \   /  |    /  \    |  \  |  |  /   _  \  |  |  /  _  \  |  \  |  |   \n"
+		"   |   \_/   |   / /\ \   |   \ |  |  \  \  \_\ |  | |  | |  | |   \ |  |   \n"
+		"   |         |  / /__\ \  |    \|  |    \  \    |  | |  | |  | |    \|  |   \n"
+		"   |  |\_/|  | /   __   \ |  |\    |  _   \  \  |  | |  | |  | |  |\    |   \n"
+		"   |  |   |  | |  |  |  | |  | \   | \ \__/   | |  | |  |_|  | |  | \   |   \n"
+		"   |__|   |__| |__|  |__| |__|  \__|  \______/  |__|  \_____/  |__|  \__|   \n"
+		"                             _____    ______                                \n"
+		"                            /  _  \  |   ___|                               \n"
+		"                           |  | |  | |  |__                                 \n"
+		"                           |  | |  | |   __|                                \n"
+		"                           |  | |  | |  |                                   \n"
+		"                           |  |_|  | |  |                                   \n"
+		"                            \_____/  |__|                                   \n"
+		"    __     __   __    __   ______    _____    ______   _____     ______     \n"
+		"   |  \   /  | |  |  |  | |   _  \  |  __ \  |   ___| |   _  \  /   _  \    \n"
+		"   |   \_/   | |  |  |  | |  |_|  | | |  \ | |  |__   |  |_|  | \  \  \_\   \n"
+		"   |         | |  |  |  | |      /  | |  | | |   __|  |      /    \  \      \n"
+		"   |  |\_/|  | |  |  |  | |  |\ \   | |  | | |  |     |  |\ \   _   \  \    \n"
+		"   |  |   |  | \  \__/  / |  | \ \  | |__/ | |  |___  |  | \ \ \ \__/   |   \n"
+		"   |__|   |__|  \______/  |__|  \_\ |_____/  |______| |__|  \_\ \______/    \n"
+		"                                                                            \n"
+		"****************************************************************************\n"
+		)
+
+instructions = (
+				"There is someone killed at the ENTRANCE. "
+				"You should MOVE there, and begin to ASK people ABOUT the poor thing. "
+				"Once you know the culprit you can BLAME them FOR KILLING the victim. "
+				"You can always LOOK AROUND or LOOK AT people, or view your NOTES. "
+				)
+				
+fprint (title)
+input ("\nPress ENTER to start game")
+roll_screen(5)
+fprint (instructions)
+roll_screen (2)
+fprint (look.look_around())
+
 ## GAME LOOP ==================================================================
 round = 0
 playing = True
@@ -226,7 +272,7 @@ while (playing):
 			murderer_location = sql.get_npc_location (current_murderer_id)
 			victim_location = sql.get_npc_location(victim_id)
 			sql.move_npc(current_murderer_id, victim_location)
-		'''	
+		
 			if victim_location != murderer_location:
 				DEBUG ("Murderer {0} moved from {1} to {2} to kill {3}!".format(sql.npc_name_from_id(current_murderer_id), sql.room_name_from_id(murderer_location), sql.room_name_from_id(victim_location), sql.npc_name_from_id(victim_id)))
 			else:
@@ -234,7 +280,7 @@ while (playing):
 
 		else:
 			DEBUG("No targets left for remaining killer {0}.".format(sql.npc_name_from_id(current_murderer_id)))
-		'''
+			
 			
 		# Npcs move -----------------------------------------------------------
 		living_npcs = sql.get_living_npcs()
@@ -309,12 +355,27 @@ while (playing):
 		playing = False
 		continue
 	
-	if raw_command [0] == 'show' and raw_command[1] == 'murderers':
+	elif raw_command [0] == 'show' and raw_command[1] == 'murderers':
 		murderers = sql.get_active_murderers()
 		for item in murderers:
-			print ("\t{0}".format(formatter.name(sql.npc_name_from_id(item))))
+			print ("\t{0:30}{1}".format(
+										formatter.name(sql.npc_name_from_id(item)),
+										sql.room_name_from_id(sql.get_npc_location(item))
+										))
 		print ("\n\n")
 		continue
+		
+	elif raw_command [0] == 'teleport':
+		if raw_command [1] in rooms:
+			player.location = sql.room_id_from_name(raw_command[1])
+			DEBUG ("Teleported to {0}.".format(raw_command[1]))
+			
+		else:
+			room_name = "{0} {1}".format(raw_command[1], raw_command[2])
+			if room_name in rooms:
+				player.location = sql.room_id_from_name(room_name)
+				DEBUG ("Teleported to {0}.".format(room_name))
+		continue	
 	
 	# Actual meaningful words
 	verb = None
@@ -326,6 +387,8 @@ while (playing):
 	first_filled_npc = None
 	second_filled_npc = None
 	bad_name_message = None
+	
+	#DEBUG_command = []
 	
 	word_range = len(raw_command)
 	index = 0
@@ -357,6 +420,9 @@ while (playing):
 			elif not second_filled_npc:
 				second_filled_npc = sql.npc_id_from_name(command_word)
 
+			if bad_name_message:
+				DEBUG(("bad name message", bad_name_message))
+				
 		else:
 			first_name = False
 			last_name = False
@@ -387,19 +453,22 @@ while (playing):
 					second_filled_npc = sql.npc_id_from_name(command_word)
 					
 				#DEBUG ("cmd test: " + str(command_word))
-				
+			
+			
 			elif first_name:
+				DEBUG("create bad name message")
 				bad_name_message = "Which {0} do you mean?".format(first_name.title())
 				break
 			elif last_name:
+				DEBUG("create bad name message")
 				bad_name_message = "You have to be more specific. Which {0} do you mean?".format(last_name.title())
 				break
 			
-			## this seems to be done, although it have never occured due to context sensitive name guesser
+			## this has some problems, but they are hard to recreate
 			## MESSAGE HERE TO TELL PLAYER TO BE MORE SPECIFIC ABOUT NAME
 		# ---------------------------------------------------------------------
 		
-		#command.append (command_word)
+		#DEBUG_command.append (command_word)
 		
 		if verb is None:
 			if command_word in verbs:
@@ -423,6 +492,8 @@ while (playing):
 		
 		index += 1
 	# End of command parsing loop ---------------------------------------------
+	
+	#DEBUG(DEBUG_command)
 	
 	# Check if bad name found -------------------------------------------------
 	if bad_name_message:
@@ -518,9 +589,35 @@ while (playing):
 	else:
 		fprint("There was no verb, what do you want to do?")
 			
-
+	# Check for end condition -------------------------------------------------
+	# no murderers left
+	if not sql.get_active_murderers ():
+		DEBUG ("Game End")
+		playing = False
 
 	
 ## END GAME LOOP	
+
+points_for_survivor = 10
+points_for_solved = 5
+points_for_unsolved = 0
+	
+points = 0
+murders = sql.column_as_list(sql.run_query("SELECT state FROM murder INNER JOIN mapped_npc ON mapped_id = murderer;"), 0)
+
+for item in murders:
+	if item == 'arrested':
+		points += points_for_solved
+	elif item == 'escaped':
+		points += points_for_unsolved
+
+points += (len(npcs) - len(murders)) * points_for_survivor
+
+max_points = len(npcs) * points_for_survivor - int(len(npcs) / 10) * points_for_solveds
+fprint("You got {0} points of {1}.".format(points, max_points))
+	
+	
 	
 sql.end()
+
+input ("Press ENTER to exit game.")
