@@ -20,7 +20,7 @@ def move(target):
 		adjacent_rooms = sql.get_adjacent_rooms(player.location)
 		if target_room_id in adjacent_rooms:
 			player.location = target_room_id
-			message = 'Moved to the {0}'.format(target)
+			message = 'Moved to the {0}'.format(formatter.room(target))
 			success = True
 		else:
 			message = "You can't move there from this room!"
@@ -33,7 +33,7 @@ def move(target):
 			player.location = target_room
 			'''
 			player.location = sql.get_room_in_direction(player.location, target)
-			message = 'Moved to the {0}'.format(sql.get_room_name(player.location))
+			message = 'Moved to the {0}'.format(formatter.room(sql.get_room_name(player.location)))
 			success = True
 		else:
 			message = "You try to go in that direction and hit your face against the wall, ouch!"

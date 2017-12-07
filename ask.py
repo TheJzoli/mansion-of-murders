@@ -11,7 +11,7 @@ def ask(witness, victim):
 			
 
 			if (details == None):
-				message = "{0}: Wait? {1} has been murdered? How horrible! I didn't know!".format (witness, victim)
+				message = "{0}: Wait? {1} has been murdered? How horrible! I didn't know!".format (formatter.name(witness), formatter.name(victim))
 			else:
 				# JOEL lisäsin tän osan tähän, ni nää tallentuu pelaaja muistioon
 				# muutin myös ton sql.murderer_detail:in palauttaa detail_id:n eikä nimeä
@@ -22,12 +22,12 @@ def ask(witness, victim):
 					details[i] = sql.detail_name_from_id(details[i])
 				# ---------------------------------------------------------------
 				
-				message = "{0}: How horrible... If I remember correctly, the murderer had {1}.".format(witness, details)
+				message = "{0}: How horrible... If I remember correctly, the murderer had {1}.".format(formatter.name(witness), formatter.name(details))
 				if (sql.npc_id_from_name(witness) in sql.witnessed_multiple_murders(victim)):
 					message += " Oh and also, the murderer was the same person who murdered "
 					all_but = sql.all_but_current_murder_victims(victim)
 					for i in all_but:
-						message += "{0}".format(sql.npc_name_from_id(i))
+						message += "{0}".format(formatter.name(sql.npc_name_from_id(i)))
 						if (i != all_but[-1]):
 							message += ", "
 							if (len(all_but) >= 2):
@@ -35,11 +35,11 @@ def ask(witness, victim):
 									message += "and "
 					message += "."
 		elif (victim in sql.live_npcs()):
-			message = "{0}: {1}? What are you talking about? They haven't been murdered.".format(witness, victim)
+			message = "{0}: {1}? What are you talking about? They haven't been murdered.".format(formatter.name(witness), formatter.name(victim))
 		else:
-			message = "{0}: {1}? Never heard of anyone called that before.".format(witness, victim)
+			message = "{0}: {1}? Never heard of anyone called that before.".format(formatter.name(witness), formatter.name(victim))
 	else:
-		message = "There is no one called {0} in this room to whom you could talk to.".format(witness)
+		message = "There is no one called {0} in this room to whom you could talk to.".format(formatter.name(witness))
 	
 	
 	
