@@ -6,5 +6,7 @@ OPENING URLs
 MASTER
 	issues
 		if there are no witnesses, clues are lost
-		make full name getting context(room) sensitive
 		
+NEXT
+	make player get note from just seeing a body
+	make notes a separate view, by saving all printed stuff in string

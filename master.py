@@ -4,7 +4,7 @@ import sql
 import move
 import look
 import ask
-#import blame
+import blame
 import formatter
 
 # This controls text output beyond vanilla print
@@ -394,7 +394,8 @@ while (playing):
 			elif last_name:
 				bad_name_message = "You have to be more specific. Which {0} do you mean?".format(last_name.title())
 				break
-				
+			
+			## this seems to be done, although it have never occured due to context sensitive name guesser
 			## MESSAGE HERE TO TELL PLAYER TO BE MORE SPECIFIC ABOUT NAME
 		# ---------------------------------------------------------------------
 		
@@ -501,6 +502,10 @@ while (playing):
 		
 			elif super == 3: # ASK
 				fprint(ask.ask(target1, target2))
+				use_action_point = True
+			
+			elif super == 4: # BLAME
+				fprint(blame.blame(target1, target2))
 				use_action_point = True
 			
 			elif super == 9: # WAIT
