@@ -66,7 +66,7 @@ def blame(murderer,victim):
 		else:
 			message = "They didn't kill that person!"
 	else:
-		message = "They ain't even dead yet!"
+		message = "They aren't even dead yet!"
 	
 	return message
 	# Leon hätäri loppu -------------------------------------------------------

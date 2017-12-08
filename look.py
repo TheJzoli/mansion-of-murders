@@ -111,7 +111,7 @@ def look(target):
 					message += "\t{0}\n".format(detail)
 
 		elif(target_id in dead_npcsid_in_room):
-			message = "Here lies the dead body of'" + str(target) + "'. How sad indeed..." 
+			message = "Here lies the dead body of " + formatter.name(target) + ". How sad indeed..." 
 
 		else:
 			message = "They're not here."
@@ -125,7 +125,7 @@ def look(target):
 		for entry in notes:
 			victim = formatter.name(sql.npc_name_from_id(entry[0]))
 			room = formatter.room(sql.room_name_from_id(entry[1]))
-			message += "{0} was killed in {1}. Clues about their killer:\n".format(victim, room)
+			message += "{0} was killed in the {1}. Clues about their killer:\n".format(formatter.name(victim), formatter.room(room))
 			for item in entry[2]:
 				message += "\t{0}\n".format(sql.detail_name_from_id(item))
 
