@@ -1,7 +1,6 @@
 import mysql.connector
 
-def DEBUG(message):
-	print("SQL DEBUG: " + str(message));
+from debug import DEBUG as DEBUG
 
 default = "SELECT message FROM error;"
 
@@ -12,13 +11,14 @@ database = mysql.connector.connect(
 	passwd = 'dbpass',
 	db = 'mom_game',
 	buffered = True)
-DEBUG ("Connect to sql")
+DEBUG ("Connected to database")
 
 cursor = database.cursor()
 cursor.execute("DELETE FROM player_clue;")
 cursor.execute("DELETE FROM clue;")
 cursor.execute("DELETE FROM murder;")
 cursor.execute("DELETE FROM mapped_npc;")
+
 
 # Close and reset database
 def end ():
@@ -92,9 +92,10 @@ def get_npcs ():
 	query = "SELECT first_name, last_name FROM npc;"
 	return run_query (query)
 	
-def get_last_name (first_name):
+def get_last_names (first_name):
+	"""Return last names from database or []"""
 	query = "SELECT last_name FROM npc WHERE first_name = '{0}';".format(first_name)
-	return query_single (query)
+	return column_as_list(run_query(query), 0)
 	
 # [0] is first name, [1] is last name
 def get_npcs_names ():
@@ -222,18 +223,6 @@ def get_npc_location (mapped_id):
 			"WHERE mapped_id = {0};"
 			).format(mapped_id)
 	return query_single(query)
-	
-def get_npc_possible_directions (mapped_id):
-	query = (
-			"SELECT to_id "
-			"FROM passage "
-			"WHERE from_id = ("
-				"SELECT location "
-				"FROM mapped_npc "
-				"WHERE mapped_id = {0}"
-			");"
-			).format (mapped_id)
-	return column_as_list (run_query(query), 0)
 
 def move_npc (mapped_id, room_id):
 	update = "UPDATE mapped_npc SET location = {0} WHERE mapped_id = {1};".format(room_id, mapped_id)
@@ -354,12 +343,6 @@ def get_room_name (room_id):
 
 	
 ## LOOK FUNCTIONS -------------------------------------------------------------
-'''
-def live_npcsid_in_room (room_id):
-	query = "SELECT npc.npc_id FROM npc WHERE npc.npc_id NOT IN(SELECT npc.npc_id FROM murder INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim INNER JOIN npc ON npc.npc_id = mapped_npc.npc WHERE mapped_npc.location = '" + str(room_id) + "');"
-	return column_as_list(run_query(query), 0)
-'''
-	
 def live_npcsid_in_room (room_id):
 	query = (
 			"SELECT mapped_id FROM mapped_npc "
