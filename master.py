@@ -251,7 +251,7 @@ title = (
 		)
 
 instructions = (
-				"There is someone killed at the ENTRANCE. "
+				"Someone has been killed in the ENTRANCE. "
 				"You should MOVE there, and begin to ASK people ABOUT the poor thing. "
 				"Once you know the culprit you can BLAME them FOR KILLING the victim. "
 				"You can always LOOK AROUND or LOOK AT people, or view your NOTES. "
