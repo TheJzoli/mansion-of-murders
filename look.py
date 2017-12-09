@@ -41,7 +41,7 @@ def look_around ():
 		count += 1
 		
 	for i in range(count):
-		message += "\t{0:{1}}\t{2}\n".format(room_names[i], longest_length + 2, directions[i])
+		message += "@i\t{0:{1}}\t{2}\n".format(room_names[i], longest_length + 2, directions[i])
 	#-----------------------------
 	'''
 	for item in passages:

@@ -207,7 +207,7 @@ def get_murderers (sub_A, sub_B):
 	return column_as_list (run_query(query), 0)
 
 	
-	
+
 	
 	
 ## NPC CONTROLLING ------------------------------------------------------------
@@ -339,7 +339,44 @@ def get_room_name (room_id):
 			).format(room_id)
 	return query_single(query)
 
+def get_direction (from_id, to_id):
+	return query_single(
+						"SELECT direction FROM passage "
+						"WHERE from_id = {0} "
+						"AND to_id = {1};".format(from_id, to_id)
+						)
 
+def find_path (from_id, to_id):
+	if from_id == to_id:
+		return None
+	else:
+		route = None
+		routes = [[from_id]]
+		used = [from_id]
+		
+		while route is None:
+			count = len (routes)
+			for i in range (count):
+				for room_id in get_adjacent_rooms(routes [i][-1]):
+					if not room_id in used:
+						if room_id == to_id:
+							route = routes [i]
+							route.append(room_id)
+							break
+						else:
+							routes.append(routes[i][:])
+							routes[-1].append(room_id)
+							used.append(room_id)
+						
+				if route:
+					break
+			
+			routes = routes [count:]
+			
+		route_directions = [(route[i+1], get_direction(route[i], route[i+1])) for i in range(len(route)- 1)]
+
+		return route_directions
+		
 
 	
 ## LOOK FUNCTIONS -------------------------------------------------------------
@@ -494,7 +531,6 @@ def  get_notes():
 
 def add_player_clue(victim, detail):
 	query = "INSERT INTO player_clue VALUES ({0}, {1});".format(victim, detail)
-	DEBUG (query)
 	run_update(query)
 
 

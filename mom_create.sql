@@ -580,6 +580,7 @@ INSERT INTO ACTIONS VALUES (20, 'look', False, 'at', True);
 INSERT INTO ACTIONS VALUES (21, 'look', False, 'around', False);
 INSERT INTO ACTIONS VALUES (21, 'look', False, NULL, FALSE);
 INSERT INTO ACTIONS VALUES (30, 'ask', True, 'about', True);
+INSERT INTO actions VALUES (31, 'ask', False, 'about', True);
 INSERT INTO ACTIONS VALUES (40, 'blame', True, 'for killing', True);
 INSERT INTO ACTIONS VALUES (90, 'wait', False, NULL, False);
 

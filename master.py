@@ -17,30 +17,33 @@ def fprint (text):
 	lines = text.split (sep = "\n")
 
 	for i in range (len(lines)):
+		line_offset = 0
 		words = lines[i].split(" ")
+
+		if len(lines[i]) >= 2 and lines[i][0] == "@":
+			if lines[i][1] == 'i':
+				words = [lines[i][2:]]
+			elif lines[i][1] == 's':
+				words[0] = words[0][2:]
+				line_offset = len(words[0]) + 1 + len(words[1]) + 1
+
 		line = ""
 		used = 0
-		line_offset = 0
+		
 		for j in range(len(words)):
 			word = words [j]
 			
 			length = len(word)
 			if length > 0:
-				if word[0] == '@':
-					if word[1:] == 'speak':
-						line_offset = len(words[j+1]) + 1 + len(words[j+2])
+				if used + length <= row_length:
+					line += word + " "
+					used += length + 1
 				else:
-					if used + length <= row_length:
-						line += word + " "
-						used += length + 1
-					else:
-						line += "\n" + line_offset * " " + word + " "
-						used = line_offset
+					line += "\n" + line_offset * " " + word + " "
+					used = line_offset
 					
 		lines [i] = line
-	
 
-	#print (formatted_text)
 	for item in lines:
 		print(item)
 		
@@ -250,18 +253,30 @@ title = (
 		"****************************************************************************\n"
 		)
 
-instructions = (
+introduction = (
 				"Someone has been killed in the ENTRANCE. "
 				"You should MOVE there, and begin to ASK people ABOUT the poor thing. "
 				"Once you know the culprit you can BLAME them FOR KILLING the victim. "
 				"You can always LOOK AROUND or LOOK AT people, or view your NOTES. "
 				)
+
+instructions = (
+				"\nAvailable Commands:\n\n"
+				"MOVE TO [ROOM NAME]\n"
+				"LOOK AT [PERSON]\n"
+				"LOOK AROUND\n"
+				"ASK [PERSON] ABOUT [OTHER PERSON]\n"
+				"BLAME [PERSON] FOR KILLING [OTHER PERSON]\n"
+				"And others for you to find out! :D\n"
+				)
 				
 print (title)
 fprint ("Press ENTER to start game")
 input()
+
 roll_screen(5)
-fprint (instructions)
+fprint (introduction)
+
 roll_screen (2)
 fprint (look.look_around())
 
@@ -270,11 +285,11 @@ round = 0
 playing = True
 delayed_messages = []
 while (playing):
+	DEBUG(player_actions_used)
 	
 	messages = []
 	for item in delayed_messages:
 		if item[1] ():
-			DEBUG((item, item[1]()))
 			messages.append(item[0])
 	
 	# NPC activities ==========================================================
@@ -352,8 +367,9 @@ while (playing):
 			
 			murder_message = "You hear people talking about someone being killed in {0}.".format(sql.room_name_from_id(murderer_location))
 			npcs_in_players_room = lambda: len(sql.live_npcsid_in_room(player.location)) > 0
+			
 			if npcs_in_players_room ():
-				messages.append ( murder_message)
+				messages.append (murder_message)
 			else:
 				delayed_messages.append((murder_message, npcs_in_players_room))
 			
@@ -384,6 +400,7 @@ while (playing):
 	# Look for two part words
 	# Look for synonyms, and swap
 	raw_command = input (">> ").lower().split()
+	
 	if len(raw_command) == 0:
 		continue
 	
@@ -406,17 +423,33 @@ while (playing):
 		continue
 		
 	elif raw_command [0] == 'teleport':
-		if raw_command [1] in rooms:
-			player.location = sql.room_id_from_name(raw_command[1])
-			DEBUG ("Teleported to {0}.".format(raw_command[1]))
-			
-		else:
+		if len(raw_command) >= 3:
 			room_name = "{0} {1}".format(raw_command[1], raw_command[2])
 			if room_name in rooms:
 				player.location = sql.room_id_from_name(room_name)
 				DEBUG ("Teleported to {0}.".format(room_name))
-		continue	
 	
+		elif raw_command [1] in rooms:
+			player.location = sql.room_id_from_name(raw_command[1])
+			DEBUG ("Teleported to {0}.".format(raw_command[1]))
+		continue
+	
+	elif raw_command [0] == 'help':
+		fprint(instructions)
+		continue
+	
+	elif raw_command [0] == 'where':
+		if len(raw_command) >= 3:
+			room_name = "{0} {1}".format(raw_command[1], raw_command[2])
+			if room_name in rooms:
+				ask.ask_direction(room_name)
+		elif raw_command [1] in rooms:
+			ask.ask_direction(raw_command[1])
+	
+	elif raw_command[0] == 'rooms':
+		sorted_rooms = sorted(rooms, key = lambda x: sql.room_id_from_name(x))
+		for item in sorted_rooms:
+			print ("{0:2} {1}".format (sql.room_id_from_name(item),item))
 	# Actual meaningful words
 	verb = None
 	target1 = None
@@ -565,7 +598,11 @@ while (playing):
 		target1 = None
 		preposition = 'at'
 		
-			
+	if verb == 'ask' and target1 in rooms:
+		target2 = target1
+		target1 = None
+		preposition = 'about'
+		
 	#DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
 	
 	# Build SQL-query from parsed commands ------------------------------------
@@ -622,9 +659,13 @@ while (playing):
 					messages.append(look.look_around())
 		
 			elif super == 3: # ASK
-				messages.append(ask.ask(target1, target2))
-				use_action_point = True
-			
+				if sub == 0:
+					messages.append(ask.ask(target1, target2))
+					use_action_point = True
+				
+				elif sub == 1:
+					messages.append(ask.ask_direction(target2))
+					
 			elif super == 4: # BLAME
 				messages.append(blame.blame(target1, target2))
 				use_action_point = True
@@ -643,7 +684,8 @@ while (playing):
 	## MOVE ALL PRINTING HERE
 	# Printing ================================================================
 	for item in messages:
-		fprint (item)
+		if not item is None:
+			fprint (item)
 		
 	# Check for end condition -------------------------------------------------
 	# no murderers left
