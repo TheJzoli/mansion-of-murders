@@ -2,15 +2,11 @@
 # These are all populated from master.py
 rooms = []              # Names of rooms
 npcs = []               # Npcs full name in list = ["firstname", "secondname"]
-first_names = []        # only first names in list
-last_names = []         # only last names in list
 player                  # player instance, holds location
 '''
-import sql
-import formatter
 
-def DEBUG(message):
-	print ("LOOK DEBUG: " + str(message))
+import sql
+from common import *
 
 def all_npcids_in_room(room_id):
         query = "SELECT mapped_npc.mapped_id FROM npc, mapped_npc WHERE npc.npc_id = mapped_npc.npc AND mapped_npc.location = '" + str(room_id) + "';"
@@ -43,10 +39,7 @@ def look_around ():
 	for i in range(count):
 		message += "@i\t{0:{1}}\t{2}\n".format(room_names[i], longest_length + 2, directions[i])
 	#-----------------------------
-	'''
-	for item in passages:
-		message += "\t{0}\n".format(sql.get_room_name(item))#and direction, uusi sql? name + direction
-	'''
+
 
 	#live_npcs = all_npcids_in_room(player.location)
 	live_npcs = sql.live_npcsid_in_room(player.location)
@@ -55,13 +48,14 @@ def look_around ():
 	if total_npcs > 0:
 		message += "These people are here:\n"
 		for item in live_npcs:
-			formatted_name = formatter.name (sql.npc_name_from_id(item))
+			formatted_name = format_npc(sql.npc_name_from_id(item))
 			message +="@i\t{0}\n".format(formatted_name)#nimen muotoilut
 		if len(dead_npcs) > 0:
 			message += "But these people seem to be dead!:\n"
 			for item in dead_npcs:
-				formatted_name = formatter.name (sql.npc_name_from_id(item))
+				formatted_name = format_npc (sql.npc_name_from_id(item))
 				message +="@i\t{0}\n".format(formatted_name)
+				sql.add_player_clue(item, None)
 	else:
 		message += "There is no one in here."
 
@@ -83,11 +77,13 @@ def single_npc_details(target_id):
 
 def look(target):
 
+	## pitää myös kattoo että sitä ei oo pidätetty tai se oo karannu
+
 	live_npcsid_in_room = sql.live_npcsid_in_room(player.location)
 	dead_npcsid_in_room = sql.dead_npcsid_in_room(player.location)
 
 	message = ""
-	if(target in rooms):
+	if(target in sql.get_rooms()):
 			
 		room_id = sql.get_room_id(target)
 		if(room_id == player.location):
@@ -95,9 +91,9 @@ def look(target):
 			if message == None:
 				message = "{0} is rather nice.".format(target)
 		else:
-				message = "You can't look there from here."
+				message = "You cannot see there from here."
 				
-	elif(target in npcs):
+	elif(target in sql.get_npcs()):
 
 		target_id = sql.npc_id_from_name(target)
 		if(target_id in live_npcsid_in_room):
@@ -106,29 +102,46 @@ def look(target):
 
 			details = single_npc_details(target_id)
 			if len(details) > 0:
-				message += "\nYou immediately notice these striking details about them:\n"#ongelma
+				message += "\nYou immediately notice these striking details about them:"#ongelma#ei ongelmaa?
 				for detail in details:
-					message += "\t{0}\n".format(detail)
+					message += "\n@i\t{0}".format(detail)
 
 		elif(target_id in dead_npcsid_in_room):
-			message = "Here lies the dead body of " + formatter.name(target) + ". How sad indeed..." 
+			message = "Here lies the dead body of " + format_npc(target) + ". How sad indeed..." 
 
 		else:
 			message = "They're not here."
 			
-	elif(target in directions):#mikä huone suunnassa
-		message = "Everything looks great in that direction."
-		
+	elif (target in sql.get_all_directions()):#mikä huone suunnassa
+		room_in_direction = sql.get_room_in_direction(player.location, target)
+		if room_in_direction:
+			room_name = format_room(sql.room_name_from_id(room_in_direction))
+			message = "You see the {0} in {1}.".format(room_name, sql.long_direction(target))
+		else:
+			message = "There's some tastefully arranged interior art there. Very apprecietable!"
+	
 	elif target == 'notes':
 		notes = sql.get_notes()
-		message = "NOTES:\n\n"
+		message = "NOTES:\n"
 		if len (notes) > 0:
 			for entry in notes:
-				victim = formatter.name(sql.npc_name_from_id(entry[0]))
-				room = formatter.room(sql.room_name_from_id(entry[1]))
-				message += "{0} was killed in the {1}. Clues about their killer:\n".format(formatter.name(victim), formatter.room(room))
-				for item in entry[2]:
-					message += "@i\t{0}\n".format(sql.detail_name_from_id(item))
+				if entry [3]:
+					message += "\nSOLVED" + expired_colour
+				victim_name = format_npc(sql.npc_name_from_id(entry[0]))
+				room_name = format_room(sql.room_name_from_id(entry[1]))
+				message += "\n{0} was killed in the {1}.".format(victim_name, room_name)
+				if entry [2]:
+					message += " Clues about their killer:"
+					for item in entry[2]:
+						message += "\n@i\t{0}".format(sql.detail_name_from_id(item))
+
+				if entry[3]:
+					message += default_colour
+				message += "\n"
+				
+			# Slice away last newline
+			message = message[:-1]
+			
 		else:
 			message += "@i\tno notes yet"
 			

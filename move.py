@@ -6,9 +6,8 @@ directions = []			# Directions' names and shortcuts
 short_directions = [] 	# Directions ids
 long_directions = [] 	# Full names of directions
 '''
-from debug import DEBUG
+from common import *
 import sql
-import formatter
 #import webbrowser
 DEBUG("INIT MOVE")
 
@@ -16,25 +15,21 @@ DEBUG("INIT MOVE")
 def move(target):
 	message = ""
 	success = False
-	if target in rooms:
+	if target in sql.get_rooms():
 		target_room_id = sql.get_room_id(target)
 		adjacent_rooms = sql.get_adjacent_rooms(player.location)
 		if target_room_id in adjacent_rooms:
 			player.location = target_room_id
-			message = 'Moved to the {0}'.format(formatter.room(target))
+			message = 'Moved to the {0}'.format(format_room(target))
 			success = True
 		else:
 			message = "You can't move there from this room!"
 			
-	elif target in directions:
+	elif target in sql.get_all_directions():
 		available_directions = sql.get_available_directions(player.location)
 		if target in available_directions:
-			'''
-			target_room = sql.get_target_room_id(target)
-			player.location = target_room
-			'''
 			player.location = sql.get_room_in_direction(player.location, target)
-			message = 'Moved to the {0}'.format(formatter.room(sql.get_room_name(player.location)))
+			message = 'Moved to the {0}'.format(format_room(sql.get_room_name(player.location)))
 			success = True
 		else:
 			message = "You try to go in that direction and hit your face against the wall, ouch!"

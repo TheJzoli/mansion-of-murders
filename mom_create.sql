@@ -114,7 +114,7 @@ CREATE TABLE CLUE (
 	FOREIGN KEY (detail) 	REFERENCES DETAIL (detail_id)
 
 );
-CREATE UNIQUE INDEX MOM_GAME ON CLUE (victim, witness, 	detail);
+CREATE UNIQUE INDEX MOM_GAME ON CLUE (victim, witness, detail);
 
 CREATE TABLE PLAYER_CLUE (
 	victim 	INT NOT NULL,
@@ -156,11 +156,11 @@ INSERT INTO room VALUES (11, 'ballroom', NULL);
 INSERT INTO room VALUES (12, 'terrace', NULL);
 INSERT INTO room VALUES (13, 'gallery', NULL);
 INSERT INTO room VALUES (14, 'servants', NULL);
-INSERT INTO room VALUES (15, 'bathroom', NULL);
-INSERT INTO room VALUES (16, 'kitchen maids', NULL);
+INSERT INTO room VALUES (15, 'kitchen maids', NULL);
 INSERT INTO two_part_words VALUES ('kitchen', 'maids');
-INSERT INTO room VALUES (17, 'back yard', NULL);
+INSERT INTO room VALUES (16, 'back yard', NULL);
 INSERT INTO two_part_words VALUES ('back', 'yard');
+INSERT INTO room VALUES (17, 'bathroom', NULL);
 
 
 -- front yard
@@ -179,8 +179,11 @@ INSERT INTO passage VALUES (4, 5, 'w');
 -- bar
 INSERT INTO passage VALUES (5, 4, 'e');
 INSERT INTO passage VALUES (5, 6, 'n');
+INSERT INTO passage VALUES (5, 10, 'w');
 -- kitchen
 INSERT INTO passage VALUES (6, 5, 's');
+INSERT INTO passage VALUES (6, 11, 'sw');
+INSERT INTO passage VALUES (6, 16, 'w');
 -- billiard room
 INSERT INTO passage VALUES (7, 3, 'nw');
 -- hall
@@ -192,10 +195,12 @@ INSERT INTO passage VALUES (9, 8, 'n');
 -- music room
 INSERT INTO passage VALUES (10, 8, 's');
 INSERT INTO passage VALUES (10, 11, 'w');
+INSERT INTO passage VALUES (10, 5, 'e');
 -- ballroom
 INSERT INTO passage VALUES (11, 10, 'e');
 INSERT INTO passage VALUES (11, 12, 's');
 INSERT INTO passage VALUES (11, 13, 'w');
+INSERT INTO passage VALUES (11, 6, 'ne');
 -- terrace
 INSERT INTO passage VALUES (12, 11, 'n');
 -- gallery
@@ -203,15 +208,17 @@ INSERT INTO passage VALUES (13, 11, 'e');
 INSERT INTO passage VALUES (13, 14, 's');
 -- servants
 INSERT INTO passage VALUES (14, 13, 'n');
-INSERT INTO passage VALUES (14, 15, 'w');
--- bathroom
-INSERT INTO passage VALUES (15, 14, 'e');
-INSERT INTO passage VALUES (15, 16, 'n');
+INSERT INTO passage VALUES (14, 17, 'w');
+INSERT INTO passage VALUES (14, 15, 'nw');
 -- kitchen maids
-INSERT INTO passage VALUES (16, 15, 's');
-INSERT INTO passage VALUES (16, 17, 'n');
+INSERT INTO passage VALUES (15, 17, 's');
+INSERT INTO passage VALUES (15, 16, 'n');
+INSERT INTO passage VALUES (15, 14, 'se');
 -- back yard
-INSERT INTO passage VALUES (17, 16, 's');
+INSERT INTO passage VALUES (16, 15, 's');
+INSERT INTO passage VALUES (16, 6, 'e');
+-- bathroom
+INSERT INTO passage VALUES (17, 14, 'e');
 
 
 /*

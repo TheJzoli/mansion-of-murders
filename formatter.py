@@ -1,3 +1,4 @@
+'''
 import sql
 
 def name (name):
@@ -5,6 +6,9 @@ def name (name):
 	return namestr
 
 def room (room):
+	return room.title()
+	
+	# tää palauttaa joistain Nonen, ei käy
 	roomstr = room.title()
 	roomlist = roomstr.split()
 	if (roomlist[0][-1] == 's'):
@@ -22,6 +26,13 @@ def room (room):
 	if (len(roomlist) == 1):
 		return roomstr
 
+# ei tätä pitäis tarvii
 def direction (dir):
 	direction = sql.long_direction(dir)
 	return direction
+'''
+'''
+print(room("gallery"))
+print(room("music room"))
+print(room("butlers room"))
+'''

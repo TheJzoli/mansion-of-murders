@@ -1,83 +1,98 @@
-cmd_colour = '\x1b[93m'
-default_color = '\x1b[97;100m'
+import common
+from common import *
 
-try:
-	from colorama import init, Fore, Back, Style
-	init()
-	
-	# set and fill screen with default color
-	print(default_color)
-	print('\x1b[2J', end = "")
-	
-	fore_color = Fore.LIGHTCYAN_EX
-	cmd_prompt = ">> " + cmd_colour
-	
-	colors = True
-except:
-	print("Colors disabled")
-	cmd_prompt = ">> "
-	colors = False
-	
 import random
 	
-from debug import DEBUG
 import sql
 import move
 import look
 import ask
 import blame
-import formatter
 
-import re
-ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+cmd_prompt = "@c>>"
+try:
+	from colorama import init
+	init()
+	
+	# set and fill screen with default colour
+	print(default_colour)
+	print('\x1b[2J', end = "")
+	
+	cmd_prompt += cmd_colour
+	
+	colours = True
+except:
+	print("Colours disabled")
+	colours = False
+	
+
 
 # This controls text output beyond vanilla print
+import re
+pattern = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
+left_offset = 5
 def fprint (text):
-	row_length = 80
+	row_length = 80 + left_offset
 	tab_length = 8
 	
 	text = text.replace('\t', tab_length * ' ')
 	
-	if not colors:
-		text = ansi_escape.sub('', text)
+	if not colours:
+		text = pattern.sub('', text)
 
 	lines = text.split (sep = "\n")
 
 	for i in range (len(lines)):
 		line_offset = 0
 		words = lines[i].split(" ")
-
+		end = "\n"
+		
 		if len(lines[i]) >= 2 and lines[i][0] == "@":
-			if lines[i][1] == 'i':
+			other = lines [i][1]
+			if other == 'i':
 				words = [lines[i][2:]]
-			elif lines[i][1] == 's':
+				
+			elif other == 's':
 				words[0] = words[0][2:]
 				line_offset = len(words[0]) + 1 + len(words[1]) + 1
-
-		line = ""
+				
+			elif other == 'c':
+				words = [lines[i][2:]]
+				end = ""
+				
+		line = left_offset * " "
 		used = 0
 		
 		for j in range(len(words)):
 			word = words [j]
 			
 			# compute length without ansi sequences
-			length = len(ansi_escape.sub('', word))
+			length = len(pattern.sub('', word))
 			if length > 0:
 				if used + length < row_length:
 					line += word + " "
 					used += length + 1
 				else:
-					line += (row_length - used) * " "
-					line += "\n" + line_offset * " " + word + " "
+					#line += (row_length - used) * " "
+					line += "\n" + (left_offset + line_offset) * " " + word + " "
 					used = line_offset + length + 1
+					
+			# if word only has color info
+			elif pattern.match(word):
+				line = word
 
-		line += (row_length - used) * " "
-		lines [i] = line
+		#line += (row_length - used) * " "
+		lines [i] = (line, end)
 	
 	for item in lines:
-		if len (item) > 0:
-			print(item)
-		
+		if len (item[0]) > 0:
+			print(item[0], end = item[1])
+			
+def print_all(messages):
+	for item in messages:
+		fprint (item)
+		print()
+
 def roll_screen(rows):
 	print (rows * "\n")
 	
@@ -170,34 +185,6 @@ def find_other_name(context, known):
 	
 	return unknown
 
-	
-## INITIALIZE MOVE
-move.rooms = rooms
-move.directions = directions
-move.short_directions = short_directions
-move.long_directions = long_directions
-
-## INITIALIZE LOOK
-look.rooms = rooms
-look.npcs = npcs
-look.first_names = first_names
-look.last_names = last_names
-look.directions = directions
-
-## INITIALIZE PLAYER ==========================================================
-class Player():
-	location = 1
-	
-# Start at full used actions, so that npcs will move on first turn
-player_actions = 3
-player_actions_used = player_actions
-
-player = Player()
-move.player = player
-look.player = player
-ask.player = player
-blame.player = player
-
 ## INITIALIZE NPCS ============================================================
 npcs_amount = len(first_names)
 npc_ids = []
@@ -233,7 +220,7 @@ def npc_move_message (moving_npcs, action):
 	
 	current_room = sql.room_name_from_id(player.location)
 	for item in moving_npcs:
-		name = formatter.name(sql.npc_name_from_id(item[0]))
+		name = format_npc(sql.npc_name_from_id(item[0]))
 		other_room = sql.room_name_from_id(item[1])
 		move_message += "{0} has {1} the {2} {3} the {4}.\n".format(
 														name,
@@ -245,14 +232,6 @@ def npc_move_message (moving_npcs, action):
 	
 	return move_message [:-1]
 
-## INITIALIZE MURDERS ========================================================
-# First murder must happen in entrance, so that player finds it early
-# It is enough to move the first murderer there, because all npcs are dealt evenly across rooms
-first_murderer = sql.query_single("SELECT MIN(mapped_id) FROM mapped_npc WHERE state = 'murdering';")
-sql.move_npc(first_murderer, sql.room_id_from_name('entrance'))
-
-# Still start murderer index from 0
-current_murderer_id = 0
 
 
 ## INTRO ======================================================================
@@ -284,12 +263,14 @@ title = (
 		)
 
 
+title = '\n'.join(list(map(lambda x: left_offset * " " + x, title.split(sep = '\n'))))
+
 introduction = (
 				"Someone has been killed in the {0}ENTRANCE{1}. "
 				"You should {0}MOVE{1} there, and begin to {0}ASK people ABOUT the poor thing{1}. "
 				"Once you know the culprit you can {0}BLAME them FOR KILLING the victim{1}. "
 				"You can always {0}LOOK AROUND{1} or {0}LOOK AT people{1}, or view your {0}NOTES{1}."
-				).format(cmd_colour, default_color)
+				).format(cmd_colour, default_colour)
 
 instructions = (
 				"\nAvailable Commands:\n\n"
@@ -313,24 +294,25 @@ roll_screen (2)
 ## ============================================================================
 ##                            GAME LOOP
 ## ============================================================================
+# First murder must happen in entrance, so that player finds it early
+# It is enough to move the first murderer there, because all npcs are dealt evenly across rooms
+first_murderer = sql.query_single("SELECT MIN(mapped_id) FROM mapped_npc WHERE state = 'murdering';")
+sql.move_npc(first_murderer, sql.room_id_from_name('entrance'))
 
-#	1.
-#
-#
-#
-#
-#
-#
-#
+# Still start murderer index from 0
+current_murderer_id = 0
+
+# Start at full used actions, so that npcs will move on first turn
+player_actions = 3
+player_actions_used = player_actions
 
 playing = True
 first_round = True
 delayed_messages = []
+
 while (playing):
 	if delayed_messages:
 		DEBUG("delayed messages: " + str(delayed_messages))
-		
-	DEBUG("player actions: " + str(player_actions_used))
 	
 	messages = []
 	for i in range(len(delayed_messages)):
@@ -378,17 +360,18 @@ while (playing):
 			
 			
 		# Npcs move -----------------------------------------------------------
-		living_npcs = sql.get_living_npcs()
-		living_npcs.remove(current_murderer_id)
-		if victim_id:
-			living_npcs.remove(victim_id)
-		
 		# From and to player's location
 		npcs_enter = []
 		npcs_exit = []
 		
-		for npc in living_npcs:
-			do_move = random.choice([True, False])
+		for npc in sql.get_living_npcs():
+			if npc in [current_murderer_id, victim_id]:
+				do_move = False
+			elif npc in murderers:
+				do_move = True
+			else:
+				do_move = random.choice([True, False])
+				
 			if do_move:
 				location = sql.get_npc_location(npc)
 				destination = random.choice(sql.get_adjacent_rooms(location))
@@ -412,7 +395,9 @@ while (playing):
 		if victim_id and current_murderer_id:
 			sql.murder(victim_id, current_murderer_id)
 			
-			murder_message = "You hear people talking about someone being killed in the {0}.".format(sql.room_name_from_id(victim_location))
+			room_name = format_room(sql.room_name_from_id(victim_location))
+			#entäs jos pelaaja on itse samassa huoneessa
+			murder_message = "You hear people talking about {1}someone being killed in the {0}.{2}".format(room_name, cmd_colour, default_colour)
 			npcs_in_players_room = lambda: len(sql.live_npcsid_in_room(player.location)) > 0
 			
 			if npcs_in_players_room ():
@@ -437,10 +422,7 @@ while (playing):
 		victim_id = None
 	
 	# NPC Printing =========================================================
-	for item in messages:
-		if not item is None:
-			fprint (item)
-			
+	print_all(messages)
 	messages = []
 	
 	# PLAYER ACTION SECTION ===================================================
@@ -453,9 +435,9 @@ while (playing):
 		first_round = False
 		
 	else:
-		print (cmd_prompt, end = "")
+		fprint (cmd_prompt)
 		raw_command = input ().lower().split()
-		print(default_color, end = "")
+		print(default_colour, end = "")
 	
 	if len(raw_command) == 0:
 		continue
@@ -473,7 +455,7 @@ while (playing):
 		murderers = sql.get_active_murderers()
 		for item in murderers:
 			print ("\t{0:30}{1}".format(
-										formatter.name(sql.npc_name_from_id(item)),
+										format_npc(sql.npc_name_from_id(item)),
 										sql.room_name_from_id(sql.get_npc_location(item))
 										))
 		print ("\n\n")
@@ -635,15 +617,14 @@ while (playing):
 		fprint(bad_name_message)
 		continue
 				
-	# Some handhelding with command typing ------------------------------------
+	# Some handhelding with command typ(o)ing ------------------------------------
 	if target1 in long_directions:
 		target1 = sql.short_direction(target1)
 	
-	if verb is None:
-		if target1 in directions:
-			verb = 'move'
-			target2 = target1
-			target1 = None
+	if target1 in directions and (verb is None or verb == 'move'):
+		verb = 'move'
+		target2 = target1
+		target1 = None
 			
 	if target1 == 'notes' and (verb is None or verb == 'look'):
 		verb = 'look'
@@ -735,15 +716,17 @@ while (playing):
 			if use_action_point and not cheat:
 				cheat = False
 				player_actions_used += 1
+		else:
+			messages.append("What's that?")
 			
 	else:
 		messages.append("There was no verb, what do you want to do?")
 			
 			
 	# Player Printing =========================================================
-	for item in messages:
-		if not item is None:
-			fprint (item)
+	if not messages:
+		DEBUG("No messages")
+	print_all(messages)
 	
 	# Check for end condition =================================================
 	# no murderers left
@@ -767,7 +750,7 @@ points_for_unsolved = 0
 points = 0
 
 if end_state == 'out of murderers':
-	fprint ("You've got rid of all the killers around. But at what price!")
+	fprint ("You've got rid of all the killers around. But at what price! {0} people died today.".format (sql.query_single("SELECT COUNT(*) FROM murder")))
 	murders = sql.column_as_list(sql.run_query("SELECT state FROM murder INNER JOIN mapped_npc ON mapped_id = murderer;"), 0)
 
 	for item in murders:
@@ -783,7 +766,7 @@ if end_state == 'out of murderers':
 	
 elif end_state == 'one murderer left':
 	last_murderer = sql.get_active_murderers()[0]
-	formatted_name = formatter.name (sql.npc_name_from_id(last_murderer))
+	formatted_name = format_npc(sql.npc_name_from_id(last_murderer))
 	fprint(
 			"Just as you thought you got all of them, "
 			"{0} proves you wrong by cutting your throat!"

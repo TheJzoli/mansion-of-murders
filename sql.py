@@ -1,6 +1,6 @@
 import mysql.connector
 
-from debug import DEBUG
+from common import *
 
 default = "SELECT message FROM error;"
 
@@ -103,12 +103,16 @@ def get_npcs_names ():
 	result = run_query (query)
 	return [column_as_list(result, 0), column_as_list (result, 1)]
 	
-# [0] are short cuts and [1] are full names
 def get_directions ():
+	""" Return direction in arrays, [0] is shorts, [1] is longs"""
 	query = "SELECT direction_id, name FROM direction;"
 	result = run_query (query)
 	return [column_as_list(result, 0), column_as_list (result, 1)]
 
+def get_all_directions ():
+	"""Fetches direction shorts and longs from database"""
+	return get_directions()[0] + get_directions()[1]
+	
 def get_specials ():
 	result = run_query("SELECT word FROM specials;")
 	return column_as_list(result, 0)
@@ -516,20 +520,28 @@ def all_but_current_murder_victims(victim):
 	return column_as_list(run_query(query), 0)
 
 ## PLAYER NOTES ---------------------------------------------------------------
-def  get_notes():
-	result = run_query ("SELECT victim, detail FROM player_clue;")
+def get_notes():
+	result = run_query (
+					"SELECT player_clue.victim, detail, state "
+					"FROM player_clue "
+					"INNER JOIN murder ON murder.victim = player_clue.victim "
+					"INNER JOIN mapped_npc ON mapped_id = murder.murderer;"
+					)
 	notes = []
 	for record in result:
 		next_victim = record[0]
 		if notes == [] or notes [-1][0] != next_victim:
 			location = get_npc_location(next_victim)
-			notes.append((next_victim, location, []))
+			solved = record[2] == 'arrested'
+			notes.append((next_victim, location, [], solved))
 			
-		
-		notes[-1][2].append(record[1])
+		if record [1]:
+			notes[-1][2].append(record[1])
 	return notes
 
 def add_player_clue(victim, detail):
+	if not detail:
+		detail = 'null'
 	query = "INSERT INTO player_clue VALUES ({0}, {1});".format(victim, detail)
 	run_update(query)
 

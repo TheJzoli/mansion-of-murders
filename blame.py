@@ -1,5 +1,5 @@
 import sql
-from debug import DEBUG as DEBUG
+from common import *
 
 def murder_solved(id_m):
 	query = "SELECT state FROM mapped_npc WHERE mapped_id = '{0}';".format(id_m)
@@ -22,6 +22,11 @@ def escaper(correct_murderer):
 
 	
 def blame(murderer,victim):
+
+	## !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	## Noora tee vielä niin, että pelaajan pitää olla samassa paikassa
+	## ja myös että kuolleita voi myös syyttää (jos siis ei vielä voi), että voi saada pisteet niistäkin murhista
+	
 	DEBUG("Blame")
 	message = ""
 	
