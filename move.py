@@ -6,10 +6,11 @@ directions = []			# Directions' names and shortcuts
 short_directions = [] 	# Directions ids
 long_directions = [] 	# Full names of directions
 '''
+from debug import DEBUG
 import sql
 import formatter
 #import webbrowser
-print("INIT MOVE")
+DEBUG("INIT MOVE")
 
 
 def move(target):

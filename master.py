@@ -1,7 +1,26 @@
-from debug import DEBUG as DEBUG
+cmd_colour = '\x1b[93m'
+default_color = '\x1b[97;100m'
 
+try:
+	from colorama import init, Fore, Back, Style
+	init()
+	
+	# set and fill screen with default color
+	print(default_color)
+	print('\x1b[2J', end = "")
+	
+	fore_color = Fore.LIGHTCYAN_EX
+	cmd_prompt = ">> " + cmd_colour
+	
+	colors = True
+except:
+	print("Colors disabled")
+	cmd_prompt = ">> "
+	colors = False
+	
 import random
-
+	
+from debug import DEBUG
 import sql
 import move
 import look
@@ -9,10 +28,18 @@ import ask
 import blame
 import formatter
 
+import re
+ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 
 # This controls text output beyond vanilla print
 def fprint (text):
 	row_length = 80
+	tab_length = 8
+	
+	text = text.replace('\t', tab_length * ' ')
+	
+	if not colors:
+		text = ansi_escape.sub('', text)
 
 	lines = text.split (sep = "\n")
 
@@ -33,19 +60,23 @@ def fprint (text):
 		for j in range(len(words)):
 			word = words [j]
 			
-			length = len(word)
+			# compute length without ansi sequences
+			length = len(ansi_escape.sub('', word))
 			if length > 0:
-				if used + length <= row_length:
+				if used + length < row_length:
 					line += word + " "
 					used += length + 1
 				else:
+					line += (row_length - used) * " "
 					line += "\n" + line_offset * " " + word + " "
-					used = line_offset
-					
-		lines [i] = line
+					used = line_offset + length + 1
 
+		line += (row_length - used) * " "
+		lines [i] = line
+	
 	for item in lines:
-		print(item)
+		if len (item) > 0:
+			print(item)
 		
 def roll_screen(rows):
 	print (rows * "\n")
@@ -58,7 +89,7 @@ def shuffle (list):
 		list[i], list[random_index] = list[random_index], list[i]
 
 def safe_remove(value, list):
-	DEBUG(value in list and list.remove(value))
+	value in list and list.remove(value)
 
 	
 ## VOCABULARY =================================================================
@@ -212,8 +243,7 @@ def npc_move_message (moving_npcs, action):
 														other_room
 														)
 	
-	return move_message
-
+	return move_message [:-1]
 
 ## INITIALIZE MURDERS ========================================================
 # First murder must happen in entrance, so that player finds it early
@@ -227,38 +257,39 @@ current_murderer_id = 0
 
 ## INTRO ======================================================================
 title = (
-		"****************************************************************************\n"
-		"    __     __      __      __    __    ______    __    _____    __    __    \n"
-		"   |  \   /  |    /  \    |  \  |  |  /   _  \  |  |  /  _  \  |  \  |  |   \n"
-		"   |   \_/   |   / /\ \   |   \ |  |  \  \  \_\ |  | |  | |  | |   \ |  |   \n"
-		"   |         |  / /__\ \  |    \|  |    \  \    |  | |  | |  | |    \|  |   \n"
-		"   |  |\_/|  | /   __   \ |  |\    |  _   \  \  |  | |  | |  | |  |\    |   \n"
-		"   |  |   |  | |  |  |  | |  | \   | \ \__/   | |  | |  |_|  | |  | \   |   \n"
-		"   |__|   |__| |__|  |__| |__|  \__|  \______/  |__|  \_____/  |__|  \__|   \n"
-		"                             _____    ______                                \n"
-		"                            /  _  \  |   ___|                               \n"
-		"                           |  | |  | |  |__                                 \n"
-		"                           |  | |  | |   __|                                \n"
-		"                           |  | |  | |  |                                   \n"
-		"                           |  |_|  | |  |                                   \n"
-		"                            \_____/  |__|                                   \n"
-		"    __     __   __    __   ______    _____    ______   _____     ______     \n"
-		"   |  \   /  | |  |  |  | |   _  \  |  __ \  |   ___| |   _  \  /   _  \    \n"
-		"   |   \_/   | |  |  |  | |  |_|  | | |  \ | |  |__   |  |_|  | \  \  \_\   \n"
-		"   |         | |  |  |  | |      /  | |  | | |   __|  |      /    \  \      \n"
-		"   |  |\_/|  | |  |  |  | |  |\ \   | |  | | |  |     |  |\ \   _   \  \    \n"
-		"   |  |   |  | \  \__/  / |  | \ \  | |__/ | |  |___  |  | \ \ \ \__/   |   \n"
-		"   |__|   |__|  \______/  |__|  \_\ |_____/  |______| |__|  \_\ \______/    \n"
-		"                                                                            \n"
-		"****************************************************************************\n"
+		"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
+		"      __     __      __      __    __    ______    __    _____    __    __      \n"
+		"     |  \   /  |    /  \    |  \  |  |  /   _  \  |  |  /  _  \  |  \  |  |     \n"
+		"     |   \_/   |   / /\ \   |   \ |  |  \  \  \_\ |  | |  | |  | |   \ |  |     \n"
+		"     |         |  / /__\ \  |    \|  |    \  \    |  | |  | |  | |    \|  |     \n"
+		"     |  |\_/|  | /   __   \ |  |\    |  _   \  \  |  | |  | |  | |  |\    |     \n"
+		"     |  |   |  | |  |  |  | |  | \   | \ \__/   | |  | |  |_|  | |  | \   |     \n"
+		"     |__|   |__| |__|  |__| |__|  \__|  \______/  |__|  \_____/  |__|  \__|     \n"
+		"                               _____    ______                                  \n"
+		"                              /  _  \  |   ___|                                 \n"
+		"                             |  | |  | |  |__                                   \n"
+		"                             |  | |  | |   __|                                  \n"
+		"                             |  | |  | |  |                                     \n"
+		"                             |  |_|  | |  |                                     \n"
+		"                              \_____/  |__|                                     \n"
+		"      __     __   __    __   ______    _____    ______   _____     ______       \n"
+		"     |  \   /  | |  |  |  | |   _  \  |  __ \  |   ___| |   _  \  /   _  \      \n"
+		"     |   \_/   | |  |  |  | |  |_|  | | |  \ | |  |__   |  |_|  | \  \  \_\     \n"
+		"     |         | |  |  |  | |      /  | |  | | |   __|  |      /    \  \        \n"
+		"     |  |\_/|  | |  |  |  | |  |\ \   | |  | | |  |     |  |\ \   _   \  \      \n"
+		"     |  |   |  | \  \__/  / |  | \ \  | |__/ | |  |___  |  | \ \ \ \__/   |     \n"
+		"     |__|   |__|  \______/  |__|  \_\ |_____/  |______| |__|  \_\ \______/      \n"
+		"                                                                                \n"
+		"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
 		)
 
+
 introduction = (
-				"Someone has been killed in the ENTRANCE. "
-				"You should MOVE there, and begin to ASK people ABOUT the poor thing. "
-				"Once you know the culprit you can BLAME them FOR KILLING the victim. "
-				"You can always LOOK AROUND or LOOK AT people, or view your NOTES. "
-				)
+				"Someone has been killed in the {0}ENTRANCE{1}. "
+				"You should {0}MOVE{1} there, and begin to {0}ASK people ABOUT the poor thing{1}. "
+				"Once you know the culprit you can {0}BLAME them FOR KILLING the victim{1}. "
+				"You can always {0}LOOK AROUND{1} or {0}LOOK AT people{1}, or view your {0}NOTES{1}."
+				).format(cmd_colour, default_color)
 
 instructions = (
 				"\nAvailable Commands:\n\n"
@@ -267,31 +298,47 @@ instructions = (
 				"LOOK AROUND\n"
 				"ASK [PERSON] ABOUT [OTHER PERSON]\n"
 				"BLAME [PERSON] FOR KILLING [OTHER PERSON]\n"
-				"And others for you to find out! :D\n"
+				"And others for you to find out! :D"
 				)
 				
 print (title)
 fprint ("Press ENTER to start game")
 input()
 
-roll_screen(5)
+roll_screen(1)
 fprint (introduction)
 
 roll_screen (2)
-fprint (look.look_around())
 
-## GAME LOOP ==================================================================
-round = 0
+## ============================================================================
+##                            GAME LOOP
+## ============================================================================
+
+#	1.
+#
+#
+#
+#
+#
+#
+#
+
 playing = True
+first_round = True
 delayed_messages = []
 while (playing):
-	DEBUG(player_actions_used)
+	if delayed_messages:
+		DEBUG("delayed messages: " + str(delayed_messages))
+		
+	DEBUG("player actions: " + str(player_actions_used))
 	
 	messages = []
-	for item in delayed_messages:
-		if item[1] ():
-			messages.append(item[0])
-	
+	for i in range(len(delayed_messages)):
+		if delayed_messages[i][1]:
+			messages.append(delayed_messages[i][0])
+			del delayed_messages[i]
+			i -= 1
+
 	# NPC activities ==========================================================
 	if player_actions_used == player_actions:
 		player_actions_used = 0
@@ -365,7 +412,7 @@ while (playing):
 		if victim_id and current_murderer_id:
 			sql.murder(victim_id, current_murderer_id)
 			
-			murder_message = "You hear people talking about someone being killed in {0}.".format(sql.room_name_from_id(murderer_location))
+			murder_message = "You hear people talking about someone being killed in the {0}.".format(sql.room_name_from_id(victim_location))
 			npcs_in_players_room = lambda: len(sql.live_npcsid_in_room(player.location)) > 0
 			
 			if npcs_in_players_room ():
@@ -376,7 +423,7 @@ while (playing):
 			clues = sql.get_details(current_murderer_id);
 			shuffle(clues)
 			
-			witnesses = sql.live_npcsid_in_room(murderer_location)
+			witnesses = sql.live_npcsid_in_room(victim_location)
 			safe_remove(current_murderer_id, witnesses)
 			shuffle(witnesses)
 			
@@ -385,31 +432,41 @@ while (playing):
 					clue = clues [i]
 					witness_id = witnesses [i % len(witnesses)]
 					sql.add_clue (victim_id, witness_id, clue)
-					
-					# DEBUG("Added clue {0} to {1}.".format(sql.detail_name_from_id(clue), sql.npc_name_from_id(witness_id)))
-		#		DEBUG ("Yes witnesses")
-		#	else:
-		#		DEBUG ("No witnesses")
-				
+		
 		#Reset
 		victim_id = None
+	
+	# NPC Printing =========================================================
+	for item in messages:
+		if not item is None:
+			fprint (item)
+			
+	messages = []
 	
 	# PLAYER ACTION SECTION ===================================================
 	# Receive and process input
 	# Get input, lower and split it
 	# Look for two part words
 	# Look for synonyms, and swap
-	raw_command = input (">> ").lower().split()
+	if first_round:
+		raw_command = ['look']
+		first_round = False
+		
+	else:
+		print (cmd_prompt, end = "")
+		raw_command = input ().lower().split()
+		print(default_color, end = "")
 	
 	if len(raw_command) == 0:
 		continue
 	
-	# instant terminate
+	# Lazy cheat commands
+	cheat = False
 	if raw_command[0] == 'exit':
 		playing = False
 		continue
 	elif raw_command[0] == 'cheat':
-		player_actions_used -= 1
+		cheat = True
 		raw_command = raw_command [1:]
 	
 	elif raw_command [0] == 'show' and raw_command[1] == 'murderers':
@@ -450,6 +507,7 @@ while (playing):
 		sorted_rooms = sorted(rooms, key = lambda x: sql.room_id_from_name(x))
 		for item in sorted_rooms:
 			print ("{0:2} {1}".format (sql.room_id_from_name(item),item))
+			
 	# Actual meaningful words
 	verb = None
 	target1 = None
@@ -603,7 +661,7 @@ while (playing):
 		target1 = None
 		preposition = 'about'
 		
-	#DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
+	# DEBUG ("{0} {1} {2} {3}".format(verb, target1, preposition, target2))
 	
 	# Build SQL-query from parsed commands ------------------------------------
 	if verb:
@@ -674,25 +732,27 @@ while (playing):
 				messages.append("Some time passes.")
 				use_action_point = True
 				
-			if use_action_point:
+			if use_action_point and not cheat:
+				cheat = False
 				player_actions_used += 1
 			
 	else:
 		messages.append("There was no verb, what do you want to do?")
 			
 			
-	## MOVE ALL PRINTING HERE
-	# Printing ================================================================
+	# Player Printing =========================================================
 	for item in messages:
 		if not item is None:
 			fprint (item)
-		
-	# Check for end condition -------------------------------------------------
+	
+	# Check for end condition =================================================
 	# no murderers left
 	if not sql.get_active_murderers ():
 		DEBUG ("Game Finished")
 		playing = False
 		end_state = 'out of murderers'
+		
+	# last murderer kills you
 	elif len (sql.get_living_npcs()) == 1:
 		DEBUG ("Game Over")
 		playing = False

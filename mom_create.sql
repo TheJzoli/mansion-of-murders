@@ -118,9 +118,9 @@ CREATE UNIQUE INDEX MOM_GAME ON CLUE (victim, witness, 	detail);
 
 CREATE TABLE PLAYER_CLUE (
 	victim 	INT NOT NULL,
-	detail 	INT NOT NULL,
+	detail 	INT,
 
-	PRIMARY KEY (victim, detail),
+	/*PRIMARY KEY (victim, detail),*/
 
 	FOREIGN KEY (victim) REFERENCES MURDER (victim),
 	FOREIGN KEY (detail) REFERENCES DETAIL (detail_id)
@@ -574,15 +574,15 @@ INSERT INTO PREPOSITIONS VALUES ('around');
 INSERT INTO PREPOSITIONS VALUES ('for killing');
 INSERT INTO TWO_PART_WORDS VALUES ('for', 'killing');
 
-INSERT INTO ACTIONS VALUES (10, 'move', False, 'to', True);
-INSERT INTO ACTIONS VALUES (11, 'move', False, NULL, True);
-INSERT INTO ACTIONS VALUES (20, 'look', False, 'at', True);
-INSERT INTO ACTIONS VALUES (21, 'look', False, 'around', False);
-INSERT INTO ACTIONS VALUES (21, 'look', False, NULL, FALSE);
-INSERT INTO ACTIONS VALUES (30, 'ask', True, 'about', True);
+INSERT INTO actions VALUES (10, 'move', False, 'to', True);
+INSERT INTO actions VALUES (11, 'move', False, NULL, True);
+INSERT INTO actions VALUES (20, 'look', False, 'at', True);
+INSERT INTO actions VALUES (21, 'look', False, 'around', False);
+INSERT INTO actions VALUES (21, 'look', False, NULL, FALSE);
+INSERT INTO actions VALUES (30, 'ask', True, 'about', True);
 INSERT INTO actions VALUES (31, 'ask', False, 'about', True);
-INSERT INTO ACTIONS VALUES (40, 'blame', True, 'for killing', True);
-INSERT INTO ACTIONS VALUES (90, 'wait', False, NULL, False);
+INSERT INTO actions VALUES (40, 'blame', True, 'for killing', True);
+INSERT INTO actions VALUES (90, 'wait', False, NULL, False);
 
 -- VERBS
 INSERT INTO synonyms VALUES ('pass', 'wait');

@@ -1,6 +1,6 @@
 import mysql.connector
 
-from debug import DEBUG as DEBUG
+from debug import DEBUG
 
 default = "SELECT message FROM error;"
 

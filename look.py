@@ -56,12 +56,12 @@ def look_around ():
 		message += "These people are here:\n"
 		for item in live_npcs:
 			formatted_name = formatter.name (sql.npc_name_from_id(item))
-			message +="\t{0}\n".format(formatted_name)#nimen muotoilut
+			message +="@i\t{0}\n".format(formatted_name)#nimen muotoilut
 		if len(dead_npcs) > 0:
 			message += "But these people seem to be dead!:\n"
 			for item in dead_npcs:
 				formatted_name = formatter.name (sql.npc_name_from_id(item))
-				message +="\t{0}\n".format(formatted_name)
+				message +="@i\t{0}\n".format(formatted_name)
 	else:
 		message += "There is no one in here."
 
@@ -122,13 +122,16 @@ def look(target):
 	elif target == 'notes':
 		notes = sql.get_notes()
 		message = "NOTES:\n\n"
-		for entry in notes:
-			victim = formatter.name(sql.npc_name_from_id(entry[0]))
-			room = formatter.room(sql.room_name_from_id(entry[1]))
-			message += "{0} was killed in the {1}. Clues about their killer:\n".format(formatter.name(victim), formatter.room(room))
-			for item in entry[2]:
-				message += "\t{0}\n".format(sql.detail_name_from_id(item))
-
+		if len (notes) > 0:
+			for entry in notes:
+				victim = formatter.name(sql.npc_name_from_id(entry[0]))
+				room = formatter.room(sql.room_name_from_id(entry[1]))
+				message += "{0} was killed in the {1}. Clues about their killer:\n".format(formatter.name(victim), formatter.room(room))
+				for item in entry[2]:
+					message += "@i\t{0}\n".format(sql.detail_name_from_id(item))
+		else:
+			message += "@i\tno notes yet"
+			
 	elif(target == 'hell'):
 		message = "Looks like you looked right into your future."
 
