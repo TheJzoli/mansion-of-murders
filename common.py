@@ -44,6 +44,24 @@ def format_room (room):
 		return roomlist[0] + " " + roomstring1
 	if (len(roomlist) == 1):
 		return roomstr
+
+		
+def format_list (collection, formatter):	
+	count = len(collection)
+	if count == 1:
+		result = formatter(collection [0])
+		
+	else:
+		result = ""
+		for i in range (count - 2):			
+			item = formatter(collection[i])
+			result += "{0}, ".format(item)
+				
+		second_last = formatter(collection[-2])
+		last = formatter(collection[-1])
+		result += "{0} and {1}".format(second_last, last)
+				
+	return result		
 		
 '''
 print(room("gallery"))

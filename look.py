@@ -1,10 +1,3 @@
-'''
-# These are all populated from master.py
-rooms = []              # Names of rooms
-npcs = []               # Npcs full name in list = ["firstname", "secondname"]
-player                  # player instance, holds location
-'''
-
 import sql
 from common import *
 
@@ -14,7 +7,8 @@ def all_npcids_in_room(room_id):
         return result
 
 def look_around ():
-	message = "You are in {0}.\n".format(sql.get_room_name(player.location))
+	room_name = format_room(sql.room_name_from_id(player.location))
+	message = "You are in the {0}.\n".format(room_name)
 	query = "SELECT description FROM room WHERE room.room_id ='" + str(player.location) + "';"
 	result = sql.query_single(query)
 
@@ -29,7 +23,7 @@ def look_around ():
 	count = 0
 	
 	for item in passages:
-		room_names.append(sql.room_name_from_id(item [0]))
+		room_names.append(format_room(sql.room_name_from_id(item [0])))
 		length = len(room_names[-1])
 		if length > longest_length:
 			longest_length = length
@@ -97,8 +91,9 @@ def look(target):
 
 		target_id = sql.npc_id_from_name(target)
 		if(target_id in live_npcsid_in_room):
-				
-			message = single_npc_description(target_id)
+			
+			message = format_npc(target) + ": "
+			message += single_npc_description(target_id)
 
 			details = single_npc_details(target_id)
 			if len(details) > 0:
