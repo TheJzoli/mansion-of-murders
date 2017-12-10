@@ -11,7 +11,7 @@ database = mysql.connector.connect(
 	passwd = 'dbpass',
 	db = 'mom_game',
 	buffered = True)
-DEBUG ("Connected to database")
+
 
 cursor = database.cursor()
 cursor.execute("DELETE FROM player_clue;")
@@ -19,6 +19,7 @@ cursor.execute("DELETE FROM clue;")
 cursor.execute("DELETE FROM murder;")
 cursor.execute("DELETE FROM mapped_npc;")
 
+DEBUG ("Connected to database.")
 
 # Close and reset database
 def end ():
@@ -178,6 +179,7 @@ def detail_name_from_id (detail_id):
 			"FROM detail "
 			"WHERE detail_id = {0};"
 			).format(detail_id)
+	DEBUG (query)
 	return query_single(query)
 
 	
@@ -530,7 +532,7 @@ def all_but_current_murder_victims(victim):
 ## PLAYER NOTES ---------------------------------------------------------------
 def get_notes():
 	result = run_query (
-					"SELECT player_clue.victim, detail, state "
+					"SELECT DISTINCT player_clue.victim, detail, state "
 					"FROM player_clue "
 					"INNER JOIN murder ON murder.victim = player_clue.victim "
 					"INNER JOIN mapped_npc ON mapped_id = murder.murderer;"
@@ -547,6 +549,12 @@ def get_notes():
 			notes[-1][2].append(record[1])
 	return notes
 
+def infinite_index():
+	index = 0
+	while True:
+		index += 1
+		yield index
+	
 def add_player_clue(victim, detail):
 	if not detail:
 		detail = 'null'

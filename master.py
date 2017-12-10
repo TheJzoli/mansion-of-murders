@@ -9,31 +9,68 @@ import look
 import ask
 import blame
 
-cmd_prompt = "@c>>"
+
+from os import system
+
+win_width = 92
+win_height = 50
+buffer_height = 9999
+
+# These set window size and buffer size
+system('mode con: cols={0} lines={1}'.format(win_width, win_height))
+system('powershell -command "&{$H=get-host;$W=$H.ui.rawui;$B=$W.buffersize;$B.width=' + str(win_width) + ';$B.height=' + str(buffer_height) + ';$W.buffersize=$B;}')
+
+
+# This sets background and font colours, and fills console with color
+print(default_colour)
+system('cls')
+
+colours = True
+cmd_prompt = "@c>>" + cmd_colour
+
+del system
+
+
+'''
+# Lets just keep this until above shows its thrustworthiness
 try:
 	from colorama import init
 	init()
+
 	
 	# set and fill screen with default colour
 	print(default_colour)
-	print('\x1b[2J', end = "")
+	print('\x1b[2J')
 	
 	cmd_prompt += cmd_colour
 	
 	colours = True
 except:
-	print("Colours disabled")
+
+	# Clear screen
+	import os
+	os.system('cls')
+	del os
+
+	print("Colours disabled.\n")
 	colours = False
-	
+'''	
 
 
 # This controls text output beyond vanilla print
 import re
 pattern = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 left_offset = 5
+row_length = 80 + left_offset
+tab_length = 8
 def fprint (text):
-	row_length = 80 + left_offset
-	tab_length = 8
+	
+	if text[-1] == '\n':
+		text = text[:-1]
+	
+	# Add highlight
+	text = text.replace('@H', cmd_colour)
+	text = text.replace('@E', default_colour)
 	
 	text = text.replace('\t', tab_length * ' ')
 	
@@ -46,6 +83,11 @@ def fprint (text):
 		line_offset = 0
 		words = lines[i].split(" ")
 		end = "\n"
+		
+		# Special commands used with @
+		# @i: line is not split, and will retain its whitespace and indent
+		# @s: for npcs speaking, indents speaking nicely
+		# @c: like @i, but also ending without newline, used for prompting input from player
 		
 		if len(lines[i]) >= 2 and lines[i][0] == "@":
 			other = lines [i][1]
@@ -88,14 +130,17 @@ def fprint (text):
 		if len (item[0]) > 0:
 			print(item[0], end = item[1])
 			
+# end fprint ------------------------------------------------------------------
+
+	
 def print_all(messages):
 	for item in messages:
 		fprint (item)
 		print()
-
+'''
 def roll_screen(rows):
 	print (rows * "\n")
-	
+'''	
 	
 def shuffle (list):
 	count = len(list)
@@ -209,13 +254,16 @@ selected_murderers = possible_murderers [:number_murderers]
 sql.map_npcs(npc_ids, room_ids, selected_murderers)
 
 def npc_move_message (moving_npcs, action):
+	if moving_npcs == []:
+		return None
+		
 	move_message = ""
 	
 	if action == 'enter':
 		action_str = 'entered'
 		preposition = ' from'
 	elif action == 'exit':
-		action_str = 'exit'
+		action_str = 'left'
 		preposition = 'to'
 	
 	current_room = sql.room_name_from_id(player.location)
@@ -235,6 +283,7 @@ def npc_move_message (moving_npcs, action):
 
 
 ## INTRO ======================================================================
+
 title = (
 		"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
 		"      __     __      __      __    __    ______    __    _____    __    __      \n"
@@ -281,19 +330,21 @@ instructions = (
 				"BLAME [PERSON] FOR KILLING [OTHER PERSON]\n"
 				"And others for you to find out! :D"
 				)
-				
+
+print()				
 print (title)
 fprint ("Press ENTER to start game")
 input()
 
-roll_screen(1)
-fprint (introduction)
-
-roll_screen (2)
+#fprint(introduction)
+print_all ([introduction])
 
 ## ============================================================================
 ##                            GAME LOOP
 ## ============================================================================
+fprint("...")
+print()
+
 # First murder must happen in entrance, so that player finds it early
 # It is enough to move the first murderer there, because all npcs are dealt evenly across rooms
 first_murderer = sql.query_single("SELECT MIN(mapped_id) FROM mapped_npc WHERE state = 'murdering';")
@@ -385,43 +436,75 @@ while (playing):
 				sql.move_npc(npc, destination)
 		
 
-		npcs_enter_message = npc_move_message(npcs_enter, 'enter')
-		npcs_exit_message = npc_move_message(npcs_exit, 'exit')
-		
-		messages.append (npcs_enter_message)
-		messages.append (npcs_exit_message)
-		
+		#npcs_enter_message = npc_move_message(npcs_enter, 'enter')
+		#npcs_exit_message = npc_move_message(npcs_exit, 'exit')
+		if not first_round:
+			if npcs_enter:
+				messages.append (npc_move_message(npcs_enter, 'enter'))
+			if npcs_exit:
+				messages.append (npc_move_message(npcs_exit, 'exit'))
+			
 		# Execute murder and deal clues ---------------------------------------
 		if victim_id and current_murderer_id:
 			sql.murder(victim_id, current_murderer_id)
 			
-			room_name = format_room(sql.room_name_from_id(victim_location))
-			#entäs jos pelaaja on itse samassa huoneessa
-			murder_message = "You hear people talking about {1}someone being killed in the {0}.{2}".format(room_name, cmd_colour, default_colour)
-			npcs_in_players_room = lambda: len(sql.live_npcsid_in_room(player.location)) > 0
 			
-			if npcs_in_players_room ():
-				messages.append (murder_message)
-			else:
-				delayed_messages.append((murder_message, npcs_in_players_room))
+			## !!!!!!!!!!!!!!!!!!!! CLUE TO PLAYER IF IN SAME ROOM
 			
 			clues = sql.get_details(current_murderer_id);
 			shuffle(clues)
 			
 			witnesses = sql.live_npcsid_in_room(victim_location)
 			safe_remove(current_murderer_id, witnesses)
-			shuffle(witnesses)
 			
+			if victim_location == player.location:
+				witnesses.append('player')
+				sql.add_player_clue(victim_id, None)
+			
+			player_clues = []
+			
+			shuffle(witnesses)			
 			if len(witnesses) > 0:
 				for i in range (5):
 					clue = clues [i]
 					witness_id = witnesses [i % len(witnesses)]
-					sql.add_clue (victim_id, witness_id, clue)
+					if witness_id == 'player':
+						player_clues.append(clue)
+						sql.add_player_clue(victim_id, clue)
+					else:						
+						sql.add_clue (victim_id, witness_id, clue)
+						
+						
+			if victim_location == player.location:
+				victim_name = format_npc(sql.npc_name_from_id(victim_id))
+				if player_clues:
+					murder_message = (
+									"Right in front of your eyes, someone killed {0}!"
+									" @HYou saw that the killer had {1}@E."
+									).format(victim_name, format_list(player_clues, sql.detail_name_from_id))
+					
+					
+				else:
+					murder_message = "{0} collapses on ground, dead. @HBut who is the killer!@E".format(victim_name)
+				messages.append (murder_message)
+			
+			else:		
+				npcs_in_players_room = lambda: len(sql.live_npcsid_in_room(player.location)) > 0
+				room_name = format_room(sql.room_name_from_id(victim_location))
+				murder_message = "You hear people talking about @Hsomeone being killed in the {0}@E.".format(room_name)
+				if npcs_in_players_room ():
+					messages.append (murder_message)
+				else:
+					delayed_messages.append((murder_message, npcs_in_players_room))
+			
 		
 		#Reset
 		victim_id = None
 	
 	# NPC Printing =========================================================
+	#if first_round:
+	#	messages = []
+		
 	print_all(messages)
 	messages = []
 	
@@ -437,8 +520,9 @@ while (playing):
 	else:
 		fprint (cmd_prompt)
 		raw_command = input ().lower().split()
-		print(default_colour, end = "")
-	
+		#print(default_colour, end = "")
+		fprint("@c" + default_colour)
+		
 	if len(raw_command) == 0:
 		continue
 	
@@ -446,19 +530,22 @@ while (playing):
 	cheat = False
 	if raw_command[0] == 'exit':
 		playing = False
+		end_state = None
 		continue
+		
 	elif raw_command[0] == 'cheat':
 		cheat = True
 		raw_command = raw_command [1:]
 	
 	elif raw_command [0] == 'show' and raw_command[1] == 'murderers':
 		murderers = sql.get_active_murderers()
+		message = "Murderers:"
 		for item in murderers:
-			print ("\t{0:30}{1}".format(
+			message += ("\n@i\t{0:30}{1}".format(
 										format_npc(sql.npc_name_from_id(item)),
 										sql.room_name_from_id(sql.get_npc_location(item))
 										))
-		print ("\n\n")
+		print_all ([message])
 		continue
 		
 	elif raw_command [0] == 'teleport':
@@ -466,17 +553,25 @@ while (playing):
 			room_name = "{0} {1}".format(raw_command[1], raw_command[2])
 			if room_name in rooms:
 				player.location = sql.room_id_from_name(room_name)
-				DEBUG ("Teleported to {0}.".format(room_name))
+				print_all (["Teleported to {0}.".format(room_name)])
 	
 		elif raw_command [1] in rooms:
 			player.location = sql.room_id_from_name(raw_command[1])
-			DEBUG ("Teleported to {0}.".format(raw_command[1]))
+			print_all (["Teleported to {0}.".format(raw_command[1])])
 		continue
 	
 	elif raw_command [0] == 'help':
-		fprint(instructions)
+		print_all([instructions])
 		continue
 	
+	elif raw_command[0] == 'rooms':
+		sorted_rooms = sorted(rooms, key = lambda x: sql.room_id_from_name(x))
+		rooms_str = ""
+		for item in sorted_rooms:
+			rooms_str += ("{0:2} {1}\n".format (sql.room_id_from_name(item),item))
+		print_all([rooms_str])
+		
+	'''
 	elif raw_command [0] == 'where':
 		if len(raw_command) >= 3:
 			room_name = "{0} {1}".format(raw_command[1], raw_command[2])
@@ -484,12 +579,9 @@ while (playing):
 				ask.ask_direction(room_name)
 		elif raw_command [1] in rooms:
 			ask.ask_direction(raw_command[1])
+	'''
 	
-	elif raw_command[0] == 'rooms':
-		sorted_rooms = sorted(rooms, key = lambda x: sql.room_id_from_name(x))
-		for item in sorted_rooms:
-			print ("{0:2} {1}".format (sql.room_id_from_name(item),item))
-			
+
 	# Actual meaningful words
 	verb = None
 	target1 = None
@@ -614,7 +706,7 @@ while (playing):
 	
 	# Check if bad name found -------------------------------------------------
 	if bad_name_message:
-		fprint(bad_name_message)
+		print_all([bad_name_message])
 		continue
 				
 	# Some handhelding with command typ(o)ing ------------------------------------

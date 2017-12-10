@@ -38,11 +38,33 @@ def format_room (room):
 		roomstring1 = "".join(room1)
 		#print(roomlist[0] + " " + roomstring1)
 		return roomlist[0] + " " + roomstring1
+
+	#if (len(roomlist) == 1):
+	#	return roomstr
 	return roomstr
+		
+def format_list (collection, formatter):	
+	count = len(collection)
+	if count == 1:
+		result = formatter(collection [0])
+		
+	else:
+		result = ""
+		for i in range (count - 2):			
+			item = formatter(collection[i])
+			result += "{0}, ".format(item)
+				
+		second_last = formatter(collection[-2])
+		last = formatter(collection[-1])
+		result += "{0} and {1}".format(second_last, last)
+				
+	return result		
 	
+'''	
 def direction (dir):
 	direction = sql.long_direction(dir)
 	return direction
+'''
 '''
 print(format_room("gallery"))
 print(format_room("music room"))
