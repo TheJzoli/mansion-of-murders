@@ -24,10 +24,6 @@ def format_npc (name):
 	return namestr
 
 def format_room (room):
-	return room.title()
-	
-	# Joel tää palauttaa joistain Nonen, ei käy
-	# ainakin music room
 	roomstr = room.title()
 	roomlist = roomstr.split()
 	if (roomlist[0][-1] == 's'):
@@ -42,11 +38,13 @@ def format_room (room):
 		roomstring1 = "".join(room1)
 		#print(roomlist[0] + " " + roomstring1)
 		return roomlist[0] + " " + roomstring1
-	if (len(roomlist) == 1):
-		return roomstr
-		
+	return roomstr
+	
+def direction (dir):
+	direction = sql.long_direction(dir)
+	return direction
 '''
-print(room("gallery"))
-print(room("music room"))
-print(room("butlers room"))
+print(format_room("gallery"))
+print(format_room("music room"))
+print(format_room("butlers room"))
 '''
