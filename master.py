@@ -750,7 +750,7 @@ points_for_unsolved = 0
 points = 0
 
 if end_state == 'out of murderers':
-	fprint ("You've got rid of all the killers around. But at what price! {0} people died today.".format (sql.query_single("SELECT COUNT(*) FROM murder")))
+	fprint ("You've gotten rid of all the killers. But at what price! {0} people died today.".format (sql.query_single("SELECT COUNT(*) FROM murder")))
 	murders = sql.column_as_list(sql.run_query("SELECT state FROM murder INNER JOIN mapped_npc ON mapped_id = murderer;"), 0)
 
 	for item in murders:
