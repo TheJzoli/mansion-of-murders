@@ -530,6 +530,10 @@ CREATE TABLE ALL_VERBS (
 	word VARCHAR (100)
 );
 
+CREATE TABLE CURSES (
+	word VARCHAR(100)
+);
+
 CREATE TABLE PREPOSITIONS (
 	word VARCHAR(100) NOT NULL,
 	PRIMARY KEY (word)
@@ -633,6 +637,42 @@ INSERT INTO synonyms VALUES ('crawl',  'move');
 -- OTHERS
 INSERT INTO specials VALUES ('notes');
 INSERT INTO synonyms VALUES ('memo', 'notes');
+INSERT INTO specials VALUES ('ragequit');
+INSERT INTO synonyms VALUES ('rage quit', 'ragequit');
+INSERT INTO two_part_words VALUES ('rage', 'quit');
+
+INSERT INTO curses VALUES ('arse');
+INSERT INTO curses VALUES ('ass');
+INSERT INTO curses VALUES ('asshole');
+INSERT INTO curses VALUES ('bastard');
+INSERT INTO curses VALUES ('bitch');
+INSERT INTO curses VALUES ('bollocks');
+INSERT INTO curses VALUES ('crap');
+INSERT INTO curses VALUES ('cunt');
+INSERT INTO curses VALUES ('damn');
+INSERT INTO curses VALUES ('fuck');
+INSERT INTO curses VALUES ('fucker');
+INSERT INTO curses VALUES ('fucking');
+INSERT INTO curses VALUES ('fucks');
+INSERT INTO curses VALUES ('goddamn');
+INSERT INTO curses VALUES ('goddamnit');
+INSERT INTO curses VALUES ('motherfucker');
+INSERT INTO curses VALUES ('hell');
+INSERT INTO curses VALUES ('nigga');
+INSERT INTO curses VALUES ('nigger');
+INSERT INTO curses VALUES ('shit');
+INSERT INTO curses VALUES ('shitting');
+INSERT INTO curses VALUES ('shitass');
+INSERT INTO curses VALUES ('twat');
+INSERT INTO curses VALUES ('cum');
+INSERT INTO curses VALUES ('cumming');
+INSERT INTO curses VALUES ('penis');
+INSERT INTO curses VALUES ('dick');
+INSERT INTO curses VALUES ('faggot');
+INSERT INTO curses VALUES ('vagina');
+INSERT INTO curses VALUES ('pussy');
+INSERT INTO curses VALUES ('benis');
+
 
 -- ALL VERBS
 INSERT INTO all_verbs VALUES ('abash');
