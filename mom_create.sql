@@ -39,7 +39,6 @@ CREATE TABLE PASSAGE (
 CREATE TABLE DETAIL (
 	detail_id 	INT NOT NULL,
 	name 		VARCHAR (40) NOT NULL,
-	description TEXT,
 
 	PRIMARY KEY (detail_id)
 );
@@ -135,32 +134,32 @@ INSERT INTO direction VALUES ('nw', 'northwest');
 INSERT INTO direction VALUES ('u', 'up');
 INSERT INTO direction VALUES ('d', 'down');
 
-INSERT INTO room VALUES (1, 'front yard', NULL);
+INSERT INTO room VALUES (1, 'front yard', 'A pathway lined with rose bushes leads to north to the huge, dark mansion.');
 INSERT INTO two_part_words VALUES ('front', 'yard');
-INSERT INTO room VALUES (2, 'entrance', NULL);
-INSERT INTO room VALUES (3, 'tea room', NULL);
+INSERT INTO room VALUES (2, 'entrance', 'Great doors and large pillars of marble welcome you to the entrance of the mansion. Red carpet is spread on the floor like it’s just for you.');
+INSERT INTO room VALUES (3, 'tea room', 'Dark and tall fireplace with glass doors warms up the tea room that’s lined with soft couches and armchairs.');
 INSERT INTO two_part_words VALUES ('tea', 'room');
-INSERT INTO room VALUES (4, 'dining room', NULL);
+INSERT INTO room VALUES (4, 'dining room', 'Long table already set for a one, two, …, five-course meal for at least forty people. Expensive china and crystal glasses cover the perfect white tablecloth.');
 INSERT INTO two_part_words VALUES ('dining', 'room');
-INSERT INTO room VALUES (5, 'bar', NULL);
-INSERT INTO room VALUES (6, 'kitchen', NULL);
-INSERT INTO room VALUES (7, 'billiard room', NULL);
+INSERT INTO room VALUES (5, 'bar', 'Wooden bar table and behind it what seems to be an endless supply of finest wines and whiskies in a glass cabinet. There are three red leather armchairs around the room. Please take a seat and enjoy a nice drink and a cigar.');
+INSERT INTO room VALUES (6, 'kitchen', 'Ah… it smells delicious in here. Someone has been cooking a banquet in here. There’s a large goose heating in the oven and there are several ingredients on the tables. A gorgeous cake with fresh cherries is put on the table.');
+INSERT INTO room VALUES (7, 'billiard room', 'This is the billiard room named after the big billiard table in the middle that’s sadly not been used as actively as intended. Anyway, be our guest and play a little or continue your way.');
 INSERT INTO two_part_words VALUES ('billiard', 'room');
-INSERT INTO room VALUES (8, 'hall', NULL);
-INSERT INTO room VALUES (9, 'butlers room', NULL);
+INSERT INTO room VALUES (8, 'hall', 'Boring old hallway with the same carpeting as everywhere and some dark looking paintings hanging from the walls.');
+INSERT INTO room VALUES (9, 'butlers room', 'A modest bed with grey coverings and small desk with notes about household duties on it. You also notice some letters but those look privet.');
 INSERT INTO two_part_words VALUES ('butlers', 'room');
-INSERT INTO room VALUES (10, 'music room', NULL);
+INSERT INTO room VALUES (10, 'music room', 'Different musical instruments lay all around the room but the most noticeable is the black grand piano right in the middle of the room. The room is weirdly shaped, but it must for the acoustics.');
 INSERT INTO two_part_words VALUES ('music', 'room');
-INSERT INTO room VALUES (11, 'ballroom', NULL);
-INSERT INTO room VALUES (12, 'terrace', NULL);
-INSERT INTO room VALUES (13, 'gallery', NULL);
-INSERT INTO room VALUES (14, 'servants room', NULL);
+INSERT INTO room VALUES (11, 'ballroom','A beautiful ballroom perfect for dances and other formal festivities. The walls are covered in gold and a sparkly chandelier is hanging from the ceiling, the parquet floor shines like this room was never been used before. At the end of the great hall you can see large stairs that lead to upstairs. You can hear the music coming from the music room and you almost feel like boogieing.');
+INSERT INTO room VALUES (12, 'terrace', 'Lovely terrace with patio furniture and some lemonade, perfect for cooling down after intense balls. When you are ready, head back to the ballroom to your north or stay and relax for a bit.');
+INSERT INTO room VALUES (13, 'gallery', 'The family’s pride; the art gallery. Hundreds of paintings hanging from the walls all framed with gold but the paintings themselves all seem to be weirdly dark. You can’t quite figure out what they represent but they give some chills for sure.');
+INSERT INTO room VALUES (14, 'servants room', 'Several grey beds in a row for all the regular servants to sleep in and small cabinet full of spare clothes for them. Messy job apparently, since the floor is covered in dirt.');
 INSERT INTO two_part_words VALUES ('servants', 'room');
-INSERT INTO room VALUES (15, 'maids room', NULL);
+INSERT INTO room VALUES (15, 'maids room', 'Dirty little room for all the kitchen servants to sleep in, no wonder it smells like rotten potatoes. Nothing more to tell about this sad little room.');
 INSERT INTO two_part_words VALUES ('maids', 'room');
-INSERT INTO room VALUES (16, 'back yard', NULL);
+INSERT INTO room VALUES (16, 'back yard', 'A calming scenery opens in front of your eyes as you make your way to the back yard. This is a garden-like paradise with blooming apple trees and plantings that border a little pathway.');
 INSERT INTO two_part_words VALUES ('back', 'yard');
-INSERT INTO room VALUES (17, 'bathroom', NULL);
+INSERT INTO room VALUES (17, 'bathroom', 'Downstairs bathroom for the servant-scums. Dirty and unhygienic bathroom with just one toilet and a bucket in a corner.' );
 
 
 -- front yard
@@ -235,47 +234,47 @@ FROM PASSAGE
 		ON D.direction_id = PASSAGE.direction;
 */
 
-INSERT INTO detail VALUES (1, 'a pocket watch', NULL);
-INSERT INTO detail VALUES (2, 'a red scarf', NULL);
-INSERT INTO detail VALUES (3, 'a duck-headed cane', NULL);
-INSERT INTO detail VALUES (4, 'a flower of clove', NULL);
-INSERT INTO detail VALUES (5, 'a hat with feathers', NULL);
-INSERT INTO detail VALUES (6, 'a thick moustache', NULL);
-INSERT INTO detail VALUES (7, 'some sauce on their clothes', NULL);
-INSERT INTO detail VALUES (8, 'a pearl necklace', NULL);
-INSERT INTO detail VALUES (9, 'a lace collar', null);
-INSERT INTO detail VALUES (10, 'flashy earrings', null);
-INSERT INTO detail VALUES (11, 'a pompous cravat', NULL);
-INSERT INTO detail VALUES (13, 'a bulging manhood', NULL);
-INSERT INTO detail VALUES (12, 'an extravagant monocle', NULL);
-INSERT INTO detail VALUES (14, 'a wine glass in pocket', null);
-INSERT INTO detail VALUES (15, 'long boots', null);
-INSERT INTO detail VALUES (16, 'deep blue eyes', null);
-INSERT INTO detail VALUES (17, 'blood red lips', null);
-INSERT INTO detail VALUES (18, 'a scar on their face', null);
-INSERT INTO detail VALUES (19, 'a dagger on their belt', null);
-INSERT INTO detail VALUES (20, 'thick eyeglasses', null);
+INSERT INTO detail VALUES (1, 'a pocket watch');
+INSERT INTO detail VALUES (2, 'a red scarf');
+INSERT INTO detail VALUES (3, 'a duck-headed cane');
+INSERT INTO detail VALUES (4, 'a flower of clove');
+INSERT INTO detail VALUES (5, 'a hat with feathers');
+INSERT INTO detail VALUES (6, 'a thick moustache');
+INSERT INTO detail VALUES (7, 'some sauce on their clothes');
+INSERT INTO detail VALUES (8, 'a pearl necklace');
+INSERT INTO detail VALUES (9, 'a lace collar');
+INSERT INTO detail VALUES (10, 'flashy earrings');
+INSERT INTO detail VALUES (11, 'a pompous cravat');
+INSERT INTO detail VALUES (13, 'a bulging manhood');
+INSERT INTO detail VALUES (12, 'an extravagant monocle');
+INSERT INTO detail VALUES (14, 'a wine glass in pocket');
+INSERT INTO detail VALUES (15, 'long boots');
+INSERT INTO detail VALUES (16, 'deep blue eyes');
+INSERT INTO detail VALUES (17, 'blood red lips');
+INSERT INTO detail VALUES (18, 'a scar on their face');
+INSERT INTO detail VALUES (19, 'a dagger on their belt');
+INSERT INTO detail VALUES (20, 'thick eyeglasses');
 
-INSERT INTO detail VALUES (21, 'a belt bag', null);
-INSERT INTO detail VALUES (22, 'a Scottish kilt', null);
-INSERT INTO detail VALUES (23, 'a trombone', null);
-INSERT INTO detail VALUES (24, 'a striped pendant', null);
-INSERT INTO detail VALUES (25, 'a parrot on their shoulder', null);
-INSERT INTO detail VALUES (26, 'sad eyes', null);
-INSERT INTO detail VALUES (27, 'an ugly nose', null);
-INSERT INTO detail VALUES (28, 'long braided hair', null);
-INSERT INTO detail VALUES (29, 'the highest heels ever', null);
-INSERT INTO detail VALUES (30, 'a mouth full of appetizers', null);
-INSERT INTO detail VALUES (31, 'a white handkerchief', null);
-INSERT INTO detail VALUES (32, 'golden chains', null);
-INSERT INTO detail VALUES (33, 'big epaulettes', null);
-INSERT INTO detail VALUES (34, 'white gloves', null);
-INSERT INTO detail VALUES (35, 'a silver-laced vest', null);
-INSERT INTO detail VALUES (36, 'a tiny nosering', null);
-INSERT INTO detail VALUES (37, 'a loathsome tattoo', null);
-INSERT INTO detail VALUES (38, 'drinking horn', null);
-INSERT INTO detail VALUES (39, 'too much danduruff', null);
-INSERT INTO detail VALUES (40, 'sparkling eyelashes', null);
+INSERT INTO detail VALUES (21, 'a belt bag');
+INSERT INTO detail VALUES (22, 'a Scottish kilt');
+INSERT INTO detail VALUES (23, 'a trombone');
+INSERT INTO detail VALUES (24, 'a striped pendant');
+INSERT INTO detail VALUES (25, 'a parrot on their shoulder');
+INSERT INTO detail VALUES (26, 'sad eyes');
+INSERT INTO detail VALUES (27, 'an ugly nose');
+INSERT INTO detail VALUES (28, 'long braided hair');
+INSERT INTO detail VALUES (29, 'the highest heels ever');
+INSERT INTO detail VALUES (30, 'a mouth full of appetizers');
+INSERT INTO detail VALUES (31, 'a white handkerchief');
+INSERT INTO detail VALUES (32, 'golden chains');
+INSERT INTO detail VALUES (33, 'big epaulettes');
+INSERT INTO detail VALUES (34, 'white gloves');
+INSERT INTO detail VALUES (35, 'a silver-laced vest');
+INSERT INTO detail VALUES (36, 'a tiny nosering');
+INSERT INTO detail VALUES (37, 'a loathsome tattoo');
+INSERT INTO detail VALUES (38, 'drinking horn');
+INSERT INTO detail VALUES (39, 'too much danduruff');
+INSERT INTO detail VALUES (40, 'sparkling eyelashes');
 
 INSERT INTO npc VALUES (1, 'snorkeldink', 'crumplehorn', 'Generic description.', 'A', 1);
 INSERT INTO npc VALUES (2, 'brewery', 'chickenbroth', 'Generic description.', 'A', 1);

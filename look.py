@@ -16,9 +16,9 @@ def all_npcids_in_room(room_id):
 def look_around ():
 	message = "You are in {0}.\n".format(sql.get_room_name(player.location))
 	query = "SELECT description FROM room WHERE room.room_id ='" + str(player.location) + "';"
-	result = sql.query_single(query)
+	message += sql.query_single(query)#muokattu näkymään
 
-	message += "You can move to:\n"
+	message += "\n You can move to:\n" #muokattu uudelle riville
 
 	#---------------------------
 	passages = sql.get_adjacent_rooms_and_directions(player.location)
