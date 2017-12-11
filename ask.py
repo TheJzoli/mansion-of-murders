@@ -26,6 +26,8 @@ def ask(witness, victim):
 					details[i] = sql.detail_name_from_id(details[i])
 				
 				message = "@s{0}: How horrible... If I remember correctly, the murderer had {1}.".format(format_npc(witness), details)
+				
+				'''
 				if (sql.npc_id_from_name(witness) in sql.witnessed_multiple_murders(victim)):
 					message += " Oh and also, the murderer was the same person who murdered "
 					all_but = sql.all_but_current_murder_victims(victim)
@@ -37,6 +39,8 @@ def ask(witness, victim):
 								if (i == all_but[-2]):
 									message += "and "
 					message += "."
+				'''
+				
 		elif (victim in sql.live_npcs()):
 			message = "@s{0}: {1}? What are you talking about? They haven't been murdered.".format(format_npc(witness), format_npc(victim))
 		else:
