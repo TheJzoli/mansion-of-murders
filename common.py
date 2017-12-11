@@ -7,7 +7,7 @@ default_colour = '\x1b[97;100m'
 expired_colour = '\x1b[37m'
 
 ## DEBUG section ==============================================================
-debug = True
+debug = False
 def DEBUG (message):
 	if debug:
 		caller = getframeinfo(stack()[1][0])

@@ -79,6 +79,10 @@ def get_verbs():
 	result = run_query(query)
 	return column_as_list (result, 0)
 
+def in_all_verbs(word):
+	query = "SELECT COUNT(*) FROM all_verbs WHERE word = '{0}';".format(word)
+	return bool(query_single(query))
+	
 def get_prepositions():
 	query = "SELECT word FROM prepositions;"
 	result = run_query (query)
@@ -383,7 +387,42 @@ def find_path (from_id, to_id):
 
 		return route_directions
 		
-
+		
+## NPC FUNCTIONS --------------------------------------------------------------
+def live_npcs ():
+	query = (
+			"SELECT first_name, last_name "
+			"FROM npc "
+			"WHERE npc_id NOT IN"
+				"(SELECT npc FROM mapped_npc"
+				" WHERE mapped_id NOT IN (SELECT victim FROM murder));"
+			)
+	return run_query(query)
+	
+def dead_npcs ():
+	'''
+	query = (
+			"SELECT first_name, last_name "
+			"FROM npc "
+			"WHERE npc_id IN"
+				"(SELECT npc FROM mapped_npc"
+				" WHERE mapped_id NOT IN (SELECT victim FROM murder));"
+			)
+	'''
+	query = (
+			"SELECT first_name, last_name FROM npc "
+			" INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
+			" INNER JOIN murder ON victim = mapped_id;"
+			)
+			
+	DEBUG(('deads', run_query(query)))
+	return run_query(query)
+	
+def npcs_in_room(room_id):
+	query = "SELECT mapped_id FROM mapped_npc WHERE location = {0};".format(room_id)
+	DEBUG(('in rooms', run_query(query)))
+	return run_query(query)
+	
 	
 ## LOOK FUNCTIONS -------------------------------------------------------------
 def live_npcsid_in_room (room_id):
@@ -404,6 +443,7 @@ def dead_npcsid_in_room (room_id):
 	return column_as_list(run_query(query), 0)
 
 def live_npcs_in_room (room_id):
+	'''
 	query = (
 			"SELECT first_name, last_name "
 			"FROM npc "
@@ -413,6 +453,14 @@ def live_npcs_in_room (room_id):
 				"INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim "
 				"INNER JOIN npc ON npc.npc_id = mapped_npc.npc "
 				"WHERE mapped_npc.location = '" + str(room_id) + "');")
+	'''
+	query = (
+			"SELECT first_name, last_name "
+			" FROM npc INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
+			" WHERE location = '{0}'"
+			" AND mapped_id NOT IN (SELECT victim FROM murder);"
+			).format(room_id)
+
 	return run_query(query)
 
 def dead_npcs_in_room (room_id):
@@ -451,27 +499,9 @@ def get_adjacent_rooms_and_directions(room_id):
 
 	
 ## ASK FUNCTIONS --------------------------------------------------------------
-def dead_npcs ():
-	query = (
-			"SELECT first_name, last_name "
-			"FROM npc "
-			"WHERE npc_id IN("
-				"SELECT npc.npc_id "
-				"FROM murder "
-				"INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim "
-				"INNER JOIN npc ON npc.npc_id = mapped_npc.npc);")
-	return run_query(query)
 
-def live_npcs ():
-	query = (
-			"SELECT first_name, last_name "
-			"FROM npc "
-			"WHERE npc_id NOT IN("
-				"SELECT npc.npc_id "
-				"FROM murder "
-				"INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim "
-				"INNER JOIN npc ON npc.npc_id = mapped_npc.npc);")
-	return run_query(query)
+
+
 	
 def solved_murder():
 	query = (
@@ -560,12 +590,7 @@ def get_notes():
 		if record [1]:
 			notes[-1][2].append(record[1])
 	return notes
-
-def infinite_index():
-	index = 0
-	while True:
-		index += 1
-		yield index
+	
 	
 def add_player_clue(victim, detail):
 	if not detail:

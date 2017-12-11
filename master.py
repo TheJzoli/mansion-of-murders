@@ -409,7 +409,6 @@ while (playing):
 		npcs_enter = []
 		npcs_exit = []
 		
-		'''
 		for npc in sql.get_living_npcs():
 			if npc in [current_murderer_id, victim_id]:
 				do_move = False
@@ -429,7 +428,6 @@ while (playing):
 					npcs_exit.append((npc, destination))	
 				
 				sql.move_npc(npc, destination)
-		'''
 
 		if not first_round:
 			if npcs_enter:
@@ -688,7 +686,8 @@ while (playing):
 		#DEBUG_command.append (command_word)
 		
 		if verb is None:
-			if command_word in verbs:
+			if sql.in_all_verbs(command_word):
+			#if command_word in verbs:
 				verb = command_word
 				
 			elif command_word in directions or command_word in specials:
@@ -821,7 +820,7 @@ while (playing):
 				cheat = False
 				player_actions_used += 1
 		else:
-			messages.append("What's that?")
+			messages.append("You cannot do that.")
 			
 	else:
 		messages.append("There was no verb, what do you want to do?")

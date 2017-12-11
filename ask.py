@@ -8,6 +8,10 @@ from common import *
 ## ja jos se tietää muita murhia, niin niihin voisi lisätä ne vihjeet
 
 def ask(witness, victim):
+	
+	victim_id = sql.npc_id_from_name(victim)
+	witness_id = sql.npc_id_from_name(witness)
+	
 	message = ""
 	if witness in sql.live_npcs_in_room(player.location):
 		if victim in sql.dead_npcs():
@@ -40,6 +44,10 @@ def ask(witness, victim):
 			message = "@s{0}: {1}? What are you talking about? They haven't been murdered.".format(format_npc(witness), format_npc(victim))
 		else:
 			message = "@s{0}: {1}? Never heard of anyone called that before.".format(format_npc(witness), format_npc(victim))
+	
+	elif witness in sql.dead_npcs() and witness_id in sql.npcs_in_room(player.location):
+		message = "Death has closed their lips for good."
+		
 	else:
 		message = "There is no one called {0} in this room to whom you could talk to.".format(format_npc(witness))
 	
