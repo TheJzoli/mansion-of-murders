@@ -312,6 +312,7 @@ introduction = (
 				"You should {0}MOVE{1} there, and begin to {0}ASK people ABOUT the poor thing{1}. "
 				"Once you know the culprit you can {0}BLAME them FOR KILLING the victim{1}. "
 				"You can always {0}LOOK AROUND{1} or {0}LOOK AT people{1}, or view your {0}NOTES{1}."
+				"\n For help with the commands, type 'help'."
 				).format(cmd_colour, default_colour)
 
 instructions = (
