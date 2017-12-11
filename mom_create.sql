@@ -666,6 +666,12 @@ INSERT INTO curses VALUES ('shitass');
 INSERT INTO curses VALUES ('twat');
 INSERT INTO curses VALUES ('cum');
 INSERT INTO curses VALUES ('cumming');
+INSERT INTO curses VALUES ('penis');
+INSERT INTO curses VALUES ('dick');
+INSERT INTO curses VALUES ('faggot');
+INSERT INTO curses VALUES ('vagina');
+INSERT INTO curses VALUES ('pussy');
+INSERT INTO curses VALUES ('benis');
 
 
 -- ALL VERBS
