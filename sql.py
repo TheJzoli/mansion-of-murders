@@ -499,7 +499,18 @@ def current_victims_murderer_id (victim):
 			).format(npc_id_from_name(victim))
 	return query_single(query)
 	
+
+def other_witnessed_victims(witness_mapped_id, murderer_mapped_id):
+	query = (
+			"SELECT DISTINCT murder.victim"
+			" FROM murder"
+			" INNER JOIN clue ON clue.victim = murder.victim"
+			" WHERE murderer = {0} AND witness = {1};"
+			).format (murderer_mapped_id, witness_mapped_id)
+	return column_as_list(run_query(query), 0)
+
 def witnessed_multiple_murders (victim): #by the current victim's murderer
+	
 	query = (
 			"SELECT clue.witness "
 			"FROM clue "

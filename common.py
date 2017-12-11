@@ -11,7 +11,7 @@ player = Player()
 
 ## DEBUG section ==============================================================
 from inspect import getframeinfo, stack
-debug = True
+debug = False
 def DEBUG (message):
 	if debug:
 		caller = getframeinfo(stack()[1][0])

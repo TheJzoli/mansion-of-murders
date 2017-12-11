@@ -564,6 +564,7 @@ while (playing):
 		print_all([instructions])
 		continue
 	
+	
 	elif raw_command[0] == 'rooms':
 		sorted_rooms = sorted(rooms, key = lambda x: sql.room_id_from_name(x))
 		rooms_str = ""
