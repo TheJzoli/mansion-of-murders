@@ -12,8 +12,8 @@ def ask(witness, victim):
 	if witness in sql.live_npcs_in_room(player.location):
 		if victim in sql.dead_npcs():
 			details = sql.murderer_detail(witness, victim)
-			if (sql.solved_murder() == sql.current_victims_murderer_id(victim)):
-				message = "@s{0}: The murderer was caught? Oh thank goodness, what a relief!".format(format_npc(witness)
+			if (sql.solved_murder() == sql.get_murderer_id(victim)):
+				message = "@s{0}: The murderer was caught? Oh thank goodness, what a relief!".format(format_npc(witness))
 
 			if (details == None):
 				message = "@s{0}: Wait? {1} has been murdered? How horrible! I didn't know!".format (format_npc(witness), format_npc(victim))
@@ -22,11 +22,22 @@ def ask(witness, victim):
 				for item in details:
 					sql.add_player_clue(sql.npc_id_from_name(victim), item)
 				
-				for i in range (len(details)):
-					details[i] = sql.detail_name_from_id(details[i])
+				#for i in range (len(details)):
+				#	details[i] = sql.detail_name_from_id(details[i])
+				details = format_list(details, sql.detail_name_from_id)
 				
 				message = "@s{0}: How horrible... If I remember correctly, the murderer had {1}.".format(format_npc(witness), details)
 				
+				victim_id = sql.npc_id_from_name(victim)
+				murderer_id = sql.get_murderer_id(victim)
+				other_victims = sql.other_witnessed_victims(victim_id, murderer_id)
+				#safe_remove (victim_id, other_victims)
+				DEBUG (other_victims)
+				if other_victims:
+					other_victims = format_list (other_victims, lambda x: format_npc(sql.npc_name_from_id(x)))
+					message += " Oh and also, the murderer was the same person who murdered {0}.".format(other_victims)
+					
+					
 				'''
 				if (sql.npc_id_from_name(witness) in sql.witnessed_multiple_murders(victim)):
 					message += " Oh and also, the murderer was the same person who murdered "

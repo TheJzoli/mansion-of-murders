@@ -498,7 +498,7 @@ def murderer_detail (witness, victim):
 	else:
 		return column_as_list(result, 0) #Multiple details? What then?
 	
-def current_victims_murderer_id (victim):
+def get_murderer_id (victim):
 	query = (
 			"SELECT mapped_id "
 			"FROM mapped_npc "

@@ -142,14 +142,7 @@ def roll_screen(rows):
 	print (rows * "\n")
 '''	
 	
-def shuffle (list):
-	count = len(list)
-	for i in range (count - 1):
-		random_index = random.randint(i, count - 1)
-		list[i], list[random_index] = list[random_index], list[i]
 
-def safe_remove(value, list):
-	value in list and list.remove(value)
 
 	
 ## VOCABULARY =================================================================
@@ -532,7 +525,19 @@ while (playing):
 		playing = False
 		end_state = None
 		continue
-		
+	
+	if len(raw_command) > 4 and raw_command[0] == 'move' and raw_command[1] in first_names and raw_command[2] in last_names and raw_command[3] == 'to':
+		npc = ((raw_command[1], raw_command[2]))
+		npc_id = npc_id_from_name(npc)
+		if len(raw_command) >= 6:
+			room_name = "{0} {1}".format(raw_command[4], raw_command[5])
+			if room_name in rooms:
+				sql.move_npc(npc_id, sql.room_id_from_name(room_name))
+				print_all(["Moved {0} to the {1}.".format(format_npc(npc), format_room(room_name))])
+		elif raw_command[5] in rooms:
+			sql.move_npc(npc_id, sql.room_id_from_name(room_name))
+			print_all(["Moved {0} to the {1}.".format(format_npc(npc), format_room(raw_command[0]))])
+			
 	elif raw_command[0] == 'cheat':
 		cheat = True
 		raw_command = raw_command [1:]
