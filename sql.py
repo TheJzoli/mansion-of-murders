@@ -472,6 +472,14 @@ def live_npcs ():
 				"INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim "
 				"INNER JOIN npc ON npc.npc_id = mapped_npc.npc);")
 	return run_query(query)
+	
+def solved_murder():
+	query = (
+			"SELECT mapped_id "
+			"FROM murder "
+			"INNER JOIN mapped_npc "
+			"WHERE state = 'arrested';")
+	return query_single(query)
 
 def murderer_detail (witness, victim):
 	#DEBUG((witness, victim))

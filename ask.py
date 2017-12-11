@@ -12,7 +12,8 @@ def ask(witness, victim):
 	if witness in sql.live_npcs_in_room(player.location):
 		if victim in sql.dead_npcs():
 			details = sql.murderer_detail(witness, victim)
-			
+			if (sql.solved_murder() == sql.current_victims_murderer_id(victim)):
+				message = "@s{0}: The murderer was caught? Oh thank goodness, what a relief!".format(format_npc(witness)
 
 			if (details == None):
 				message = "@s{0}: Wait? {1} has been murdered? How horrible! I didn't know!".format (format_npc(witness), format_npc(victim))
@@ -48,7 +49,6 @@ def ask(witness, victim):
 		message = "There is no one called {0} in this room to whom you could talk to.".format(format_npc(witness))
 	
 	return message
-#print("Ask {0} about {1}'s killer".format(witness, victim))
 
 def ask_direction(destination_room):
 	destination_room_id = sql.room_id_from_name(destination_room)
