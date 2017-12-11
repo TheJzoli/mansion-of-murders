@@ -661,8 +661,11 @@ INSERT INTO curses VALUES ('hell');
 INSERT INTO curses VALUES ('nigga');
 INSERT INTO curses VALUES ('nigger');
 INSERT INTO curses VALUES ('shit');
+INSERT INTO curses VALUES ('shitting');
 INSERT INTO curses VALUES ('shitass');
 INSERT INTO curses VALUES ('twat');
+INSERT INTO curses VALUES ('cum');
+INSERT INTO curses VALUES ('cumming');
 
 
 -- ALL VERBS
