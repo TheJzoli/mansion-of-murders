@@ -43,40 +43,44 @@ def format_room (room):
 
 	if (roomlist[0][-1] == 's'):
 		room0 = list(roomlist[0])
+		
 		if (roomlist[0] == 'Servants'):
 			room0.append("'")
 			roomstring0 = "".join(room0)
 			return roomstring0 + " " + roomlist[1]
+			
 		else:
 			room0.insert(-1, "'")
 			roomstring0 = "".join(room0)
-			#print(roomstring0 + " " + roomlist[1])
 			return roomstring0 + " " + roomlist[1]
+			
 	if (len(roomlist) >= 2 and roomlist[1][-1] == 's'):
 		room1 = list(roomlist[1])
 		room1.insert(-1, "'")
 		roomstring1 = "".join(room1)
-		#print(roomlist[0] + " " + roomstring1)
 		return roomlist[0] + " " + roomstring1
 
-	#if (len(roomlist) == 1):
-	#	return roomstr
 	return roomstr
 		
 def format_list (collection, formatter):	
-	count = len(collection)
-	if count == 1:
-		result = formatter(collection [0])
-		
+	if not collection:
+		result = None
+	
 	else:
-		result = ""
-		for i in range (count - 2):			
-			item = formatter(collection[i])
-			result += "{0}, ".format(item)
-				
-		second_last = formatter(collection[-2])
-		last = formatter(collection[-1])
-		result += "{0} and {1}".format(second_last, last)
+		count = len(collection)
+	
+		if count == 1:
+			result = formatter(collection [0])
+		
+		else:
+			result = ""
+			for i in range (count - 2):			
+				item = formatter(collection[i])
+				result += "{0}, ".format(item)
+					
+			second_last = formatter(collection[-2])
+			last = formatter(collection[-1])
+			result += "{0} and {1}".format(second_last, last)
 				
 	return result		
 	
@@ -85,8 +89,9 @@ def direction (dir):
 	direction = sql.long_direction(dir)
 	return direction
 '''
+
 '''
-print(format_room("gallery"))
-print(format_room("music room"))
+print(format_room("maids room"))
+print(format_room("servants room"))
 print(format_room("butlers room"))
 '''

@@ -21,36 +21,20 @@ def ask(witness, victim):
 
 				for item in details:
 					sql.add_player_clue(sql.npc_id_from_name(victim), item)
-				
-				#for i in range (len(details)):
-				#	details[i] = sql.detail_name_from_id(details[i])
-				details = format_list(details, sql.detail_name_from_id)
-				
-				message = "@s{0}: How horrible... If I remember correctly, the murderer had {1}.".format(format_npc(witness), details)
+	
+				detail_names = format_list(details, sql.detail_name_from_id)			
+				message = "@s{0}: How horrible... If I remember correctly, the murderer had {1}.".format(format_npc(witness), detail_names)
 				
 				victim_id = sql.npc_id_from_name(victim)
+				witness_id = sql.npc_id_from_name(witness)
 				murderer_id = sql.get_murderer_id(victim)
-				other_victims = sql.other_witnessed_victims(victim_id, murderer_id)
-				#safe_remove (victim_id, other_victims)
-				DEBUG (other_victims)
+				
+				other_victims = sql.witnessed_victims(witness_id, murderer_id).remove(victim_id)
+
 				if other_victims:
 					other_victims = format_list (other_victims, lambda x: format_npc(sql.npc_name_from_id(x)))
 					message += " Oh and also, the murderer was the same person who murdered {0}.".format(other_victims)
 					
-					
-				'''
-				if (sql.npc_id_from_name(witness) in sql.witnessed_multiple_murders(victim)):
-					message += " Oh and also, the murderer was the same person who murdered "
-					all_but = sql.all_but_current_murder_victims(victim)
-					for i in all_but:
-						message += "{0}".format(format_npc(sql.npc_name_from_id(i)))
-						if (i != all_but[-1]):
-							message += ", "
-							if (len(all_but) >= 2):
-								if (i == all_but[-2]):
-									message += "and "
-					message += "."
-				'''
 				
 		elif (victim in sql.live_npcs()):
 			message = "@s{0}: {1}? What are you talking about? They haven't been murdered.".format(format_npc(witness), format_npc(victim))

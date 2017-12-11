@@ -408,6 +408,7 @@ while (playing):
 		npcs_enter = []
 		npcs_exit = []
 		
+		'''
 		for npc in sql.get_living_npcs():
 			if npc in [current_murderer_id, victim_id]:
 				do_move = False
@@ -427,10 +428,8 @@ while (playing):
 					npcs_exit.append((npc, destination))	
 				
 				sql.move_npc(npc, destination)
-		
+		'''
 
-		#npcs_enter_message = npc_move_message(npcs_enter, 'enter')
-		#npcs_exit_message = npc_move_message(npcs_exit, 'exit')
 		if not first_round:
 			if npcs_enter:
 				messages.append (npc_move_message(npcs_enter, 'enter'))
@@ -528,15 +527,17 @@ while (playing):
 	
 	if len(raw_command) > 4 and raw_command[0] == 'move' and raw_command[1] in first_names and raw_command[2] in last_names and raw_command[3] == 'to':
 		npc = ((raw_command[1], raw_command[2]))
-		npc_id = npc_id_from_name(npc)
+		npc_id = sql.npc_id_from_name(npc)
 		if len(raw_command) >= 6:
 			room_name = "{0} {1}".format(raw_command[4], raw_command[5])
 			if room_name in rooms:
-				sql.move_npc(npc_id, sql.room_id_from_name(room_name))
 				print_all(["Moved {0} to the {1}.".format(format_npc(npc), format_room(room_name))])
-		elif raw_command[5] in rooms:
+				sql.move_npc(npc_id, sql.room_id_from_name(room_name))
+				continue
+		elif raw_command[4] in rooms:
+			print_all(["Moved {0} to the {1}.".format(format_npc(npc), format_room(raw_command[4]))])
 			sql.move_npc(npc_id, sql.room_id_from_name(room_name))
-			print_all(["Moved {0} to the {1}.".format(format_npc(npc), format_room(raw_command[0]))])
+			continue
 			
 	elif raw_command[0] == 'cheat':
 		cheat = True
@@ -559,11 +560,12 @@ while (playing):
 			if room_name in rooms:
 				player.location = sql.room_id_from_name(room_name)
 				print_all (["Teleported to {0}.".format(room_name)])
-	
+				continue
+				
 		elif raw_command [1] in rooms:
 			player.location = sql.room_id_from_name(raw_command[1])
 			print_all (["Teleported to {0}.".format(raw_command[1])])
-		continue
+			continue
 	
 	elif raw_command [0] == 'help':
 		print_all([instructions])
@@ -800,9 +802,12 @@ while (playing):
 					messages.append(ask.ask(target1, target2))
 					use_action_point = True
 				
-				elif sub == 1:
+				elif sub == 1 and target2 in directions:
 					messages.append(ask.ask_direction(target2))
-					
+				
+				else:
+					messages.append("What do you want to ask?")
+				
 			elif super == 4: # BLAME
 				messages.append(blame.blame(target1, target2))
 				use_action_point = True
