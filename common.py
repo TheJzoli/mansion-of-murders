@@ -1,7 +1,28 @@
+from random import randint
+from inspect import getframeinfo, stack
+
 # Color ansi escapes
 cmd_colour = '\x1b[93m'
 default_colour = '\x1b[97;100m'
 expired_colour = '\x1b[37m'
+
+## DEBUG section ==============================================================
+debug = True
+def DEBUG (message):
+	if debug:
+		caller = getframeinfo(stack()[1][0])
+		print ("DEBUG [{0}: {1}]: {2}".format(caller.filename.split(sep="\\")[-1], caller.lineno, message))
+
+## Utilities ==================================================================
+def shuffle (list):
+	count = len(list)
+	for i in range (count - 1):
+		random_index = randint(i, count - 1)
+		list[i], list[random_index] = list[random_index], list[i]
+
+def safe_remove(value, list):
+	value in list and list.remove(value)
+
 
 ## Player section =============================================================
 class Player():
@@ -9,13 +30,6 @@ class Player():
 
 player = Player()
 
-## DEBUG section ==============================================================
-from inspect import getframeinfo, stack
-debug = False
-def DEBUG (message):
-	if debug:
-		caller = getframeinfo(stack()[1][0])
-		print ("DEBUG [{0}: {1}]: {2}".format(caller.filename.split(sep="\\")[-1], caller.lineno, message))
 
 
 ## Format section =============================================================
@@ -26,7 +40,7 @@ def format_npc (name):
 def format_room (room):
 	roomstr = room.title()
 	roomlist = roomstr.split()
-	
+
 	if (roomlist[0][-1] == 's'):
 		room0 = list(roomlist[0])
 		if (roomlist[0] == 'Servants'):
