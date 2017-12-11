@@ -59,7 +59,7 @@ def format_room (room):
 		room1.insert(-1, "'")
 		roomstring1 = "".join(room1)
 		return roomlist[0] + " " + roomstring1
-
+		
 	return roomstr
 		
 def format_list (collection, formatter):	
