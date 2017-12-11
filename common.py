@@ -33,20 +33,18 @@ def format_room (room):
 			room0.append("'")
 			roomstring0 = "".join(room0)
 			return roomstring0 + " " + roomlist[1]
+			
 		else:
 			room0.insert(-1, "'")
 			roomstring0 = "".join(room0)
-			#print(roomstring0 + " " + roomlist[1])
 			return roomstring0 + " " + roomlist[1]
+			
 	if (len(roomlist) >= 2 and roomlist[1][-1] == 's'):
 		room1 = list(roomlist[1])
 		room1.insert(-1, "'")
 		roomstring1 = "".join(room1)
-		#print(roomlist[0] + " " + roomstring1)
 		return roomlist[0] + " " + roomstring1
-
-	#if (len(roomlist) == 1):
-	#	return roomstr
+		
 	return roomstr
 		
 def format_list (collection, formatter):	
