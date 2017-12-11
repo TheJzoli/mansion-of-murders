@@ -11,7 +11,7 @@ player = Player()
 
 ## DEBUG section ==============================================================
 from inspect import getframeinfo, stack
-debug = True
+debug = False
 def DEBUG (message):
 	if debug:
 		caller = getframeinfo(stack()[1][0])
@@ -26,12 +26,18 @@ def format_npc (name):
 def format_room (room):
 	roomstr = room.title()
 	roomlist = roomstr.split()
+	
 	if (roomlist[0][-1] == 's'):
 		room0 = list(roomlist[0])
-		room0.insert(-1, "'")
-		roomstring0 = "".join(room0)
-		#print(roomstring0 + " " + roomlist[1])
-		return roomstring0 + " " + roomlist[1]
+		if (roomlist[0] == 'Servants'):
+			room0.append("'")
+			roomstring0 = "".join(room0)
+			return roomstring0 + " " + roomlist[1]
+		else:
+			room0.insert(-1, "'")
+			roomstring0 = "".join(room0)
+			#print(roomstring0 + " " + roomlist[1])
+			return roomstring0 + " " + roomlist[1]
 	if (len(roomlist) >= 2 and roomlist[1][-1] == 's'):
 		room1 = list(roomlist[1])
 		room1.insert(-1, "'")
