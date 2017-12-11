@@ -1,3 +1,10 @@
+'''
+# These are all populated from master.py
+rooms = []              # Names of rooms
+npcs = []               # Npcs full name in list = ["firstname", "secondname"]
+player                  # player instance, holds location
+'''
+
 import sql
 from common import *
 
@@ -7,8 +14,7 @@ def all_npcids_in_room(room_id):
         return result
 
 def look_around ():
-	room_name = format_room(sql.room_name_from_id(player.location))
-	message = "You are in the {0}.\n".format(room_name)
+	message = "You are in {0}.\n".format(sql.get_room_name(player.location))
 	query = "SELECT description FROM room WHERE room.room_id ='" + str(player.location) + "';"
 	result = sql.query_single(query)
 
@@ -23,7 +29,7 @@ def look_around ():
 	count = 0
 	
 	for item in passages:
-		room_names.append(format_room(sql.room_name_from_id(item [0])))
+		room_names.append(sql.room_name_from_id(item [0]))
 		length = len(room_names[-1])
 		if length > longest_length:
 			longest_length = length
@@ -35,7 +41,6 @@ def look_around ():
 	#-----------------------------
 
 
-	#live_npcs = all_npcids_in_room(player.location)
 	live_npcs = sql.live_npcsid_in_room(player.location)
 	dead_npcs = sql.dead_npcsid_in_room(player.location)
 	total_npcs = len (live_npcs) + len (dead_npcs)
@@ -43,7 +48,7 @@ def look_around ():
 		message += "These people are here:\n"
 		for item in live_npcs:
 			formatted_name = format_npc(sql.npc_name_from_id(item))
-			message +="@i\t{0}\n".format(formatted_name)#nimen muotoilut
+			message +="@i\t{0}\n".format(formatted_name)
 		if len(dead_npcs) > 0:
 			message += "But these people seem to be dead!:\n"
 			for item in dead_npcs:
@@ -68,13 +73,22 @@ def single_npc_details(target_id):
 				"AND mapped_npc.mapped_id = '"
 				) + str(target_id) + "';"
         return sql.column_as_list(sql.run_query(query),0)
+		
+def arrested_npcs():
+	query = "SELECT mapped_id FROM mapped_npc WHERE state = 'arrested';"
+	return sql.column_as_list(sql.run_query(query),0)
+
+def escaped_npcs():
+	query = "SELECT mapped_id FROM mapped_npc WHERE state = 'escaped';"
+	return sql.column_as_list(sql.run_query(query),0)
 
 def look(target):
 
-	## pitää myös kattoo että sitä ei oo pidätetty tai se oo karannu
 
 	live_npcsid_in_room = sql.live_npcsid_in_room(player.location)
 	dead_npcsid_in_room = sql.dead_npcsid_in_room(player.location)
+	arrested = arrested_npcs()
+	escaped = escaped_npcs()
 
 	message = ""
 	if(target in sql.get_rooms()):
@@ -91,23 +105,28 @@ def look(target):
 
 		target_id = sql.npc_id_from_name(target)
 		if(target_id in live_npcsid_in_room):
-			
-			message = format_npc(target) + ": "
-			message += single_npc_description(target_id)
+				
+			message = single_npc_description(target_id)
 
 			details = single_npc_details(target_id)
 			if len(details) > 0:
-				message += "\nYou immediately notice these striking details about them:"#ongelma#ei ongelmaa?
+				message += "\nYou immediately notice these striking details about them:"
 				for detail in details:
 					message += "\n@i\t{0}".format(detail)
 
 		elif(target_id in dead_npcsid_in_room):
 			message = "Here lies the dead body of " + format_npc(target) + ". How sad indeed..." 
+			
+		elif(target_id in arrested):
+			message = "They've already been arrested and taken away."
+			
+		elif(target_id in escaped):
+			message = "Oh no looks like they've escaped."
 
 		else:
 			message = "They're not here."
 			
-	elif (target in sql.get_all_directions()):#mikä huone suunnassa
+	elif (target in sql.get_all_directions()):
 		room_in_direction = sql.get_room_in_direction(player.location, target)
 		if room_in_direction:
 			room_name = format_room(sql.room_name_from_id(room_in_direction))
