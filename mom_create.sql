@@ -312,7 +312,7 @@ INSERT INTO npc VALUES (30,'bakery','snugglesnatch','He looks like a dandy in hi
 INSERT INTO npc VALUES (31, 'timothy', 'cummerbund', 'Sneaky looking French gentleman. He has little curly moustache he rubs between his fingers. He is thin but the suit he is wearing covers it perfectly.', 'B', 2);
 INSERT INTO npc VALUES (32, 'syphilis', 'banglesnatch', 'This man looks exotic. He has tan and clothes from distant countries. He looks like a diplomat and you don\'t recognise his accent.', 'B', 2);
 INSERT INTO npc VALUES (33, 'burberry', 'nottinghill', 'Look at this man\'s ears, they\'re huge! But you don\'t make fun of this man since he is almost the most influential man in England.', 'B', 2);
-INSERT INTO npc VALUES (34, 'blubberdick', 'crumplehorn', 'Poorly dressed young boy. He’s probably one of the kitchen servants who\'s sneaked into the party.', 'B', 2);
+INSERT INTO npc VALUES (34, 'blubberdick', 'crumplehorn', 'Poorly dressed young boy. He\'s probably one of the kitchen servants who\'s sneaked into the party.', 'B', 2);
 INSERT INTO npc VALUES (35,'bendandsnap','clavichord','He is maybe middle-aged. His hair is a little grey and his starting to get bald, but he looks active and healthy. His shoes look expensive.','B',2);
 INSERT INTO npc VALUES (36, 'whippersnatch', 'curdledong', 'This man is visibly drunk. His nose is red, and he struggles to stand without swaying. He reeks like cheap whisky and his jacket looks wet.', 'B', 3);
 INSERT INTO npc VALUES (37, 'tiddleywomp', 'cumberbund', 'Uh, this man is ugly. His suit is sharp, his hair is gorgeous and he\'s hilarious, but you just don\'t want to look at his face.', 'B', 3);
@@ -326,7 +326,7 @@ INSERT INTO npc VALUES (44, 'bombadil', 'chickenbroth', 'He looks a little jumpy
 INSERT INTO npc VALUES (45,'benjamin', 'chowderpants','Peculiar man this one. He\'s bug-eyed and short, but he looks heavy. His suit doesn\'t quite fit his figure.','B',4);
 INSERT INTO npc VALUES (46, 'buttermilk', 'crumplesack', 'Looks like he\'s going to be sick. His skin is something between white and green and he keeps swaying from one side to another.', 'B', 5);
 INSERT INTO npc VALUES (47, 'bendandsnap', 'curdledmilk', 'His coat is ragged, and trousers look second-hand. It\'s weird that he was invited in the first place, since he is so obviously poor.', 'B', 5);
-INSERT INTO npc VALUES (48, 'benjamin', 'snickersbar', 'Funny-looking little man. He\’s wearing over-sized green suit and a dotted bow-tie. Otherwise he\'s normal-sized but his feet are abnormally large.', 'B', 5);
+INSERT INTO npc VALUES (48, 'benjamin', 'snickersbar', 'Funny-looking little man. He\'s wearing over-sized green suit and a dotted bow-tie. Otherwise he\'s normal-sized but his feet are abnormally large.', 'B', 5);
 INSERT INTO npc VALUES (49, 'snozzlebert', 'snugglesnatch', 'He\'s a sad man crying in the corners and slowly sipping from his not-so-secret flask.  His hair is a mess and so appears to be his life.', 'B', 5);
 INSERT INTO npc VALUES (50,'buttercup', 'covergirl','You look at the man and the only thing that comes to your mind is Ebenezer Scrooge from the Christmas Carol. His back is hunched, his hair and sideburns are white and he\'s wearing a long black frock coat and a dusty top hat. What a miser.','B',5);
 
