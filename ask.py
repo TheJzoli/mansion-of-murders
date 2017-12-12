@@ -14,7 +14,10 @@ def ask(witness, victim):
 	#f witness in sql.live_npcs_in_room(player.location):
 	if witness in sql.live_npcs() and witness in sql.npcs_in_room(player.location):
 		success = True
-		if victim in sql.dead_npcs():
+		if witness == victim:
+			message = "I feel fine, thank you!"
+			
+		elif victim in sql.dead_npcs():
 			details = sql.murderer_detail(witness, victim)
 			
 			# Arrested means here that murder is solved

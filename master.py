@@ -137,11 +137,7 @@ def print_all(messages):
 	for item in messages:
 		fprint (item)
 		print()
-'''
-def roll_screen(rows):
-	print (rows * "\n")
-'''	
-	
+
 
 
 	
@@ -307,6 +303,7 @@ title = (
 
 title = '\n'.join(list(map(lambda x: left_offset * " " + x, title.split(sep = '\n'))))
 
+
 introduction = (
 				"Someone has been killed in the {0}ENTRANCE{1}. "
 				"You should {0}MOVE{1} there, and begin to {0}ASK people ABOUT the poor thing{1}. "
@@ -315,15 +312,35 @@ introduction = (
 				"\n For help with the commands, type 'help'."
 				).format(cmd_colour, default_colour)
 
-instructions = (
-				"Available Commands:\n\n"
-				"MOVE TO [ROOM NAME]\n"
-				"LOOK AT [PERSON]\n"
-				"LOOK AROUND\n"
-				"ASK [PERSON] ABOUT [OTHER PERSON]\n"
-				"BLAME [PERSON] FOR KILLING [OTHER PERSON]\n\n"
-				"And others for you to find out! :D"
+introduction = (
+				"Welcome to the Mansion of Murders. You've been invited to a ball, at an old English manor well outside the town. "
+				"But you're not going there to party, no sir, you're actually a private investigator and "
+				"you're working based on a tip you received from no other than the host of the said ball. "
+				"He suspects that some of the guest may have hostile intents...\n"
+				
+				"As soon as you arrive to the mansion murders start to take place and you must act fast. "
+				"Using the clues provided by the people who saw the murder, you must identify the murderers "
+				"and catch them before it's too late and the party turns into a bloodbath.\n"
+				
+				"Move around the mansion, ask about the murders, examine the people around you "
+				"and when you think you're sure you've identified the correct murderer you can accuse them, "
+				"but be careful who you blame because the real murderers may escape.\n"
 				)
+				
+				
+				#"@i'move to <room name>'				Moving to another room.\n"
+instructions =	("You have three actions in your turn. You can use your actions to following operations:\n"
+				 + "@i{0:40} {1}.\n".format("'@HMOVE TO@E <room name>'",'Moving to another room')
+				 + "@i{0:40} {1}.\n".format("'@HMOVE@E <direction	>'",'Moving to another room')
+				 + "@i{0:40} {1}.\n".format("'@HASK@E <person> @HABOUT@E <dead person>'",'Asking about murders')
+				 + "@i{0:40} {1}.\n".format("'@HBLAME@E <person> @HFOR KILLING@E <dead person>'",'Blaming possible murderers')
+				 + "\nIn addition, you have following free operations, that don't use up your actions:\n"
+				 + "@i{0:40} {1}.\n".format("'@HLOOK AROUND@E', '@HLOOK AT@E <room name>'",'Looking at your surroundings')
+				 + "@i{0:40} {1}.\n".format("'@HLOOK AT@E <person>'", 'Looking at a person')
+				 + "@i{0:40} {1}.\n".format("'@HLOOK AT NOTES@E'", 'Looking at your notes')
+				 + "@i{0:40} {1}.\n".format("'@HASK ABOUT@E <room name>'", 'Finding a way to a room')
+				 + "@i{0:40} {1}.\n".format("'@HHELP@E'", 'Getting help')
+				 )
 
 print()				
 print (title)
@@ -331,7 +348,7 @@ fprint ("Press ENTER to start game")
 input()
 
 #fprint(introduction)
-print_all ([introduction])
+print_all ([introduction, instructions])
 
 ## ============================================================================
 ##                            GAME LOOP
