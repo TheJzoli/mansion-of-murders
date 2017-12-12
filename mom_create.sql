@@ -47,7 +47,7 @@ CREATE TABLE NPC (
 	npc_id 		INT NOT NULL,
 	first_name 	VARCHAR (40) NOT NULL,
 	last_name 	VARCHAR (40) NOT NULL,
-	description	TEXT,
+	description	TEXT NOT NULL,
 
 	map_group	ENUM ('A', 'B') NOT NULL,
 	sub_group	INT NOT NULL,
@@ -136,14 +136,14 @@ INSERT INTO direction VALUES ('d', 'down');
 
 INSERT INTO room VALUES (1, 'front yard', 'A pathway lined with rose bushes leads to north to the huge, dark mansion.');
 INSERT INTO two_part_words VALUES ('front', 'yard');
-INSERT INTO room VALUES (2, 'entrance', 'Great doors and large pillars of marble welcome you to the entrance of the mansion. Red carpet is spread on the floor like it’s just for you.');
-INSERT INTO room VALUES (3, 'tea room', 'Dark and tall fireplace with glass doors warms up the tea room that’s lined with soft couches and armchairs.');
+INSERT INTO room VALUES (2, 'entrance', 'Great doors and large pillars of marble welcome you to the entrance of the mansion. Red carpet is spread on the floor like it\'s just for you.');
+INSERT INTO room VALUES (3, 'tea room', 'Dark and tall fireplace with glass doors warms up the tea room that\'s lined with soft couches and armchairs.');
 INSERT INTO two_part_words VALUES ('tea', 'room');
-INSERT INTO room VALUES (4, 'dining room', 'Long table already set for a one, two, …, five-course meal for at least forty people. Expensive china and crystal glasses cover the perfect white tablecloth.');
+INSERT INTO room VALUES (4, 'dining room', 'Long table already set for a one, two, five-course meal for at least forty people. Expensive china and crystal glasses cover the perfect white tablecloth.');
 INSERT INTO two_part_words VALUES ('dining', 'room');
 INSERT INTO room VALUES (5, 'bar', 'Wooden bar table and behind it what seems to be an endless supply of finest wines and whiskies in a glass cabinet. There are three red leather armchairs around the room. Please take a seat and enjoy a nice drink and a cigar.');
-INSERT INTO room VALUES (6, 'kitchen', 'Ah… it smells delicious in here. Someone has been cooking a banquet in here. There’s a large goose heating in the oven and there are several ingredients on the tables. A gorgeous cake with fresh cherries is put on the table.');
-INSERT INTO room VALUES (7, 'billiard room', 'This is the billiard room named after the big billiard table in the middle that’s sadly not been used as actively as intended. Anyway, be our guest and play a little or continue your way.');
+INSERT INTO room VALUES (6, 'kitchen', 'Ah… it smells delicious in here. Someone has been cooking a banquet in here. There\'s a large goose heating in the oven and there are several ingredients on the tables. A gorgeous cake with fresh cherries is put on the table.');
+INSERT INTO room VALUES (7, 'billiard room', 'This is the billiard room named after the big billiard table in the middle that\'s sadly not been used as actively as intended. Anyway, be our guest and play a little or continue your way.');
 INSERT INTO two_part_words VALUES ('billiard', 'room');
 INSERT INTO room VALUES (8, 'hall', 'Boring old hallway with the same carpeting as everywhere and some dark looking paintings hanging from the walls.');
 INSERT INTO room VALUES (9, 'butlers room', 'A modest bed with grey coverings and small desk with notes about household duties on it. You also notice some letters but those look privet.');
@@ -152,7 +152,7 @@ INSERT INTO room VALUES (10, 'music room', 'Different musical instruments lay al
 INSERT INTO two_part_words VALUES ('music', 'room');
 INSERT INTO room VALUES (11, 'ballroom','A beautiful ballroom perfect for dances and other formal festivities. The walls are covered in gold and a sparkly chandelier is hanging from the ceiling, the parquet floor shines like this room was never been used before. At the end of the great hall you can see large stairs that lead to upstairs. You can hear the music coming from the music room and you almost feel like boogieing.');
 INSERT INTO room VALUES (12, 'terrace', 'Lovely terrace with patio furniture and some lemonade, perfect for cooling down after intense balls. When you are ready, head back to the ballroom to your north or stay and relax for a bit.');
-INSERT INTO room VALUES (13, 'gallery', 'The family’s pride; the art gallery. Hundreds of paintings hanging from the walls all framed with gold but the paintings themselves all seem to be weirdly dark. You can’t quite figure out what they represent but they give some chills for sure.');
+INSERT INTO room VALUES (13, 'gallery', 'The family’s pride; the art gallery. Hundreds of paintings hanging from the walls all framed with gold but the paintings themselves all seem to be weirdly dark. You can\'t quite figure out what they represent but they give some chills for sure.');
 INSERT INTO room VALUES (14, 'servants room', 'Several grey beds in a row for all the regular servants to sleep in and small cabinet full of spare clothes for them. Messy job apparently, since the floor is covered in dirt.');
 INSERT INTO two_part_words VALUES ('servants', 'room');
 INSERT INTO room VALUES (15, 'maids room', 'Dirty little room for all the kitchen servants to sleep in, no wonder it smells like rotten potatoes. Nothing more to tell about this sad little room.');
@@ -276,46 +276,56 @@ INSERT INTO detail VALUES (38, 'drinking horn');
 INSERT INTO detail VALUES (39, 'too much danduruff');
 INSERT INTO detail VALUES (40, 'sparkling eyelashes');
 
-INSERT INTO npc VALUES (1, 'snorkeldink', 'crumplehorn', 'Generic description.', 'A', 1);
-INSERT INTO npc VALUES (2, 'brewery', 'chickenbroth', 'Generic description.', 'A', 1);
-INSERT INTO npc VALUES (3, 'rinkydink', 'chuckecheese', 'Generic description.', 'A', 1);
-INSERT INTO npc VALUES (4, 'brandenburg', 'creamsicle', 'Generic description.', 'A', 1);
-INSERT INTO npc VALUES (5, 'benadryl', 'moldyspore', 'Generic description.', 'A', 2);
-INSERT INTO npc VALUES (6, 'bumberstump', 'cumbercooch', 'Generic description.', 'A', 2);
-INSERT INTO npc VALUES (7, 'benetton', 'camouflage', 'Generic description.', 'A', 2);
-INSERT INTO npc VALUES (8, 'bentobox', 'cottagecheese', 'Generic description.', 'A', 2);
-INSERT INTO npc VALUES (9, 'bombadil', 'curdlesnoot', 'Generic description.', 'A', 3);
-INSERT INTO npc VALUES (10, 'buckingham', 'curdledmilk', 'Generic description.', 'A', 3);
-INSERT INTO npc VALUES (11, 'boilerdang', 'vegemite', 'Generic description.', 'A', 3);
-INSERT INTO npc VALUES (12, 'bandersnatch', 'countryside', 'Generic description.', 'A', 3);
-INSERT INTO npc VALUES (13, 'syphilis', 'countryside', 'Generic description.', 'A', 4);
-INSERT INTO npc VALUES (14, 'bunsenburner', 'cumbersnatch', 'Generic description.', 'A', 4);
-INSERT INTO npc VALUES (15, 'burberry', 'crackerdong', 'Generic description.', 'A', 4);
-INSERT INTO npc VALUES (16, 'baseballmitt', 'cuckooclock', 'Generic description.', 'A', 4);
-INSERT INTO npc VALUES (17, 'blubberbutt', 'crimpysnitch', 'Generic description.', 'A', 5);
-INSERT INTO npc VALUES (18, 'barister', 'lingerie', 'Generic description.', 'A', 5);
-INSERT INTO npc VALUES (19, 'burlington', 'rivendell', 'Generic description.', 'A', 5);
-INSERT INTO npc VALUES (20, 'brewery', 'curdlesnoot', 'Generic description.', 'A', 5);
-INSERT INTO npc VALUES (21, 'billyray', 'nottinghill', 'Generic description.', 'B', 1);
-INSERT INTO npc VALUES (22, 'bandicoot', 'crucifix', 'Generic description.', 'B', 1);
-INSERT INTO npc VALUES (23, 'liverswort', 'cunningsnatch', 'Generic description.', 'B', 1);
-INSERT INTO npc VALUES (24, 'snorkeldink', 'cumberbund', 'Generic description.', 'B', 1);
-INSERT INTO npc VALUES (25, 'timothy', 'cummerbund', 'Generic description.', 'B', 2);
-INSERT INTO npc VALUES (26, 'syphilis', 'banglesnatch', 'Generic description.', 'B', 2);
-INSERT INTO npc VALUES (27, 'burberry', 'nottinghill', 'Generic description.', 'B', 2);
-INSERT INTO npc VALUES (28, 'blubberdick', 'crumplehorn', 'Generic description.', 'B', 2);
-INSERT INTO npc VALUES (29, 'whippersnatch', 'curdledong', 'Generic description.', 'B', 3);
-INSERT INTO npc VALUES (30, 'tiddleywomp', 'cumberbund', 'Generic description.', 'B', 3);
-INSERT INTO npc VALUES (31, 'bedlington', 'cheddarcheese', 'Generic description.', 'B', 3);
-INSERT INTO npc VALUES (32, 'pallettown', 'chesterfield', 'Generic description.', 'B', 3);
-INSERT INTO npc VALUES (33, 'brandenburg', 'carrotstick', 'Generic description.', 'B', 4);
-INSERT INTO npc VALUES (34, 'boobytrap', 'crackerdong', 'Generic description.', 'B', 4);
-INSERT INTO npc VALUES (35, 'tiddleywomp', 'chesterfield', 'Generic description.', 'B', 4);
-INSERT INTO npc VALUES (36, 'bombadil', 'chickenbroth', 'Generic description.', 'B', 4);
-INSERT INTO npc VALUES (37, 'buttermilk', 'crumplesack', 'Generic description.', 'B', 5);
-INSERT INTO npc VALUES (38, 'bendandsnap', 'curdledmilk', 'Generic description.', 'B', 5);
-INSERT INTO npc VALUES (39, 'benjamin', 'snickersbar', 'Generic description.', 'B', 5);
-INSERT INTO npc VALUES (40, 'snozzlebert', 'snugglesnatch', 'Generic description.', 'B', 5);
+INSERT INTO npc VALUES (1, 'snorkeldink', 'crumplehorn', 'You definitely notice this man even from afar. If his great stomach or even greater laugh doesn\'t do the trick, the bushy moustache will. Of course, being the host and all, his always dressed to his best; dark tail coat and a top hat.', 'A', 1);
+INSERT INTO npc VALUES (2, 'brewery', 'chickenbroth', 'This handsome young fellow looks like he could swoon the tournures off from all the ladies. He\'s looks so stylish and modern with his sideburns and a new blazer that\'s the latest fashion. What a show of.', 'A', 1);
+INSERT INTO npc VALUES (3, 'rinkydink', 'chuckecheese', 'Oh, this poor awkward looking little bastard. He looks so skinny; the wind could blow him away any second. His tuxedo looks somehow too small and too big at the same time and the fact that he\'s a ginger like his whole family doesn\'t help him at all.', 'A', 1);
+INSERT INTO npc VALUES (4, 'brandenburg', 'creamsicle', 'This must be the only man who has made ginger work. He looks tall and handsome and his tuxedo is a perfect fit unlike his brother\'s.', 'A', 1);
+INSERT INTO npc VALUES (5,'burgerking','thundercatch','The lord\'s unfortunate little brother. He was born with ginger hair and curly nose hairs. He looks a little short and chubby in his tail coat, but at least he seems to be happy.','A',1);
+INSERT INTO npc VALUES (6, 'benadryl', 'moldyspore', 'He\'s a boring-looking man. Grey hair, grey suit, greyish skin, everything about this poor man screams for the permission to retire.', 'A', 2);
+INSERT INTO npc VALUES (7, 'bumberstump', 'cumbercooch', 'He looks very old. He\'s being serving the family for generations and he\'s as loyal as they come but he\'s an old-fashioned man. He wears the same gloves and vest he has worn since the 1830\'s and swears under his breath whenever someone tries something new.', 'A', 2);
+INSERT INTO npc VALUES (8, 'benetton', 'camouflage', 'The lord\'s right hand and his daily source of dirty jokes. This middle-aged man looks straight and honest and he likes to keep his looks simple and practical.', 'A', 2);
+INSERT INTO npc VALUES (9, 'bentobox', 'cottagecheese', 'The stable master\'s younger son. He\'s still a child but you notice right away that he\'s a little simple-minded. He has tried to wear something fancy for this party, but he\'s only white shirt is upside-down.', 'A', 2);
+INSERT INTO npc VALUES (10,'butawhiteboy','cantbekhan','Old and wise man this one. He\'s well-mannered and calm which is why he is so good with the horses. You can see the age affecting to his face already, but it doesn\'t affect his smile at all. He looks worried about his two sons though.','A',2);
+INSERT INTO npc VALUES (11, 'bombadil', 'curdlesnoot', 'The stable master\'s older son. This young man looks strong and healthy, sculpted by his physical labour at the stables. If he weren\'t a servant you\'d say he\'s quite handsome as well.', 'A', 3);
+INSERT INTO npc VALUES (12, 'buckingham', 'curdledmilk', 'This one looks a little mean. Maybe it\'s his huge grey eyebrows, maybe the way he walks in a hunch tapping his fingers together, who knows. But you must admit that for a man his age he is in quite a good shape.', 'A', 3);
+INSERT INTO npc VALUES (13, 'boilerdang', 'vegemite', 'He looks young and eager. He is taller than anyone in the house, but he manages to keep out of the way. Still he seems to be a little distracted all the time.', 'A', 3);
+INSERT INTO npc VALUES (14, 'bandersnatch', 'countryside', 'Like a scout this one is always ready. He is a small boy, but perfect for his tea-serving job. His gloves and bowtie are the same shade of cream, but his teeth have gone yellow from all the tea and coffee he\'s sneaked. That\'s probably also the reason why he\'s shaking.', 'A', 3);
+INSERT INTO npc VALUES (15,'nozzlebert','ampersand','Poor man has forgot to take off his gardener\'s gloves. He\'s still put on a cravat and his Sunday pants for the occasion, so he\'s trying. It\'s the first time he\'s been allowed inside the mansion.','A',3);
+INSERT INTO npc VALUES (16, 'syphilis', 'countryside', 'He looks like he\'s been made for hunting. He is big and strong, and his tweed jacket is tailored for the sport. He\'s still wearing his muddy boots and his Newsboy cap, and you wonder if he always smells like gunpowder.', 'A', 4);
+INSERT INTO npc VALUES (17, 'bunsenburner', 'cumbersnatch', 'Looks like he\'s tired of this place and all the people. That\'s what all day of opening doors and driving people around does to a man. And the family is clearly not paying him enough, looking at the hand-me-down tuxedo he\'s wearing.', 'A', 4);
+INSERT INTO npc VALUES (18, 'burberry', 'crackerdong', 'He looks like a very proud man. His sideburns have merged with his light beard and his eyes are deep blue, but still he looks a bit intimidating in his dark dinner jacket.', 'A', 4);
+INSERT INTO npc VALUES (19, 'baseballmitt', 'cuckooclock', 'He looks like he doesn\'t want to be here. The soon-to-be-18-year-old looks handsome but uncomfortable in his brand-new tuxedo.', 'A', 4);
+INSERT INTO npc VALUES (20,'biblical','concubine','A spirited little man taking after his big brother. He looks more than happy about wearing his brother\'s old suit and shoes.','A',4);
+INSERT INTO npc VALUES (21, 'blubberbutt', 'crimpysnitch', 'An old man wearing even older frock coat and a top hat. His sideburns have turned white and fragile over the years, but he still has the energy to shout misogynistic obscenities at every given chance.', 'A', 5);
+INSERT INTO npc VALUES (22, 'barister', 'lingerie', 'You see the largest man you\'ve ever laid your eyes upon. Dear god what has he eaten?  He has stains all over his tuxedo and his hair looks greasy.', 'A', 5);
+INSERT INTO npc VALUES (23, 'burlington', 'rivendell', 'Being nobleman shows all over this man\'s face. He\'s wearing multiple rings and a monocle. How fancy.', 'A', 5);
+INSERT INTO npc VALUES (24, 'brewery', 'curdlesnoot', 'This man\'s moustache is glorious. It goes down the sides of his mouth and connects to his sideburns making it look bigger. Must be a rich man if he can afford to take care of a facial hair like that.', 'A', 5);
+INSERT INTO npc VALUES (25,'anglerfish','concubine','A bit ladylike appearance. He\'s hair is blonde and curly, and he seems to be admiring himself from the mirror in his hand.','A',5);
+INSERT INTO npc VALUES (26, 'billyray', 'nottinghill', 'A young man, maybe German. He looks very tired and a little sad, but his outfit is the nicest you\'ve seen yet.', 'B', 1);
+INSERT INTO npc VALUES (27, 'bandicoot', 'crucifix', 'Maybe a 13-year-old young lad with hair as dark as coal and a coy smile. He looks shy in his knickerbockers and leather shoes but maybe he\'s just bored. Poor boy.', 'B', 1);
+INSERT INTO npc VALUES (28, 'liverswort', 'cunningsnatch', 'Skinny fellow. He has a long coat that covers some of the thinness, but you see it from his face. His hair looks great though, and he smells like fresh sea wind.', 'B', 1);
+INSERT INTO npc VALUES (29, 'snorkeldink', 'cumberbund', 'He looks very arrogant. He looks down on everybody and walks like he owns the place. Maybe it\'s his high status or his flashy jewels and tuxedo, but this man seems very unlikable.', 'B', 1);
+INSERT INTO npc VALUES (30,'bakery','snugglesnatch','He looks like a dandy in his dark tail coat he has decorated with golden embroidery. His hair is combed back, and his teeth are pearly white.','B',1);
+INSERT INTO npc VALUES (31, 'timothy', 'cummerbund', 'Sneaky looking French gentleman. He has little curly moustache he rubs between his fingers. He is thin but the suit he is wearing covers it perfectly.', 'B', 2);
+INSERT INTO npc VALUES (32, 'syphilis', 'banglesnatch', 'This man looks exotic. He has tan and clothes from distant countries. He looks like a diplomat and you don\'t recognise his accent.', 'B', 2);
+INSERT INTO npc VALUES (33, 'burberry', 'nottinghill', 'Look at this man\'s ears, they\'re huge! But you don\'t make fun of this man since he is almost the most influential man in England.', 'B', 2);
+INSERT INTO npc VALUES (34, 'blubberdick', 'crumplehorn', 'Poorly dressed young boy. He’s probably one of the kitchen servants who\'s sneaked into the party.', 'B', 2);
+INSERT INTO npc VALUES (35,'bendandsnap','clavichord','He is maybe middle-aged. His hair is a little grey and his starting to get bald, but he looks active and healthy. His shoes look expensive.','B',2);
+INSERT INTO npc VALUES (36, 'whippersnatch', 'curdledong', 'This man is visibly drunk. His nose is red, and he struggles to stand without swaying. He reeks like cheap whisky and his jacket looks wet.', 'B', 3);
+INSERT INTO npc VALUES (37, 'tiddleywomp', 'cumberbund', 'Uh, this man is ugly. His suit is sharp, his hair is gorgeous and he\'s hilarious, but you just don\'t want to look at his face.', 'B', 3);
+INSERT INTO npc VALUES (38, 'bedlington', 'cheddarcheese', 'Prettiest man you\'ve ever seen. His face is peachy and his eyes sparkle. The breeches his wearing make his bottom look fabulous.', 'B', 3);
+INSERT INTO npc VALUES (39, 'pallettown', 'chesterfield', 'Powerful young boy. He inherited their family\'s lands when his father died so he\'s the richest child in here. Unfortunately, he didn\'t inherit his father\'s sense of style.', 'B', 3);
+INSERT INTO npc VALUES (40,'blasphemy','cumbercooch','What a lovely old man in a sack coat. He is completely bald and some of his teeth are missing but he looks delightful.','B',3);
+INSERT INTO npc VALUES (41, 'brandenburg', 'carrotstick', 'This man is dressed like a commoner. But you\'ve seen his pictures hanging on the walls. Maybe it\'s a disguise but most likely he just wants to get a little break from all the fuss.', 'B', 4);
+INSERT INTO npc VALUES (42, 'boobytrap', 'crackerdong', 'Life has treated this man poorly. Scars cover his face and his other ear is cut in half. He\'s dressed in dark clothing that covers the signs of child abuse.', 'B', 4);
+INSERT INTO npc VALUES (43, 'tiddleywomp', 'chesterfield', 'He looks like he\'s been very lucky in life. He has a full silver hair and a wide smile. He looks handsome in his navy-blue sack coat and you\'ve heard his wife was once the most beautiful girl in England.', 'B', 4);
+INSERT INTO npc VALUES (44, 'bombadil', 'chickenbroth', 'He looks a little jumpy. He\'s pale and his hair is thin and seems to be shedding all over the floors. The grey four-button suit he\'s wearing looks new.', 'B', 4);
+INSERT INTO npc VALUES (45,'benjamin', 'chowderpants','Peculiar man this one. He\'s bug-eyed and short, but he looks heavy. His suit doesn\'t quite fit his figure.','B',4);
+INSERT INTO npc VALUES (46, 'buttermilk', 'crumplesack', 'Looks like he\'s going to be sick. His skin is something between white and green and he keeps swaying from one side to another.', 'B', 5);
+INSERT INTO npc VALUES (47, 'bendandsnap', 'curdledmilk', 'His coat is ragged, and trousers look second-hand. It\'s weird that he was invited in the first place, since he is so obviously poor.', 'B', 5);
+INSERT INTO npc VALUES (48, 'benjamin', 'snickersbar', 'Funny-looking little man. He\’s wearing over-sized green suit and a dotted bow-tie. Otherwise he\'s normal-sized but his feet are abnormally large.', 'B', 5);
+INSERT INTO npc VALUES (49, 'snozzlebert', 'snugglesnatch', 'He\'s a sad man crying in the corners and slowly sipping from his not-so-secret flask.  His hair is a mess and so appears to be his life.', 'B', 5);
+INSERT INTO npc VALUES (50,'buttercup', 'covergirl','You look at the man and the only thing that comes to your mind is Ebenezer Scrooge from the Christmas Carol. His back is hunched, his hair and sideburns are white and he\'s wearing a long black frock coat and a dusty top hat. What a miser.','B',5);
 
 INSERT INTO npc_detail VALUES (  1,   2);
 INSERT INTO npc_detail VALUES (  1,   5);
