@@ -3,14 +3,14 @@ from inspect import getframeinfo, stack
 
 # Color ansi escapes
 cmd_colour = '\x1b[93m'
-default_colour = '\x1b[97;100m'
+default_colour = '\x1b[97;41m'
 expired_colour = '\x1b[37m'
 
 ## DEBUG section ==============================================================
 debug = False
-def DEBUG (message):
+def DEBUG (message, offset = 0):
 	if debug:
-		caller = getframeinfo(stack()[1][0])
+		caller = getframeinfo(stack()[1 + offset][0])
 		print ("DEBUG [{0}: {1}]: {2}".format(caller.filename.split(sep="\\")[-1], caller.lineno, message))
 
 ## Utilities ==================================================================

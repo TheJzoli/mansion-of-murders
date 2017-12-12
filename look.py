@@ -14,11 +14,15 @@ def all_npcids_in_room(room_id):
         return result
 
 def look_around ():
-	message = "You are in {0}.\n".format(sql.get_room_name(player.location))
+	room_name = format_room(sql.room_name_from_id(player.location))
+	message = "You are in {0}.\n".format(room_name)
+	
 	query = "SELECT description FROM room WHERE room.room_id ='" + str(player.location) + "';"
-	message += sql.query_single(query)#muokattu näkymään
+	description = sql.query_single(query) #muokattu näkymään
+	if description:
+		message += description
 
-	message += "\n You can move to:\n" #muokattu uudelle riville
+	message += "\nYou can move to:\n" #muokattu uudelle riville
 
 	#---------------------------
 	passages = sql.get_adjacent_rooms_and_directions(player.location)
@@ -33,13 +37,14 @@ def look_around ():
 		length = len(room_names[-1])
 		if length > longest_length:
 			longest_length = length
-		directions.append (sql.long_direction(item[1]))
+		directions.append (sql.to_long_direction(item[1]))
 		count += 1
 		
 	for i in range(count):
-		message += "@i\t{0:{1}}\t{2}\n".format(room_names[i], longest_length + 2, directions[i])
+		message += "@i\t{0:{1}}\t{2}\n".format(format_room(room_names[i]), longest_length + 2, directions[i])
 	#-----------------------------
-
+	
+	
 
 	live_npcs = sql.live_npcsid_in_room(player.location)
 	dead_npcs = sql.dead_npcsid_in_room(player.location)
@@ -84,7 +89,6 @@ def escaped_npcs():
 
 def look(target):
 
-
 	live_npcsid_in_room = sql.live_npcsid_in_room(player.location)
 	dead_npcsid_in_room = sql.dead_npcsid_in_room(player.location)
 	arrested = arrested_npcs()
@@ -101,7 +105,7 @@ def look(target):
 		else:
 				message = "You cannot see there from here."
 				
-	elif(target in sql.get_npcs()):
+	elif(target in sql.all_npcs()):
 
 		target_id = sql.npc_id_from_name(target)
 		if(target_id in live_npcsid_in_room):

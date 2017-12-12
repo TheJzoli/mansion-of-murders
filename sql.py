@@ -80,8 +80,11 @@ def get_verbs():
 	return column_as_list (result, 0)
 
 def in_all_verbs(word):
-	query = "SELECT COUNT(*) FROM all_verbs WHERE word = '{0}';".format(word)
-	return bool(query_single(query))
+	try:
+		query = "SELECT COUNT(*) FROM all_verbs WHERE word = '{0}';".format(word)
+		return bool(query_single(query)) or word in get_verbs()
+	except:
+		return word in get_verbs()
 	
 def get_prepositions():
 	query = "SELECT word FROM prepositions;"
@@ -108,15 +111,7 @@ def get_npcs_names ():
 	result = run_query (query)
 	return [column_as_list(result, 0), column_as_list (result, 1)]
 	
-def get_directions ():
-	""" Return direction in arrays, [0] is shorts, [1] is longs"""
-	query = "SELECT direction_id, name FROM direction;"
-	result = run_query (query)
-	return [column_as_list(result, 0), column_as_list (result, 1)]
 
-def get_all_directions ():
-	"""Fetches direction shorts and longs from database"""
-	return get_directions()[0] + get_directions()[1]
 	
 def get_specials ():
 	result = run_query("SELECT word FROM specials;")
@@ -134,14 +129,6 @@ def all_npc_names_in_room(room_id):
 	
 	
 ## CONVERSIONS ----------------------------------------------------------------
-def long_direction (short_direction):
-	query = "SELECT name FROM direction WHERE direction_id = '{0}';".format(short_direction)
-	return run_query(query)[0][0]
-
-def short_direction(long_direction):
-	query = "SELECT direction_id FROM direction WHERE name = '{0}';".format(long_direction)
-	return run_query(query)[0][0]
-	
 def npc_name_from_id (mapped_id):
 	query = (
 			"SELECT first_name, last_name "
@@ -340,14 +327,12 @@ def get_room_in_direction(start_room_id, direction):
 			"WHERE from_id = {0} AND direction = '{1}';"
 			). format(start_room_id, direction)
 	return query_single(query)
-	
+
+#Obsolete
 def get_room_name (room_id):
-	query = (
-			"SELECT name "
-			"FROM room "
-			"WHERE room_id = '{0}';"
-			).format(room_id)
-	return query_single(query)
+	DEBUG("Use room_name_from_id instead", 1)
+	return room_name_from_id(room_id)
+	
 
 def get_direction (from_id, to_id):
 	return query_single(
@@ -388,40 +373,82 @@ def find_path (from_id, to_id):
 		return route_directions
 		
 		
+		
+		
+## DIRECTION FUNCTIONS --------------------------------------------------------
+def to_long_direction(direction):
+	query = "SELECT name FROM direction WHERE direction_id = '{0}' OR name = '{0}';".format(direction)
+	return run_query(query)[0][0]
+
+def to_short_direction(direction):
+	query = "SELECT direction_id FROM direction WHERE direction_id = '{0}' OR name = '{0}';".format(direction)
+	return run_query(query)[0][0]
+	
+#Obsolete
+def long_direction (short_direction):
+	DEBUG ("Use 'to_long_direction' instead", 1)
+	return to_long_direction(short_direction)
+
+#Obsolete
+def short_direction(long_direction):
+	DEBUG ("Use 'to_short_direction' instead", 1)
+	return to_short_direction(long_direction)
+	
+def get_directions ():
+	""" Return direction in arrays, [0] is shorts, [1] is longs"""
+	query = "SELECT direction_id, name FROM direction;"
+	result = run_query (query)
+	return [column_as_list(result, 0), column_as_list (result, 1)]
+
+def get_all_directions ():
+	"""Fetches direction shorts and longs from database"""
+	return get_directions()[0] + get_directions()[1]
+		
+		
+		
+		
+		
 ## NPC FUNCTIONS --------------------------------------------------------------
-def live_npcs ():
+def all_npcs ():
+	query = "SELECT first_name, last_name FROM npc;"
+	return run_query(query)
+
+#Obsolete
+def get_npcs ():
+	DEBUG("Use 'all_npcs'", offset = 1)
+	return all_npcs()
+	
+def live_npcs ():	
 	query = (
 			"SELECT first_name, last_name "
-			"FROM npc "
-			"WHERE npc_id NOT IN"
-				"(SELECT npc FROM mapped_npc"
-				" WHERE mapped_id NOT IN (SELECT victim FROM murder));"
+			" FROM npc INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
+			" WHERE mapped_id NOT IN (SELECT victim FROM murder);"
 			)
 	return run_query(query)
 	
 def dead_npcs ():
-	'''
-	query = (
-			"SELECT first_name, last_name "
-			"FROM npc "
-			"WHERE npc_id IN"
-				"(SELECT npc FROM mapped_npc"
-				" WHERE mapped_id NOT IN (SELECT victim FROM murder));"
-			)
-	'''
 	query = (
 			"SELECT first_name, last_name FROM npc "
 			" INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
 			" INNER JOIN murder ON victim = mapped_id;"
 			)
-			
-	DEBUG(('deads', run_query(query)))
+	return run_query(query)
+		
+def npcs_in_room(room_id):
+	#query = "SELECT mapped_id FROM mapped_npc WHERE location = {0};".format(room_id)
+	query = (
+			"SELECT first_name, last_name FROM npc "
+			" INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
+			" WHERE location = {0};"
+			).format(room_id)
+	#DEBUG(('in rooms', run_query(query)))
 	return run_query(query)
 	
-def npcs_in_room(room_id):
-	query = "SELECT mapped_id FROM mapped_npc WHERE location = {0};".format(room_id)
-	DEBUG(('in rooms', run_query(query)))
-	return run_query(query)
+def npc_state(mapped_id):
+	query = "SELECT state FROM mapped_npc WHERE mapped_id = {0};".format(mapped_id)
+	return query_single (query)
+	
+	
 	
 	
 ## LOOK FUNCTIONS -------------------------------------------------------------
@@ -511,6 +538,7 @@ def solved_murder():
 			"WHERE state = 'arrested';")
 	return query_single(query)
 
+	
 def murderer_detail (witness, victim):
 	#DEBUG((witness, victim))
 	query = (
@@ -528,13 +556,13 @@ def murderer_detail (witness, victim):
 	else:
 		return column_as_list(result, 0) #Multiple details? What then?
 	
-def get_murderer_id (victim):
+def get_murderer_id (victim_mapped_id):
 	query = (
 			"SELECT mapped_id "
 			"FROM mapped_npc "
 			"INNER JOIN murder ON mapped_id = murder.murderer "
 			"WHERE murder.victim = {0};"
-			).format(npc_id_from_name(victim))
+			).format(victim_mapped_id)
 	return query_single(query)
 	
 
@@ -547,7 +575,7 @@ def witnessed_victims(witness_mapped_id, murderer_mapped_id):
 			).format (murderer_mapped_id, witness_mapped_id)
 	DEBUG(npc_name_from_id(witness_mapped_id))
 	return column_as_list(run_query(query), 0)
-
+'''
 def witnessed_multiple_murders (victim): #by the current victim's murderer
 	
 	query = (
@@ -570,7 +598,7 @@ def all_but_current_murder_victims(victim):
 			"WHERE murder.murderer IN ({0}) AND mapped_id != {1}"
 			).format(current_victims_murderer_id(victim), npc_id_from_name(victim))
 	return column_as_list(run_query(query), 0)
-
+'''
 ## PLAYER NOTES ---------------------------------------------------------------
 def get_notes():
 	result = run_query (
