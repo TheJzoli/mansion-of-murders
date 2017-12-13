@@ -1,4 +1,4 @@
-import common
+﻿import common
 from common import *
 
 import random
@@ -299,28 +299,20 @@ title = (
 		"                                                                                \n"
 		"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++\n"
 		)
-
-
+		
+		
 title = '\n'.join(list(map(lambda x: left_offset * " " + x, title.split(sep = '\n'))))
 
 
 introduction = (
-				"Someone has been killed in the {0}ENTRANCE{1}. "
-				"You should {0}MOVE{1} there, and begin to {0}ASK people ABOUT the poor thing{1}. "
-				"Once you know the culprit you can {0}BLAME them FOR KILLING the victim{1}. "
-				"You can always {0}LOOK AROUND{1} or {0}LOOK AT people{1}, or view your {0}NOTES{1}."
-				"\n For help with the commands, type 'help'."
-				).format(cmd_colour, default_colour)
-
-introduction = (
-				"Welcome to the Mansion of Murders. You've been invited to a ball, at an old English manor well outside the town. "
+				"Welcome to the Mansion of Murders. You've been invited to a ball, at an old English mansion well outside the town. "
 				"But you're not going there to party, no sir, you're actually a private investigator and "
 				"you're working based on a tip you received from no other than the host of the said ball. "
-				"He suspects that some of the guest may have hostile intents...\n"
+				"He suspects that some of the guest may have hostile intents...\n\n"
 				
 				"As soon as you arrive to the mansion murders start to take place and you must act fast. "
 				"Using the clues provided by the people who saw the murder, you must identify the murderers "
-				"and catch them before it's too late and the party turns into a bloodbath.\n"
+				"and catch them before it's too late and the party turns into a bloodbath.\n\n"
 				
 				"Move around the mansion, ask about the murders, examine the people around you "
 				"and when you think you're sure you've identified the correct murderer you can accuse them, "
@@ -328,32 +320,51 @@ introduction = (
 				)
 				
 				
-				#"@i'move to <room name>'				Moving to another room.\n"
-instructions =	("You have three actions in your turn. You can use your actions to following operations:\n"
-				 + "@i{0:40} {1}.\n".format("'@HMOVE TO@E <room name>'",'Moving to another room')
-				 + "@i{0:40} {1}.\n".format("'@HMOVE@E <direction	>'",'Moving to another room')
-				 + "@i{0:40} {1}.\n".format("'@HASK@E <person> @HABOUT@E <dead person>'",'Asking about murders')
-				 + "@i{0:40} {1}.\n".format("'@HBLAME@E <person> @HFOR KILLING@E <dead person>'",'Blaming possible murderers')
-				 + "\nIn addition, you have following free operations, that don't use up your actions:\n"
-				 + "@i{0:40} {1}.\n".format("'@HLOOK AROUND@E', '@HLOOK AT@E <room name>'",'Looking at your surroundings')
-				 + "@i{0:40} {1}.\n".format("'@HLOOK AT@E <person>'", 'Looking at a person')
-				 + "@i{0:40} {1}.\n".format("'@HLOOK AT NOTES@E'", 'Looking at your notes')
-				 + "@i{0:40} {1}.\n".format("'@HASK ABOUT@E <room name>'", 'Finding a way to a room')
-				 + "@i{0:40} {1}.\n".format("'@HHELP@E'", 'Getting help')
+	
+column_width = 50
+instructions =	("@iYou have three actions in your turn.\n\nYou can use your actions to following operations:\n"
+				 + "@i{0:{2}} {1}.\n".format("'@HMOVE TO <room name>@E', '@HMOVE <direction>@E'",'Moving to another room', column_width + 4)
+				 + "@i{0:{2}} {1}.\n".format("'@HASK <person> ABOUT <dead person>@E'",'Asking about murders', column_width)
+				 + "@i{0:{2}} {1}.\n".format("'@HBLAME <person> FOR KILLING <dead person>@E'",'Blaming possible murderers', column_width)
+				 + "\n@iIn addition, you have following free operations, that don't use up your actions:\n"
+				 + "@i{0:{2}} {1}.\n".format("'@HLOOK AROUND@E', '@HLOOK AT <room name>@E'",'Looking at your surroundings', column_width + 4)
+				 + "@i{0:{2}} {1}.\n".format("'@HLOOK AT <person>@E'", 'Looking at a person', column_width)
+				 + "@i{0:{2}} {1}.\n".format("'@HLOOK AT NOTES@E'", 'Looking at your notes', column_width)
+				 + "@i{0:{2}} {1}.\n".format("'@HASK ABOUT <room name>'@E", 'Finding a way to a room', column_width)
+				 + "@i{0:{2}} {1}.\n".format("'@HHELP@E'", 'Getting help', column_width)
 				 )
 
 print()				
 print (title)
-fprint ("Press ENTER to start game")
+fprint ("@cPress ENTER to start game")
 input()
+print()
 
-#fprint(introduction)
-print_all ([introduction, instructions])
+print_all ([introduction])
+
+# Small tutorial	
+fprint ("Start by typing 'help'")
+start_cmd = None
+while start_cmd != 'help':
+	fprint (cmd_prompt)
+	start_cmd = input ().lower()
+	if start_cmd:
+		start_cmd = start_cmd.split()[0]
+	fprint("@c" + default_colour)
+		
+print_all ([instructions])
+
+fprint("Look around")
+while start_cmd != 'look':
+	fprint (cmd_prompt)
+	start_cmd = input ().lower()
+	if start_cmd:
+		start_cmd = start_cmd.split()[0]
+	fprint("@c" + default_colour)
 
 ## ============================================================================
 ##                            GAME LOOP
 ## ============================================================================
-fprint("...")
 print()
 
 # First murder must happen in entrance, so that player finds it early
@@ -537,7 +548,6 @@ while (playing):
 	else:
 		fprint (cmd_prompt)
 		raw_command = input ().lower().split()
-		#print(default_colour, end = "")
 		fprint("@c" + default_colour)
 		
 	if len(raw_command) == 0:

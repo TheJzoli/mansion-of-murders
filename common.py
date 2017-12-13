@@ -3,7 +3,7 @@ from inspect import getframeinfo, stack
 
 # Color ansi escapes
 cmd_colour = '\x1b[93m'
-default_colour = '\x1b[97;41m'
+default_colour = '\x1b[97;45m'
 expired_colour = '\x1b[37m'
 
 ## DEBUG section ==============================================================
