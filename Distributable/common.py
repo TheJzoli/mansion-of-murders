@@ -84,14 +84,3 @@ def format_list (collection, formatter):
 				
 	return result		
 	
-'''	
-def direction (dir):
-	direction = sql.long_direction(dir)
-	return direction
-'''
-
-'''
-print(format_room("maids room"))
-print(format_room("servants room"))
-print(format_room("butlers room"))
-'''

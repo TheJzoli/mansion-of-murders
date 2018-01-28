@@ -1,17 +1,10 @@
-import mysql.connector
-
+import sqlite3
 from common import *
 
-default = "SELECT message FROM error;"
 
 ## DATABASE
-database = mysql.connector.connect(
-	host = 'localhost',
-	user = 'dbuser',
-	passwd = 'dbpass',
-	db = 'mom_game',
-	buffered = True)
-
+DEBUG("Initializing database connection...")
+database = sqlite3.connect('database.db')
 
 cursor = database.cursor()
 cursor.execute("DELETE FROM player_clue;")
@@ -19,7 +12,7 @@ cursor.execute("DELETE FROM clue;")
 cursor.execute("DELETE FROM murder;")
 cursor.execute("DELETE FROM mapped_npc;")
 
-DEBUG ("Connected to database.")
+DEBUG("Connected to database.")
 
 # Close and reset database
 def end ():
@@ -110,8 +103,6 @@ def get_npcs_names ():
 	query = "SELECT first_name, last_name FROM npc;"
 	result = run_query (query)
 	return [column_as_list(result, 0), column_as_list (result, 1)]
-	
-
 	
 def get_specials ():
 	result = run_query("SELECT word FROM specials;")
@@ -470,17 +461,6 @@ def dead_npcsid_in_room (room_id):
 	return column_as_list(run_query(query), 0)
 
 def live_npcs_in_room (room_id):
-	'''
-	query = (
-			"SELECT first_name, last_name "
-			"FROM npc "
-			"WHERE npc_id NOT IN("
-				"SELECT npc.npc_id "
-				"FROM murder "
-				"INNER JOIN mapped_npc ON mapped_npc.mapped_id = murder.victim "
-				"INNER JOIN npc ON npc.npc_id = mapped_npc.npc "
-				"WHERE mapped_npc.location = '" + str(room_id) + "');")
-	'''
 	query = (
 			"SELECT first_name, last_name "
 			" FROM npc INNER JOIN mapped_npc ON mapped_npc.npc = npc_id "
@@ -526,10 +506,6 @@ def get_adjacent_rooms_and_directions(room_id):
 
 	
 ## ASK FUNCTIONS --------------------------------------------------------------
-
-
-
-	
 def solved_murder():
 	query = (
 			"SELECT mapped_id "
@@ -575,30 +551,10 @@ def witnessed_victims(witness_mapped_id, murderer_mapped_id):
 			).format (murderer_mapped_id, witness_mapped_id)
 	DEBUG(npc_name_from_id(witness_mapped_id))
 	return column_as_list(run_query(query), 0)
-'''
-def witnessed_multiple_murders (victim): #by the current victim's murderer
+
 	
-	query = (
-			"SELECT clue.witness "
-			"FROM clue "
-			"WHERE clue.victim IN ("
-				"SELECT mapped_id "
-				"FROM mapped_npc "
-				"INNER JOIN murder ON mapped_id = murder.victim "
-				"WHERE murder.murderer IN ({0})) "
-			"GROUP BY victim;"
-			).format(current_victims_murderer_id(victim))
-	return column_as_list(run_query(query), 0)
 	
-def all_but_current_murder_victims(victim):
-	query = (
-			"SELECT mapped_id "
-			"FROM mapped_npc "
-			"INNER JOIN murder ON mapped_id = murder.victim "
-			"WHERE murder.murderer IN ({0}) AND mapped_id != {1}"
-			).format(current_victims_murderer_id(victim), npc_id_from_name(victim))
-	return column_as_list(run_query(query), 0)
-'''
+	
 ## PLAYER NOTES ---------------------------------------------------------------
 def get_notes():
 	result = run_query (
@@ -625,6 +581,4 @@ def add_player_clue(victim, detail):
 		detail = 'null'
 	query = "INSERT INTO player_clue VALUES ({0}, {1});".format(victim, detail)
 	run_update(query)
-
-
 

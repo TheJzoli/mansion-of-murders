@@ -1,16 +1,5 @@
-'''
-# These are all populated from master.py
-player					# Instance of Player class
-rooms = [] 				# Names of rooms
-directions = []			# Directions' names and shortcuts
-short_directions = [] 	# Directions ids
-long_directions = [] 	# Full names of directions
-'''
 from common import *
 import sql
-#import webbrowser
-DEBUG("INIT MOVE")
-
 
 def move(target):
 	message = ""
@@ -29,7 +18,7 @@ def move(target):
 		available_directions = sql.get_available_directions(player.location)
 		if target in available_directions:
 			player.location = sql.get_room_in_direction(player.location, target)
-			message = 'Moved to the {0}'.format(format_room(sql.get_room_name(player.location)))
+			message = 'Moved to the {0}'.format(format_room(sql.room_name_from_id(player.location)))
 			success = True
 		else:
 			message = "You try to go in that direction and hit your face against the wall, ouch!"

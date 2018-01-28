@@ -2,8 +2,8 @@ DROP DATABASE IF EXISTS MOM_GAME;
 CREATE DATABASE MOM_GAME;
 USE MOM_GAME;
 
-CREATE TABLE ERROR (message TEXT NOT NULL);
-INSERT INTO ERROR VALUES ("Default message");
+CREATE USER IF NOT EXISTS'dbuser07'@'localhost' IDENTIFIED BY 'dbpassword07';
+GRANT SELECT, INSERT, UPDATE, DELETE ON MOM_GAME.* TO dbuser07@localhost;
 
 CREATE TABLE TWO_PART_WORDS (
 	word_1 VARCHAR(200) NOT NULL,
@@ -257,12 +257,12 @@ INSERT INTO detail VALUES (17, 'blood red lips');
 INSERT INTO detail VALUES (18, 'a scar on their face');
 INSERT INTO detail VALUES (19, 'a dagger on their belt');
 INSERT INTO detail VALUES (20, 'thick eyeglasses');
-
 INSERT INTO detail VALUES (21, 'a belt bag');
 INSERT INTO detail VALUES (22, 'a Scottish kilt');
 INSERT INTO detail VALUES (23, 'a trombone');
 INSERT INTO detail VALUES (24, 'a striped pendant');
 INSERT INTO detail VALUES (25, 'a parrot on their shoulder');
+
 INSERT INTO detail VALUES (26, 'sad eyes');
 INSERT INTO detail VALUES (27, 'an ugly nose');
 INSERT INTO detail VALUES (28, 'long braided hair');
@@ -313,6 +313,7 @@ INSERT INTO npc VALUES (21, 'blubberbutt', 'crimpysnitch', 'An old man wearing e
 INSERT INTO npc VALUES (22, 'barister', 'lingerie', 'You see the largest man you\'ve ever laid your eyes upon. Dear god what has he eaten?  He has stains all over his tuxedo and his hair looks greasy.', 'A', 5);
 INSERT INTO npc VALUES (23, 'burlington', 'rivendell', 'Being nobleman shows all over this man\'s face. He\'s wearing multiple rings and a monocle. How fancy.', 'A', 5);
 INSERT INTO npc VALUES (24, 'brewery', 'curdlesnoot', 'This man\'s moustache is glorious. It goes down the sides of his mouth and connects to his sideburns making it look bigger. Must be a rich man if he can afford to take care of a facial hair like that.', 'A', 5);
+
 INSERT INTO npc VALUES (25,'anglerfish','concubine','A bit ladylike appearance. He\'s hair is blonde and curly, and he seems to be admiring himself from the mirror in his hand.','A',5);
 INSERT INTO npc VALUES (26, 'billyray', 'nottinghill', 'A young man, maybe German. He looks very tired and a little sad, but his outfit is the nicest you\'ve seen yet.', 'B', 1);
 INSERT INTO npc VALUES (27, 'bandicoot', 'crucifix', 'Maybe a 13-year-old young lad with hair as dark as coal and a coy smile. He looks shy in his knickerbockers and leather shoes but maybe he\'s just bored. Poor boy.', 'B', 1);
